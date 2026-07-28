@@ -1,0 +1,1 @@
+sudo security dump-keychain -d login.keychain

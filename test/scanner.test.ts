@@ -30,6 +30,58 @@ describe("scan", () => {
     expect(result.findings.some((f) => f.category === "network_egress")).toBe(true);
   });
 
+  it("tracks Python interpreters selected only from trusted discovery candidates", () => {
+    const result = scan(`
+      which_python=$(which python || which python3 || command -v python3.12)
+      $which_python -c "import pty; pty.spawn('/bin/sh')"
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "escape.discovered-python",
+        category: "interpreter_escape",
+      }),
+      expect.objectContaining({
+        ruleId: "dynamic.discovered-python-command",
+        category: "dynamic_execution",
+      }),
+    ]));
+
+    const hardNegatives = [
+      `runner=$(which python || which sh); $runner -c "$code"`,
+      `runner=$(command -v custom-runtime); $runner -c "$code"`,
+      `runner=python3; $runner -c "$code"`,
+      `runner=$(which python3); $runner --version`,
+      `runner=$(which python3); $runner /tmp/script.py`,
+      `echo '$which_python -c "print(1)"'`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "escape.discovered-python"
+        || finding.ruleId === "dynamic.discovered-python-command"
+      )).toBe(false);
+    }
+  });
+
+  it("classifies static interpreter inline-code switches as dynamic execution", () => {
+    const commands = [
+      "python3 -c 'print(1)'",
+      "perl -e 'print 1'",
+      "ruby -e 'puts 1'",
+      "node --eval 'console.log(1)'",
+      "php -r 'echo 1;'",
+      "osascript -e 'return 1'",
+      "pwsh -Command 'Get-Date'",
+    ];
+    for (const source of commands) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "dynamic.interpreter-inline-code"
+      )).toBe(true);
+    }
+    expect(scan("python3 /tmp/script.py").findings.some((finding) =>
+      finding.ruleId === "dynamic.interpreter-inline-code"
+    )).toBe(false);
+  });
+
   it("detects staged archive execution", () => {
     const result = scan(`
       wget https://example.test/tool.tar.gz -O /tmp/tool.tar.gz

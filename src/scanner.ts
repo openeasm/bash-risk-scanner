@@ -163,6 +163,25 @@ function staticBashPathArgument(text: string): string | undefined {
   return match?.[2];
 }
 
+function bashDiscoveredPythonVariables(root: SyntaxNode): Set<string> {
+  const variables = new Set<string>();
+  for (const assignment of root.descendantsOfType("variable_assignment")) {
+    const name = assignment.childForFieldName("name")?.text;
+    const value = assignment.childForFieldName("value");
+    if (!name || value?.type !== "command_substitution") continue;
+    const commands = value.descendantsOfType("command");
+    if (
+      commands.length > 0
+      && commands.every((command) =>
+        /^(?:which|command\s+-v)\s+python(?:\d+(?:\.\d+)*)?\s*$/.test(command.text),
+      )
+    ) {
+      variables.add(name);
+    }
+  }
+  return variables;
+}
+
 function bashCommandVariants(
   text: string,
   commandWrappers: Map<string, Set<string>> = new Map(),
@@ -1117,6 +1136,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const commandWrappers = staticBashCommandWrappers(source);
   const functionSummaries = bashFunctionSummaries(source);
   const shellStartupVariables = bashShellStartupVariables(source);
+  const discoveredPythonVariables = bashDiscoveredPythonVariables(tree.rootNode);
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -1163,6 +1183,35 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: rule.severity,
         confidence: rule.confidence,
         message: rule.message,
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    for (const variable of discoveredPythonVariables) {
+      const escapedVariable = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (!variants.some((variant) =>
+        new RegExp(
+          `^\\s*["']?\\$(?:\\{)?${escapedVariable}\\}?["']?\\s+-c(?:\\s|$)`,
+        ).test(variant),
+      )) continue;
+      findings.push({
+        ruleId: "escape.discovered-python",
+        category: "interpreter_escape",
+        title: "Invokes a discovered Python interpreter",
+        severity: "medium",
+        confidence: "high",
+        message: "Invokes a variable proven to select from Python interpreter executables.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      }, {
+        ruleId: "dynamic.discovered-python-command",
+        category: "dynamic_execution",
+        title: "Executes inline Python code",
+        severity: "high",
+        confidence: "high",
+        message: "Passes inline code to a variable proven to reference a Python interpreter.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",

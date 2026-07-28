@@ -33,6 +33,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:source|\.)\s+<\s*\(/i,
   },
   {
+    id: "dynamic.interpreter-inline-code",
+    category: "dynamic_execution",
+    title: "Executes inline interpreter code",
+    severity: "high",
+    confidence: "high",
+    message: "Passes inline code directly to a general-purpose interpreter.",
+    pattern: /^\s*(?:python\d*\s+-c|(?:perl|ruby)\s+-e|node\s+(?:-e|--eval)|php\s+-r|osascript\s+-e|(?:powershell|pwsh)\s+(?:-Command|-EncodedCommand))(?:\s|$)/i,
+  },
+  {
     id: "persistence.scheduler",
     category: "persistence",
     title: "Modifies a scheduled or startup task",
