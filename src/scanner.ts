@@ -637,6 +637,20 @@ function bashSearchesSafariCookieFile(text: string): boolean {
     && /^(?:[.]\/)?Cookies[.]binarycookies$/.test(file);
 }
 
+function bashStagesKeychainFile(text: string): boolean {
+  if (!/^\s*cat(?:\s|$)/.test(text) || !text.includes(">")) return false;
+  const match = text.match(
+    /^\s*cat\s+(?:--\s+)?(["']?)([^"'$\s;|&<>]+)\1\s*>\s*(["']?)([^"'$\s;|&<>]+)\3\s*$/,
+  );
+  if (!match) return false;
+  const source = match[2]!;
+  const destination = match[4]!;
+  return /^(?:(?:~|\/Users\/[^/]+)\/Library\/Keychains\/|\/Library\/Keychains\/)[^/]+[.]keychain(?:-db)?$/
+    .test(source)
+    && destination !== source
+    && destination !== "/dev/null";
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1911,6 +1925,10 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const hasPrivateSshKeyStageCandidate =
     /(?:id_rsa|id_ed25519|id_ecdsa|id_dsa)/.test(source)
     && source.includes("-exec");
+  const hasKeychainFileStageCandidate =
+    source.includes("Library/Keychains")
+    && source.includes(">")
+    && /[.]keychain(?:-db)?\b/.test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2342,6 +2360,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Finds a statically named private SSH key and copies matches to a static staging path.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasKeychainFileStageCandidate) {
+      const directCat = /^\s*["']?cat["']?(?:\s|$)/.test(statement.text);
+      if (
+        !(directCat && definedFunctions.has("cat"))
+        && variants.some((variant) => bashStagesKeychainFile(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.keychain-file-stage",
+          category: "credential_access",
+          title: "Stages a macOS Keychain database file",
+          severity: "high",
+          confidence: "high",
+          message: "Reads a static Keychain database and redirects its contents to a static staging file.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

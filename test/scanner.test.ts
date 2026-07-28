@@ -1412,6 +1412,44 @@ describe("scan", () => {
     }
   });
 
+  it("detects Keychain database staging without matching inspection or dynamic paths", () => {
+    const staging = [
+      "cat ~/Library/Keychains/login.keychain-db > /tmp/keychain",
+      `cat "/Users/alice/Library/Keychains/login.keychain-db" > "/tmp/login.db"`,
+      "sudo cat /Library/Keychains/System.keychain > /tmp/system.keychain",
+      "command cat -- ~/Library/Keychains/custom.keychain > ./staged-keychain",
+    ];
+    for (const source of staging) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.keychain-file-stage",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "cat ~/Library/Keychains/login.keychain-db",
+      "less ~/Library/Keychains/login.keychain-db",
+      "cat ~/Library/Keychains/login.keychain-db > /dev/null",
+      "cat ~/Library/Keychains/login.keychain-db > ~/Library/Keychains/login.keychain-db",
+      `cat "$keychain_file" > /tmp/keychain`,
+      `cat ~/Library/Keychains/login.keychain-db > "$output_file"`,
+      "cat ~/Library/Application Support/example.db > /tmp/example.db",
+      "cat /tmp/login.keychain-db > /tmp/keychain",
+      `echo "cat ~/Library/Keychains/login.keychain-db > /tmp/keychain"`,
+      "# cat ~/Library/Keychains/login.keychain-db > /tmp/keychain",
+      `cat() { echo "project helper"; }
+       cat ~/Library/Keychains/login.keychain-db > /tmp/keychain`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.keychain-file-stage"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

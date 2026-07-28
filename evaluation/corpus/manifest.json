@@ -2794,7 +2794,7 @@
     },
     {
       "id": "holdout-atomic-stage-keychain-file-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/stage-keychain-file.sh.txt",
@@ -2818,6 +2818,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic keychain_export placeholder with its inert /tmp default and copied only the keychain-file staging command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-install-launchagent-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/install-launchagent.sh.txt",
+      "sha256": "7068a0fc08f2682ac2c3e80df974a2dbe5f036bab8a389d4ca6a154c5753370e",
+      "expectedCategories": ["persistence", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.launchagent-install-load",
+          "evidencePattern": "cp\\s+/tmp/atomicredteam_T1543_001[.]plist\\s+~/Library/LaunchAgents/com[.]atomicredteam[.]plist.*launchctl\\s+load\\s+-w\\s+~/Library/LaunchAgents/com[.]atomicredteam[.]plist"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+cp"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1543.001/T1543.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1543.001.yaml.txt",
+        "upstreamSha256": "6d314768f184dd93207a45dd145428513c8c04ac5af4dde80e6fe044d3a50863",
+        "upstreamId": "a5983dee-bf6c-4eaf-951c-dbc1a7b90900",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic plist inputs with inert static /tmp and user LaunchAgents paths and copied only the executor commands; the evaluation harness never executes them."
       }
     }
   ]
