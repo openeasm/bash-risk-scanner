@@ -141,6 +141,7 @@ npm run build
 npm pack --dry-run
 ```
 
-`npm run test:report` 会在 `reports/` 生成静态 HTML 测试报告，入口为
-`reports/test-report.html`。查看时需要保留同目录的资源文件。命令仍在终端输出
+`npm run test:report` 会在 `reports/` 生成 Vitest 静态 HTML 明细。完整测试报告
+入口为 `reports/index.html`，用例明细入口为 `reports/test-report.html`。查看时
+需要保留同目录的资源文件。命令仍在终端输出
 默认测试结果，并在任一测试失败时返回非零状态。
