@@ -314,6 +314,7 @@ function collectPythonObjectBindings(
       || constructor === "requests.session"
       || constructor === "twine.utils.make_requests_session"
       || constructor === "adafruit_shell.Shell"
+      || constructor === "socket.socket"
     ) {
       aliases.set(
         localName,
@@ -323,6 +324,61 @@ function collectPythonObjectBindings(
       );
     }
   });
+}
+
+const SENSITIVE_ENVIRONMENT_NAME = /(?:^|[_-])(?:TOKEN|SECRET|PASSWORD|PASSWD|API[_-]?KEY|ACCESS[_-]?KEY|PRIVATE[_-]?KEY|CREDENTIALS?)(?:$|[_-])/i;
+
+function quotedValue(text: string): string | undefined {
+  const match = text.match(/^\s*["']([^"']+)["']\s*$/s);
+  return match?.[1];
+}
+
+function environmentCredentialFinding(
+  node: SyntaxNode,
+  language: "python" | "javascript",
+  aliases: Map<string, string>,
+  javascriptShadows: Set<string>,
+  maxEvidence: number,
+): Finding | undefined {
+  const text = node.text;
+  let variableName: string | undefined;
+
+  if (language === "python") {
+    if (node.type === "subscript") {
+      const value = node.childForFieldName("value")?.text ?? "";
+      const canonicalValue = canonicalizeCallee(value, aliases);
+      if (canonicalValue !== "os.environ") return undefined;
+      const index = node.childForFieldName("subscript")?.text
+        ?? node.namedChildren.at(-1)?.text
+        ?? "";
+      variableName = quotedValue(index);
+    }
+  } else if (node.type === "member_expression") {
+    if (javascriptShadows.has("process")) return undefined;
+    const property = node.childForFieldName("property")?.text ?? "";
+    if (/^process\.env\.[A-Za-z_$][\w$]*$/.test(text)) {
+      variableName = property;
+    } else if (/^process\.env\s*\[/.test(text)) {
+      variableName = quotedValue(property);
+    }
+  } else if (node.type === "subscript_expression") {
+    if (javascriptShadows.has("process")) return undefined;
+    if ((node.childForFieldName("object")?.text ?? "") !== "process.env") return undefined;
+    variableName = quotedValue(node.childForFieldName("index")?.text ?? "");
+  }
+
+  if (!variableName || !SENSITIVE_ENVIRONMENT_NAME.test(variableName)) return undefined;
+  return {
+    ruleId: `${language}.environment-secret`,
+    category: "credential_access",
+    title: "Reads a credential-like environment variable",
+    severity: "high",
+    confidence: "high",
+    message: "Reads a specifically named environment variable commonly used for credentials.",
+    evidence: evidence(text, maxEvidence),
+    range: rangeOf(node),
+    language,
+  };
 }
 
 function collectJavaScriptShadows(root: SyntaxNode): Set<string> {
@@ -388,6 +444,14 @@ function scanAstLanguage(
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
+    const environmentFinding = environmentCredentialFinding(
+      node,
+      language,
+      aliases,
+      javascriptShadows,
+      maxEvidence,
+    );
+    if (environmentFinding) findings.push(environmentFinding);
     if ((language === "python" && node.type === "call")
       || (language === "javascript" && ["call_expression", "new_expression"].includes(node.type))) {
       interestingNodes.push(node);
@@ -479,6 +543,26 @@ function scanAstLanguage(
         range: rangeOf(node),
         language,
       });
+    }
+    if (
+      language === "python"
+      && callee === "os.environ.get"
+    ) {
+      const argument = node.childForFieldName("arguments")?.namedChildren[0]?.text ?? "";
+      const variableName = quotedValue(argument);
+      if (variableName && SENSITIVE_ENVIRONMENT_NAME.test(variableName)) {
+        findings.push({
+          ruleId: "python.environment-secret",
+          category: "credential_access",
+          title: "Reads a credential-like environment variable",
+          severity: "high",
+          confidence: "high",
+          message: "Reads a specifically named environment variable commonly used for credentials.",
+          evidence: evidence(text, maxEvidence),
+          range: rangeOf(node),
+          language,
+        });
+      }
     }
     const javascriptRoot = originalCallee.match(/^[A-Za-z_$][\w$]*/)?.[0];
     const importedJavaScriptModule = javascriptRoot

@@ -30,8 +30,9 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 
 公开来源语料还包括固定 commit 的完整 nvm、Homebrew、pipx、pnpm self-installer、
 node-gyp、aiohttp、pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
-Anaconda、Electorrent、WHAD client、Gajira TODO 和 apt-transport-s3 代码，以及
-Atomic Red Team 的 Bash 命令和 Python telnet client。
+Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop
+和 CPython smtplib 代码，以及 Atomic Red Team 的 Bash 命令和 Python telnet
+client。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -109,8 +110,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 42 条离线语料：40 条完全匹配，precision 98.6%、recall 97.3%、
-F1 98.0%。前六轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 44 条离线语料：42 条完全匹配，precision 100%、recall 96.3%、
+F1 98.1%。前七轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -132,19 +133,23 @@ validation 回归：
 - Electorrent：`promisify(child_process.exec)` 会传播执行器来源，`chmod 4755`
   检出 SUID；普通 `0755` 不报权限提升。
 - WHAD client：复制到 `/usr/lib/udev/rules.d` 识别为系统配置修改。
+- Gajira TODO：`process.env.GITHUB_TOKEN` 识别为具名环境凭据访问。
+- apt-transport-s3：`os.environ.get("AWS_SECRET_ACCESS_KEY")` 识别为凭据访问；
+  本地 APT method 的 `self.send(...)` 不再误报外传，而确认来源的 socket send
+  仍保持检出。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Gajira TODO 的 `process.env.GITHUB_TOKEN` 尚未检出凭据访问。
-- apt-transport-s3 的 `os.environ.get("AWS_SECRET_ACCESS_KEY")` 尚未检出凭据访问。
-- apt-transport-s3 的 `self.send(...)` 是写回本地 APT method 协议，却被通用
-  `.send()` sink 误判为数据外传，并连带触发 read-upload chain。
+- Epicshop 的第三方 `execa(...)` 进程执行尚未识别为动态执行。
+- Epicshop 的 `execa("git", ["push"])` 尚未识别为数据外传。
+- CPython smtplib 将 socket 保存到 `self.sock` 后调用 `sendall()`，当前对象来源
+  传播尚未覆盖字段赋值，因此漏报数据外传。
 
-新 test 分层以实际 precision 50%、recall 33.3% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应先修复这个 FP 和两个 FN，再提高 test 门槛。
+新 test 分层以实际 precision 100%、recall 62.5% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应先修复三个 FN，再提高 test recall 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-81 个单元测试或当前小规模公开语料外推生产环境准确率。
+83 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

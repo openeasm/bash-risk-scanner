@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T15:12:50.294Z",
+  "generatedAt": "2026-07-28T15:22:45.480Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -19,8 +19,8 @@
     },
     "minimumBySplit": {
       "test": {
-        "precision": 0.5,
-        "recall": 0
+        "precision": 1,
+        "recall": 0.625
       }
     },
     "requiredPerfectSplits": [
@@ -42,20 +42,20 @@
     "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 42,
-    "passedSamples": 40,
+    "sampleCount": 44,
+    "passedSamples": 42,
     "failedSamples": 2,
-    "tp": 72,
-    "fp": 1,
-    "fn": 2,
-    "precision": 0.9863013698630136,
-    "recall": 0.972972972972973,
-    "f1": 0.979591836734694,
-    "parseErrorRate": 0.023809523809523808,
+    "tp": 79,
+    "fp": 0,
+    "fn": 3,
+    "precision": 1,
+    "recall": 0.9634146341463414,
+    "f1": 0.9813664596273292,
+    "parseErrorRate": 0.022727272727272728,
     "performance": {
-      "p50Milliseconds": 1.6684110000000203,
-      "p95Milliseconds": 47.33466999999996,
-      "maximumMilliseconds": 97.66095499999997
+      "p50Milliseconds": 1.9888520000000085,
+      "p95Milliseconds": 86.59427300000004,
+      "maximumMilliseconds": 108.18033200000002
     }
   },
   "languages": {
@@ -68,20 +68,20 @@
       "f1": 1
     },
     "python": {
-      "tp": 31,
-      "fp": 1,
-      "fn": 1,
-      "precision": 0.96875,
-      "recall": 0.96875,
-      "f1": 0.96875
-    },
-    "node": {
-      "tp": 22,
+      "tp": 33,
       "fp": 0,
       "fn": 1,
       "precision": 1,
-      "recall": 0.9565217391304348,
-      "f1": 0.9777777777777777
+      "recall": 0.9705882352941176,
+      "f1": 0.9850746268656716
+    },
+    "node": {
+      "tp": 27,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1,
+      "recall": 0.9310344827586207,
+      "f1": 0.9642857142857143
     }
   },
   "provenanceGroups": {
@@ -94,12 +94,12 @@
       "f1": 1
     },
     "public-snapshot": {
-      "tp": 41,
-      "fp": 1,
-      "fn": 2,
-      "precision": 0.9761904761904762,
-      "recall": 0.9534883720930233,
-      "f1": 0.9647058823529412
+      "tp": 48,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.9411764705882353,
+      "f1": 0.9696969696969697
     },
     "synthetic-realistic": {
       "tp": 25,
@@ -120,15 +120,15 @@
       "f1": 1
     },
     "test": {
-      "tp": 1,
-      "fp": 1,
-      "fn": 2,
-      "precision": 0.5,
-      "recall": 0.3333333333333333,
-      "f1": 0.4
+      "tp": 5,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.625,
+      "f1": 0.7692307692307693
     },
     "validation": {
-      "tp": 46,
+      "tp": 49,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -138,20 +138,20 @@
   },
   "categories": {
     "credential_access": {
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "data_exfiltration": {
       "tp": 7,
       "fp": 0,
       "fn": 2,
       "precision": 1,
       "recall": 0.7777777777777778,
       "f1": 0.8750000000000001
-    },
-    "data_exfiltration": {
-      "tp": 7,
-      "fp": 1,
-      "fn": 0,
-      "precision": 0.875,
-      "recall": 1,
-      "f1": 0.9333333333333333
     },
     "defense_evasion": {
       "tp": 2,
@@ -162,7 +162,7 @@
       "f1": 1
     },
     "destructive_behavior": {
-      "tp": 6,
+      "tp": 7,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -180,10 +180,10 @@
     "dynamic_execution": {
       "tp": 6,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.8571428571428571,
+      "f1": 0.923076923076923
     },
     "interpreter_escape": {
       "tp": 5,
@@ -194,7 +194,7 @@
       "f1": 1
     },
     "network_egress": {
-      "tp": 23,
+      "tp": 25,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -218,7 +218,7 @@
       "f1": 1
     },
     "second_stage_payload": {
-      "tp": 3,
+      "tp": 4,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -278,7 +278,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 13.583635000000001,
+      "durationMilliseconds": 15.423877000000005,
       "passed": true
     },
     {
@@ -337,7 +337,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.8397560000000084,
+      "durationMilliseconds": 1.0608320000000049,
       "passed": true
     },
     {
@@ -375,7 +375,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6880809999999968,
+      "durationMilliseconds": 0.714051000000012,
       "passed": true
     },
     {
@@ -413,7 +413,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9273599999999931,
+      "durationMilliseconds": 1.1786170000000027,
       "passed": true
     },
     {
@@ -439,7 +439,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.308959999999999,
+      "durationMilliseconds": 0.39518300000000295,
       "passed": true
     },
     {
@@ -465,7 +465,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9881649999999951,
+      "durationMilliseconds": 1.273458000000005,
       "passed": true
     },
     {
@@ -503,7 +503,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.9982570000000095,
+      "durationMilliseconds": 7.413683999999989,
       "passed": true
     },
     {
@@ -549,7 +549,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6801030000000026,
+      "durationMilliseconds": 1.9763480000000015,
       "passed": true
     },
     {
@@ -587,7 +587,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.170897999999994,
+      "durationMilliseconds": 1.5036369999999977,
       "passed": true
     },
     {
@@ -646,7 +646,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.317369999999997,
+      "durationMilliseconds": 2.795911000000018,
       "passed": true
     },
     {
@@ -684,7 +684,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.8291660000000007,
+      "durationMilliseconds": 1.167856999999998,
       "passed": true
     },
     {
@@ -710,7 +710,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2901419999999888,
+      "durationMilliseconds": 1.5554559999999924,
       "passed": true
     },
     {
@@ -736,7 +736,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3086799999999954,
+      "durationMilliseconds": 0.3359710000000007,
       "passed": true
     },
     {
@@ -782,7 +782,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.191183000000009,
+      "durationMilliseconds": 6.829300999999987,
       "passed": true
     },
     {
@@ -820,7 +820,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.4640579999999943,
+      "durationMilliseconds": 1.9758370000000127,
       "passed": true
     },
     {
@@ -874,7 +874,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6684110000000203,
+      "durationMilliseconds": 1.9888520000000085,
       "passed": true
     },
     {
@@ -928,7 +928,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2474809999999934,
+      "durationMilliseconds": 1.6257400000000075,
       "passed": true
     },
     {
@@ -966,7 +966,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7699149999999975,
+      "durationMilliseconds": 1.0587079999999958,
       "passed": true
     },
     {
@@ -992,7 +992,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7748949999999866,
+      "durationMilliseconds": 0.8850669999999923,
       "passed": true
     },
     {
@@ -1018,7 +1018,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.23764599999998381,
+      "durationMilliseconds": 0.35928499999999985,
       "passed": true
     },
     {
@@ -1086,7 +1086,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 68.59819800000002,
+      "durationMilliseconds": 70.86952699999998,
       "passed": true
     },
     {
@@ -1290,7 +1290,7 @@
       "findingCount": 32,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 97.66095499999997,
+      "durationMilliseconds": 108.18033200000002,
       "passed": true
     },
     {
@@ -1340,7 +1340,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.163013000000035,
+      "durationMilliseconds": 1.3224210000000198,
       "passed": true
     },
     {
@@ -1382,7 +1382,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.2086620000000039,
+      "durationMilliseconds": 0.250567999999987,
       "passed": true
     },
     {
@@ -1424,7 +1424,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.34077000000002045,
+      "durationMilliseconds": 0.4181270000000268,
       "passed": true
     },
     {
@@ -1474,7 +1474,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.41101199999997107,
+      "durationMilliseconds": 0.5104730000000473,
       "passed": true
     },
     {
@@ -1545,7 +1545,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 31.359336999999982,
+      "durationMilliseconds": 44.49195599999996,
       "passed": true
     },
     {
@@ -1609,7 +1609,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 10.178653999999995,
+      "durationMilliseconds": 14.770338999999979,
       "passed": true
     },
     {
@@ -1674,7 +1674,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.22165700000005,
+      "durationMilliseconds": 4.400288999999987,
       "passed": true
     },
     {
@@ -1745,7 +1745,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 36.39481799999999,
+      "durationMilliseconds": 47.40485799999999,
       "passed": true
     },
     {
@@ -1785,7 +1785,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.7688170000000127,
+      "durationMilliseconds": 3.850541000000021,
       "passed": true
     },
     {
@@ -1825,7 +1825,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.25964799999997,
+      "durationMilliseconds": 8.830384999999978,
       "passed": true
     },
     {
@@ -1873,7 +1873,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.321799999999996,
+      "durationMilliseconds": 1.7525110000000268,
       "passed": true
     },
     {
@@ -1913,7 +1913,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7131089999999745,
+      "durationMilliseconds": 0.9721439999999575,
       "passed": true
     },
     {
@@ -1974,7 +1974,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 16.495318999999995,
+      "durationMilliseconds": 25.281409000000053,
       "passed": true
     },
     {
@@ -2014,7 +2014,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.5316119999999955,
+      "durationMilliseconds": 11.374755999999934,
       "passed": true
     },
     {
@@ -2146,7 +2146,7 @@
       "findingCount": 17,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 10.156822999999974,
+      "durationMilliseconds": 14.13558999999998,
       "passed": true
     },
     {
@@ -2186,7 +2186,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 33.345894999999985,
+      "durationMilliseconds": 42.854552999999896,
       "passed": true
     },
     {
@@ -2234,7 +2234,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.908202000000017,
+      "durationMilliseconds": 2.345621999999935,
       "passed": true
     },
     {
@@ -2310,12 +2310,12 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 9.008638000000019,
+      "durationMilliseconds": 12.350076000000058,
       "passed": true
     },
     {
       "id": "holdout-gajira-env-token-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/gajira-todo/index.js.txt",
@@ -2331,23 +2331,31 @@
       "expectedCategories": [
         "credential_access"
       ],
-      "actualCategories": [],
-      "actualFindings": [],
-      "truePositives": [],
-      "falsePositives": [],
-      "falseNegatives": [
+      "actualCategories": [
         "credential_access"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.environment-secret",
+          "category": "credential_access",
+          "evidence": "process.env.GITHUB_TOKEN"
+        }
+      ],
+      "truePositives": [
+        "credential_access"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 0,
+      "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.201188000000002,
-      "passed": false
+      "durationMilliseconds": 4.716282000000092,
+      "passed": true
     },
     {
       "id": "holdout-apt-s3-env-credentials-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/apt-transport-s3/s3.py.txt",
@@ -2365,15 +2373,10 @@
         "network_egress"
       ],
       "actualCategories": [
-        "data_exfiltration",
+        "credential_access",
         "network_egress"
       ],
       "actualFindings": [
-        {
-          "ruleId": "python.chain.read-upload",
-          "category": "data_exfiltration",
-          "evidence": "pow(2, c) urllib.parse.urljoin(host, path_session_token) urllib.parse.urljoin(host, path_sec_cred) urllib.parse.urljoin(host, path_instance_metadata) urllib.request.Request( self.session_token_metadata, method='PUT', headers={TOKEN_HEADER_…"
-        },
         {
           "ruleId": "python.network",
           "category": "network_egress",
@@ -2390,50 +2393,179 @@
           "evidence": "urllib.request.urlopen(request, None, 30)"
         },
         {
+          "ruleId": "python.environment-secret",
+          "category": "credential_access",
+          "evidence": "os.environ.get(\"AWS_ACCESS_KEY_ID\")"
+        },
+        {
+          "ruleId": "python.environment-secret",
+          "category": "credential_access",
+          "evidence": "os.environ.get(\"AWS_SECRET_ACCESS_KEY\")"
+        },
+        {
+          "ruleId": "python.environment-secret",
+          "category": "credential_access",
+          "evidence": "os.environ.get(\"AWS_SESSION_TOKEN\")"
+        },
+        {
           "ruleId": "python.network",
           "category": "network_egress",
           "evidence": "urllib.request.urlopen(self._request(uri), None, 30)"
+        }
+      ],
+      "truePositives": [
+        "credential_access",
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 7,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 62.83129799999995,
+      "passed": true
+    },
+    {
+      "id": "holdout-epicshop-workshop-updater-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/epicshop/update-workshops.js.txt",
+      "sha256": "c8d75f24dbf3b06f0c8f004f13248930083d95a59b91b8cca382c9165066695b",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "epicweb-dev/epicshop",
+        "commit": "82256e67a6991136375a55f1228853371bd8995d",
+        "sourceUrl": "https://github.com/epicweb-dev/epicshop/blob/82256e67a6991136375a55f1228853371bd8995d/other/update-workshops/index.js",
+        "license": "GPL-3.0-only",
+        "licenseFile": "public/epicshop/LICENSE.md"
+      },
+      "expectedCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "destructive_behavior",
+        "dynamic_execution",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "actualCategories": [
+        "credential_access",
+        "destructive_behavior",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.environment-secret",
+          "category": "credential_access",
+          "evidence": "process.env.WORKSHOP_UPDATE_TOKEN"
         },
         {
-          "ruleId": "python.exfiltration",
-          "category": "data_exfiltration",
-          "evidence": "self.send(100, { 'Version': '1.1', 'Single-Instance': 'true', 'Send-Config': 'true'})"
+          "ruleId": "javascript.environment-secret",
+          "category": "credential_access",
+          "evidence": "process.env.GITHUB_TOKEN"
         },
         {
-          "ruleId": "python.exfiltration",
-          "category": "data_exfiltration",
-          "evidence": "self.send(102, headers)"
+          "ruleId": "javascript.environment-secret",
+          "category": "credential_access",
+          "evidence": "process.env.WORKSHOP_UPDATE_TOKEN"
         },
         {
-          "ruleId": "python.exfiltration",
-          "category": "data_exfiltration",
-          "evidence": "self.send(200, headers)"
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "fetch(url, { headers: { Accept: 'application/vnd.github.v3+json', Authorization: `Bearer ${GITHUB_TOKEN}`, 'User-Agent': 'epicshop-update-action', }, })"
         },
         {
-          "ruleId": "python.exfiltration",
-          "category": "data_exfiltration",
-          "evidence": "self.send(201, headers)"
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "fetch( `https://api.github.com/repos/${GITHUB_ORG}/${repoName}`, { headers: { Accept: 'application/vnd.github.v3+json', Authorization: `Bearer ${GITHUB_TOKEN}`, 'User-Agent': 'epicshop-update-action', }, }, )"
         },
         {
-          "ruleId": "python.exfiltration",
-          "category": "data_exfiltration",
-          "evidence": "self.send(400, headers)"
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "fetch( `https://registry.npmjs.org/${packageName}/-/${tarballName}-${version}.tgz`, { method: 'GET', signal: controller.signal, }, )"
+        },
+        {
+          "ruleId": "javascript.second-stage",
+          "category": "second_stage_payload",
+          "evidence": "fetch( `https://registry.npmjs.org/${packageName}/-/${tarballName}-${version}.tgz`, { method: 'GET', signal: controller.signal, }, )"
+        },
+        {
+          "ruleId": "javascript.destructive",
+          "category": "destructive_behavior",
+          "evidence": "fs.rm(tempDir, { recursive: true, force: true })"
+        },
+        {
+          "ruleId": "javascript.destructive",
+          "category": "destructive_behavior",
+          "evidence": "fs.rm(tempDir, { recursive: true, force: true })"
+        }
+      ],
+      "truePositives": [
+        "credential_access",
+        "destructive_behavior",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        "data_exfiltration",
+        "dynamic_execution"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 9,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 88.34683400000006,
+      "passed": false
+    },
+    {
+      "id": "holdout-cpython-smtplib-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/cpython/smtplib.py.txt",
+      "sha256": "fc846e9b3154d39593a25de7c5815de50c7ab22f5dd04a8ad65d5da99a7f25ef",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "python/cpython",
+        "commit": "2ffab083782968a4d732738f4f1dff6bbd69d2b0",
+        "sourceUrl": "https://github.com/python/cpython/blob/2ffab083782968a4d732738f4f1dff6bbd69d2b0/Lib/smtplib.py",
+        "license": "Python-2.0",
+        "licenseFile": "public/cpython/LICENSE"
+      },
+      "expectedCategories": [
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "network_egress"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "socket.create_connection((host, port), timeout, self.source_address)"
+        },
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)"
         }
       ],
       "truePositives": [
         "network_egress"
       ],
-      "falsePositives": [
+      "falsePositives": [],
+      "falseNegatives": [
         "data_exfiltration"
       ],
-      "falseNegatives": [
-        "credential_access"
-      ],
       "missingExpectedFindings": [],
-      "findingCount": 10,
+      "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 47.33466999999996,
+      "durationMilliseconds": 86.59427300000004,
       "passed": false
     }
   ]

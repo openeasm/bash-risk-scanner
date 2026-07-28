@@ -179,6 +179,59 @@ buffer.write("local report")
     expect(result.findings.some((finding) => finding.category === "data_exfiltration")).toBe(false);
   });
 
+  it("detects named environment secrets without flagging ordinary settings", () => {
+    const python = scanPython(`
+import os
+token = os.environ.get("AWS_SECRET_ACCESS_KEY")
+password = os.environ["DATABASE_PASSWORD"]
+region = os.environ.get("AWS_REGION")
+`);
+    expect(python.findings.filter((finding) =>
+      finding.ruleId === "python.environment-secret",
+    )).toHaveLength(2);
+
+    const javascript = scanJavaScript(`
+const token = process.env.GITHUB_TOKEN
+const password = process.env["DATABASE_PASSWORD"]
+const mode = process.env.NODE_ENV
+`);
+    expect(javascript.findings.filter((finding) =>
+      finding.ruleId === "javascript.environment-secret",
+    )).toHaveLength(2);
+
+    const shadowed = scanJavaScript(`
+const process = { env: { GITHUB_TOKEN: "documentation" } }
+console.log(process.env.GITHUB_TOKEN)
+`);
+    expect(shadowed.findings.some((finding) =>
+      finding.ruleId === "javascript.environment-secret",
+    )).toBe(false);
+  });
+
+  it("requires a confirmed socket source for generic Python send methods", () => {
+    const socketSend = scanPython(`
+import socket
+sock = socket.socket()
+sock.send(secret)
+`);
+    expect(socketSend.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "python.exfiltration",
+        category: "data_exfiltration",
+      }),
+    ]));
+
+    const localProtocol = scanPython(`
+class AptMethod:
+    def send(self, code, headers):
+        print(code, headers)
+self.send(200, {"Filename": local_path})
+`);
+    expect(localProtocol.findings.some((finding) =>
+      finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
   it("detects a relative Node.js download wrapper with a URL argument", () => {
     const result = scanJavaScript(`
 const { download } = require('./download')

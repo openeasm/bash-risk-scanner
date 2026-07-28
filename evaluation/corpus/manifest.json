@@ -742,12 +742,19 @@
     },
     {
       "id": "holdout-gajira-env-token-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/gajira-todo/index.js.txt",
       "sha256": "f22b6e2aba59b4e7ab6c718ff59b56b3898aa259d370f3caf1a31394a07ab8a5",
       "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "javascript.environment-secret",
+          "evidencePattern": "process[.]env[.]GITHUB_TOKEN"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "atlassian/gajira-todo",
@@ -759,12 +766,24 @@
     },
     {
       "id": "holdout-apt-s3-env-credentials-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/apt-transport-s3/s3.py.txt",
       "sha256": "62d6f93072ae66a878ad69ae3fcd35e024d63a57d94e5bd48f7b2434a812fb35",
       "expectedCategories": ["credential_access", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "python.environment-secret",
+          "evidencePattern": "AWS_SECRET_ACCESS_KEY"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "urlopen"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "MayaraCloud/apt-transport-s3",
@@ -772,6 +791,47 @@
         "sourceUrl": "https://github.com/MayaraCloud/apt-transport-s3/blob/55c0f04d19164662c5eb0e499a46572375b34744/s3",
         "license": "GPL-3.0-or-later",
         "licenseNote": "The SPDX license is stated in the source file header."
+      }
+    },
+    {
+      "id": "holdout-epicshop-workshop-updater-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/epicshop/update-workshops.js.txt",
+      "sha256": "c8d75f24dbf3b06f0c8f004f13248930083d95a59b91b8cca382c9165066695b",
+      "expectedCategories": [
+        "credential_access",
+        "network_egress",
+        "dynamic_execution",
+        "data_exfiltration",
+        "destructive_behavior",
+        "second_stage_payload"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "epicweb-dev/epicshop",
+        "commit": "82256e67a6991136375a55f1228853371bd8995d",
+        "sourceUrl": "https://github.com/epicweb-dev/epicshop/blob/82256e67a6991136375a55f1228853371bd8995d/other/update-workshops/index.js",
+        "license": "GPL-3.0-only",
+        "licenseFile": "public/epicshop/LICENSE.md"
+      }
+    },
+    {
+      "id": "holdout-cpython-smtplib-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/cpython/smtplib.py.txt",
+      "sha256": "fc846e9b3154d39593a25de7c5815de50c7ab22f5dd04a8ad65d5da99a7f25ef",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "python/cpython",
+        "commit": "2ffab083782968a4d732738f4f1dff6bbd69d2b0",
+        "sourceUrl": "https://github.com/python/cpython/blob/2ffab083782968a4d732738f4f1dff6bbd69d2b0/Lib/smtplib.py",
+        "license": "Python-2.0",
+        "licenseFile": "public/cpython/LICENSE"
       }
     }
   ]

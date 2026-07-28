@@ -182,6 +182,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/MayaraCloud/apt-transport-s3/55c0f04d19164662c5eb0e499a46572375b34744/s3",
     sha256: "62d6f93072ae66a878ad69ae3fcd35e024d63a57d94e5bd48f7b2434a812fb35",
   },
+  {
+    target: "epicshop/update-workshops.js.txt",
+    url: "https://raw.githubusercontent.com/epicweb-dev/epicshop/82256e67a6991136375a55f1228853371bd8995d/other/update-workshops/index.js",
+    sha256: "c8d75f24dbf3b06f0c8f004f13248930083d95a59b91b8cca382c9165066695b",
+  },
+  {
+    target: "epicshop/LICENSE.md",
+    url: "https://raw.githubusercontent.com/epicweb-dev/epicshop/82256e67a6991136375a55f1228853371bd8995d/LICENSE.md",
+    sha256: "c8fc0b6bcd94aa397f7c83826019804e33466d42b794b2af8d2facd57cf86d4a",
+  },
+  {
+    target: "cpython/smtplib.py.txt",
+    url: "https://raw.githubusercontent.com/python/cpython/2ffab083782968a4d732738f4f1dff6bbd69d2b0/Lib/smtplib.py",
+    sha256: "fc846e9b3154d39593a25de7c5815de50c7ab22f5dd04a8ad65d5da99a7f25ef",
+  },
+  {
+    target: "cpython/LICENSE",
+    url: "https://raw.githubusercontent.com/python/cpython/2ffab083782968a4d732738f4f1dff6bbd69d2b0/LICENSE",
+    sha256: "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
+  },
 ];
 
 async function download(url) {
