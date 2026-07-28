@@ -277,6 +277,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:auditctl\s+-e\s+0\b|ufw\s+(?:disable\b|logging\s+off\b)|pfctl\s+-d\b|systemctl\s+(?:stop|disable)\s+(?:\S*(?:audit|edr|defender|falcon|sentinel|security|antivirus)\S*|ufw|firewalld|iptables|nftables)(?:\.service)?\b|service\s+(?:\S*(?:audit|edr|defender|falcon|sentinel|security|antivirus)\S*|ufw|firewalld|iptables|nftables|pf)\s+(?:stop|disable)\b|(?:pkill|killall)\b[^;\n]*(?:audit|edr|defender|falcon|sentinel|security|antivirus))/i,
   },
   {
+    id: "defense.audit-rules-delete",
+    category: "defense_evasion",
+    title: "Deletes all Linux audit rules",
+    severity: "critical",
+    confidence: "high",
+    message: "Removes every configured auditd rule and watch, reducing security visibility.",
+    pattern: /^\s*auditctl\s+(?:(?:-[A-Za-z]*D[A-Za-z]*|--delete-all))(?:\s|$)/,
+  },
+  {
     id: "defense.firewall-flush",
     category: "defense_evasion",
     title: "Flushes Linux firewall protections",

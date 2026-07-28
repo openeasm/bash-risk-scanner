@@ -1254,6 +1254,51 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects deletion of all audit rules without matching audit administration", () => {
+    const deletions = [
+      "auditctl -D",
+      "sudo auditctl --delete-all",
+    ];
+    for (const source of deletions) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "defense.audit-rules-delete",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "auditctl -d always,exit -S execve",
+      "auditctl -l",
+      "auditctl -s",
+      "auditctl -e 1",
+      "auditctl -e 2",
+      "auditctl -a always,exit -F arch=b64 -S execve",
+      "auditctl -w /etc/passwd -p wa",
+      "auditctl --help",
+      "echo 'auditctl -D'",
+      "# auditctl --delete-all",
+      `auditctl() { echo "project helper"; }
+       auditctl -D`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "defense.audit-rules-delete"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      auditctl() { echo "project helper"; }
+      command auditctl -D
+      sudo auditctl --delete-all
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "defense.audit-rules-delete"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",

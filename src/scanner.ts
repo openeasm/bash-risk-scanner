@@ -1875,6 +1875,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         )?.[1];
         if (directMetadataClient && definedFunctions.has(directMetadataClient)) continue;
       }
+      if (
+        rule.id === "defense.audit-rules-delete"
+        && definedFunctions.has("auditctl")
+        && /^\s*["']?auditctl["']?(?:\s|$)/.test(statement.text)
+      ) continue;
       const matched = variants.some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);

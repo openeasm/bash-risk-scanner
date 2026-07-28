@@ -1,0 +1,1 @@
+update-rc.d T1543.002 defaults
