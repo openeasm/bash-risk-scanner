@@ -555,7 +555,10 @@ function bashAccessesGnuPgDirectory(text: string): boolean {
   return words.slice(1).some(isStaticGnuPgPath);
 }
 
-function bashStagesPrivateSshKeys(text: string): boolean {
+function bashStagesPrivateSshKeys(
+  text: string,
+  stagingCommand: "cp" | "rsync" = "cp",
+): boolean {
   if (!/^\s*find(?:\s|$)/.test(text) || !/\s-exec(?:dir)?\s/.test(text)) {
     return false;
   }
@@ -566,7 +569,7 @@ function bashStagesPrivateSshKeys(text: string): boolean {
   }
 
   let findsPrivateKey = false;
-  let stagesWithCp = false;
+  let stagesPrivateKey = false;
   for (let index = 1; index < words.length - 1; index += 1) {
     const word = words[index]!;
     if (/^(?:-name|-iname)$/.test(word)) {
@@ -578,7 +581,10 @@ function bashStagesPrivateSshKeys(text: string): boolean {
     }
     if (!/^-exec(?:dir)?$/.test(word)) continue;
     const command = words[index + 1]!;
-    if (!/^(?:\/(?:usr\/)?bin\/)?cp$/.test(command)) continue;
+    const commandPattern = stagingCommand === "cp"
+      ? /^(?:\/(?:usr\/)?bin\/)?cp$/
+      : /^(?:\/(?:usr\/)?bin\/)?rsync$/;
+    if (!commandPattern.test(command)) continue;
     const execWords: string[] = [];
     for (let cursor = index + 2; cursor < words.length; cursor += 1) {
       const execWord = words[cursor]!;
@@ -590,9 +596,14 @@ function bashStagesPrivateSshKeys(text: string): boolean {
       .find((candidate) =>
         !candidate.startsWith("-") && !/[$`;&|<>]/.test(candidate)
       );
-    stagesWithCp = placeholder >= 0 && staticDestination !== undefined;
+    stagesPrivateKey = placeholder >= 0
+      && staticDestination !== undefined
+      && (
+        stagingCommand !== "rsync"
+        || !isRsyncRemoteOperand(staticDestination)
+      );
   }
-  return findsPrivateKey && stagesWithCp;
+  return findsPrivateKey && stagesPrivateKey;
 }
 
 function bashChangesToSafariCookieDirectory(text: string): boolean {
@@ -2610,6 +2621,22 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Finds a statically named private SSH key and copies matches to a static staging path.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+      if (
+        !(directFind && definedFunctions.has("find"))
+        && variants.some((variant) => bashStagesPrivateSshKeys(variant, "rsync"))
+      ) {
+        findings.push({
+          ruleId: "credential.private-key-rsync-stage",
+          category: "credential_access",
+          title: "Discovers and stages private SSH keys with rsync",
+          severity: "high",
+          confidence: "high",
+          message: "Finds a statically named private SSH key and copies matches to a static local rsync destination.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",
