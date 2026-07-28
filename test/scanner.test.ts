@@ -1280,6 +1280,45 @@ describe("scan", () => {
     }
   });
 
+  it("detects GnuPG directory discovery and staging without matching inert references", () => {
+    const accesses = [
+      `find / -type d -name '.gnupg' 2>/dev/null -exec rsync -Rr {} /tmp/GnuPG \\;`,
+      `find /home -path '*/.gnupg'`,
+      "cp -R ~/.gnupg /tmp/stage",
+      "rsync -a /home/alice/.gnupg/ /tmp/stage",
+      "tar czf /tmp/gpg.tgz /home/alice/.gnupg",
+      "sudo find / -iname .gnupg",
+    ];
+    for (const source of accesses) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.gnupg-discovery",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find / -name '.config'",
+      `find / -name "$secret_dir"`,
+      "mkdir /tmp/GnuPG",
+      "find --help .gnupg",
+      "ls /tmp/GnuPG",
+      `echo "find / -name .gnupg"`,
+      "# find / -name .gnupg",
+      `find() { echo "project helper"; }
+       find / -name .gnupg`,
+      `cp() { echo "project helper"; }
+       cp -R ~/.gnupg /tmp/stage`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.gnupg-discovery"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

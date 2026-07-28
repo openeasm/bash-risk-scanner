@@ -528,6 +528,33 @@ function bashOpensSudoersEditor(text: string): boolean {
   );
 }
 
+function bashAccessesGnuPgDirectory(text: string): boolean {
+  if (!/^\s*(?:find|cp|rsync|tar)(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  const command = words[0];
+  if (!command || words.some((word) =>
+    /^(?:-h|--help|--version)$/.test(word)
+  )) return false;
+
+  const isStaticGnuPgPath = (word: string): boolean =>
+    !/[$`;&|<>]/.test(word)
+    && /(?:^|\/)[.]gnupg(?:\/|$)/i.test(word);
+
+  if (command === "find") {
+    for (let index = 1; index < words.length - 1; index += 1) {
+      if (!/^(?:-name|-iname|-path|-ipath)$/.test(words[index]!)) continue;
+      const pattern = words[index + 1]!;
+      if (
+        !/[$`;&|<>]/.test(pattern)
+        && /(?:^|\/)[*]?[.]gnupg(?:\/[*]?)?$/.test(pattern)
+      ) return true;
+    }
+    return false;
+  }
+
+  return words.slice(1).some(isStaticGnuPgPath);
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1798,6 +1825,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     source.includes("sudoers")
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*(?:vi|vim|nvim|nano|emacs|ee)(?:\s|$)/m
       .test(source);
+  const hasGnuPgDirectoryCandidate = source.toLowerCase().includes(".gnupg");
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2189,6 +2217,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "critical",
           confidence: "high",
           message: "Opens a sudo policy file in a writable interactive editor.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasGnuPgDirectoryCandidate) {
+      const directGnuPgCommand = statement.text.match(
+        /^\s*["']?(find|cp|rsync|tar)["']?(?:\s|$)/,
+      )?.[1];
+      if (
+        !(directGnuPgCommand && definedFunctions.has(directGnuPgCommand))
+        && variants.some((variant) => bashAccessesGnuPgDirectory(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.gnupg-discovery",
+          category: "credential_access",
+          title: "Discovers or stages a GnuPG credential directory",
+          severity: "high",
+          confidence: "high",
+          message: "Locates, copies, synchronizes, or archives a static GnuPG credential directory.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

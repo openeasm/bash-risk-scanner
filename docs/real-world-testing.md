@@ -116,8 +116,8 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 103 条离线语料：102 条完全匹配，precision 100%、recall 99.5%、
-F1 99.8%。前面的冻结集缺口均已转为带具体
+当前基线为 104 条离线语料：103 条完全匹配，类别级 precision、recall 和
+F1 均为 100%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -334,6 +334,9 @@ validation 回归：
 - Atomic Red Team T1548.003 使用 Vim/Vi/Neovim/Nano/Emacs/ee 打开静态
   sudoers 路径现在识别为敏感系统修改；只读模式、cat/less、`sudo -l`、visudo
   校验、动态路径、普通文件、文本和函数遮蔽均不命中。
+- Atomic Red Team T1552.004 的静态 `.gnupg` 目录搜索、复制、同步和归档现在
+  识别为 GnuPG 凭据访问；普通隐藏目录、动态名称、只创建目标目录、帮助、文本、
+  注释和函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
@@ -342,16 +345,16 @@ test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI to
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
 已修复的 Atomic T1685.004、T1543.002、T1136.001 和 T1556.003 已转入
 validation；Atomic T1548.003 的 `timestamp_timeout=-1` 也已转入 validation。
-`Defaults !tty_tickets` 和 `sudo vim /etc/sudoers` 也已转入 validation。
-当前冻结样本改为 Atomic T1552.004 递归发现 `.gnupg` 目录并复制到暂存区；
-扫描器尚未识别其 GnuPG 凭据发现语义 `credential.gnupg-discovery`。发布门禁
-继续要求整体
+`Defaults !tty_tickets`、`sudo vim /etc/sudoers` 和 `.gnupg` 目录发现也已转入
+validation。当前冻结样本改为 Atomic T1552.004 使用 `find -name id_rsa
+-exec cp --parents` 发现并暂存私有 SSH 密钥；扫描器能识别凭据类别，但尚未识别
+这条跨命令行为链的具体语义 `credential.private-key-stage`。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分静态 `.gnupg` 搜索/复制与
-普通隐藏目录、动态名称、仅创建目标目录、帮助、注释、文本和函数遮蔽。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分发现后复制私钥与单纯查找、
+普通文件复制、动态名称、帮助、注释、文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-146 个单元测试或当前小规模公开语料外推生产环境准确率。
+147 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

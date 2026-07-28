@@ -2710,7 +2710,7 @@
     },
     {
       "id": "holdout-atomic-discover-gnupg-directory-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/discover-gnupg-directory.sh.txt",
@@ -2734,6 +2734,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the GnuPG discovery executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-stage-private-ssh-keys-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/stage-private-ssh-keys.sh.txt",
+      "sha256": "223968866610ddad3788c922d620802e87b0e800b6c663f65fff9f6ad0709bfe",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.private-key-stage",
+          "evidencePattern": "find\\s+/\\s+-name\\s+id_rsa.*-exec\\s+cp"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "7c247dc7-5128-4643-907b-73a76d9135c3",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the command that discovers and stages private SSH keys; the evaluation harness never executes it."
       }
     }
   ]
