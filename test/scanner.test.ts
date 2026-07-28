@@ -1109,6 +1109,61 @@ describe("scan", () => {
     )).toHaveLength(4);
   });
 
+  it("detects permissive PAM authentication insertion without matching ordinary PAM changes", () => {
+    const bypasses = [
+      `sudo sed -i "1s,^,auth sufficient pam_succeed_if.so uid >= 0\\\\n,g" /etc/pam.d/su-l`,
+      `sed -i '2i\\\\auth sufficient pam_permit.so' /etc/pam.d/login`,
+      `echo 'auth sufficient pam_permit.so' >> /etc/pam.d/sshd`,
+      `printf '%s\\n' 'auth sufficient pam_succeed_if.so quiet uid >= 0' | sudo tee -a /etc/pam.d/su`,
+    ];
+    for (const source of bypasses) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "privilege.pam-bypass",
+          category: "privilege_escalation",
+          confidence: "high",
+          severity: "critical",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `sudo sed -i "\\\\,auth sufficient pam_succeed_if.so uid >= 0,d" /etc/pam.d/su-l`,
+      `echo 'auth required pam_unix.so' >> /etc/pam.d/sshd`,
+      `echo 'auth sufficient pam_succeed_if.so uid >= 1000' >> /etc/pam.d/su`,
+      `echo 'account required pam_permit.so' >> /etc/pam.d/login`,
+      `echo 'session optional pam_permit.so' >> /etc/pam.d/login`,
+      `echo 'auth required pam_permit.so' >> /etc/pam.d/login`,
+      `echo 'auth sufficient pam_rootok.so' >> /etc/pam.d/su`,
+      `echo 'auth sufficient pam_permit.so' > /tmp/pam-example`,
+      `rule='auth sufficient pam_permit.so'; echo "$rule" >> /etc/pam.d/sshd`,
+      `grep 'auth sufficient pam_permit.so' /etc/pam.d/login`,
+      `echo "Add auth sufficient pam_permit.so to /etc/pam.d/login"`,
+      `# echo 'auth sufficient pam_permit.so' >> /etc/pam.d/login`,
+      `sed() { echo "project helper"; }
+       sed -i '1i\\\\auth sufficient pam_permit.so' /etc/pam.d/login`,
+      `echo() { printf '%s\\n' "$*"; }
+       echo 'auth sufficient pam_permit.so' >> /etc/pam.d/login`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "privilege.pam-bypass"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      sed() { echo "project helper"; }
+      echo() { printf '%s\\n' "$*"; }
+      command sed -i '1i\\\\auth sufficient pam_permit.so' /etc/pam.d/login
+      sudo sed -i '1i\\\\auth sufficient pam_permit.so' /etc/pam.d/sshd
+      command echo 'auth sufficient pam_permit.so' >> /etc/pam.d/login
+      sudo sh -c "echo 'auth sufficient pam_permit.so' >> /etc/pam.d/sshd"
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "privilege.pam-bypass"
+    )).toHaveLength(4);
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

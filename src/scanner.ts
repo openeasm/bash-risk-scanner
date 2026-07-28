@@ -467,6 +467,25 @@ function bashCreatesLocalAccount(text: string): boolean {
     && /^\/Users\/[^/$`;&|<>\s]+$/.test(words[3]!);
 }
 
+function bashInstallsPamBypass(text: string): boolean {
+  if (
+    !/\/etc\/pam(?:[.]d\/[^ "';|&<>]+|[.]conf)\b/.test(text)
+    || !/\bauth\s+sufficient\s+(?:pam_permit[.]so\b|pam_succeed_if[.]so(?:\s+\w+)*\s+uid\s+>=\s+0\b)/i
+      .test(text)
+  ) return false;
+
+  if (/^\s*sed(?:\s|$)/.test(text)) {
+    if (!/(?:^|\s)-i(?:\s|$|["'])/.test(text)) return false;
+    if (
+      /pam_(?:permit|succeed_if)[.]so[^"']*(?:,|\/)d(?:["']|\s|$)/i.test(text)
+    ) return false;
+    return /(?:^|[^A-Za-z])(?:\d+)?s[^A-Za-z0-9\s]\^/i.test(text)
+      || /(?:^|[^A-Za-z0-9])(?:\d+)?[ia](?:\\|\s)/.test(text);
+  }
+  return /^\s*(?:echo|printf|tee)(?:\s|$)/.test(text)
+    && /(?:>>?|tee(?:\s+-a)?)\s*["']?\/etc\/pam(?:[.]d\/|[.]conf\b)/.test(text);
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -674,7 +693,7 @@ function bashCommandVariants(
         "",
       );
       next = next.replace(/^\s*(?:ba)?sh\s+-c\s+/i, "");
-      next = next.replace(/^\s*(["'])([^"']+)\1/, "$2");
+      next = next.replace(/^\s*(?:"([^"]+)"|'([^']+)')/, "$1$2");
       if (next === current) break;
       variants.add(next);
       current = next;
@@ -1721,6 +1740,12 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const hasLocalAccountCommand =
     /(?:^|\n)[\t ]*(?:(?:(?:sudo|doas|command|builtin|env)\b|\$(?:\{)?[A-Za-z_]\w*\}?)\s+)*(?:useradd|adduser|pw|dscl)(?:\s|$)/m
       .test(source);
+  const hasPamBypassCandidate =
+    source.includes("/etc/pam")
+    && (
+      source.includes("pam_permit.so")
+      || source.includes("pam_succeed_if.so")
+    );
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -1833,6 +1858,29 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
       functionSummaries.transparent,
     ),
   }));
+  if (hasPamBypassCandidate) {
+    for (const pipeline of tree.rootNode.descendantsOfType("pipeline")) {
+      const directPipelineWriter = pipeline.text.match(
+        /^\s*["']?(echo|printf|tee)["']?(?:\s|$)/,
+      )?.[1];
+      if (
+        directPipelineWriter
+        && definedFunctions.has(directPipelineWriter)
+      ) continue;
+      if (!bashInstallsPamBypass(pipeline.text)) continue;
+      findings.push({
+        ruleId: "privilege.pam-bypass",
+        category: "privilege_escalation",
+        title: "Installs a permissive PAM authentication rule",
+        severity: "critical",
+        confidence: "high",
+        message: "Adds a PAM authentication rule whose sufficient module succeeds unconditionally.",
+        evidence: evidence(pipeline.text, maxEvidence),
+        range: rangeOf(pipeline),
+        language: "bash",
+      });
+    }
+  }
   for (const { statement, variants } of commandVariants) {
     if (variants.some((variant) => bashAwkSpawnsStaticShell(variant))) {
       findings.push({
@@ -1973,6 +2021,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Creates a persistent local user account in the operating-system account database.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasPamBypassCandidate) {
+      const directPamWriter = statement.text.match(
+        /^\s*["']?(sed|echo|printf|tee)["']?(?:\s|$)/,
+      )?.[1];
+      if (
+        !(directPamWriter && definedFunctions.has(directPamWriter))
+        && variants.some((variant) => bashInstallsPamBypass(variant))
+      ) {
+        findings.push({
+          ruleId: "privilege.pam-bypass",
+          category: "privilege_escalation",
+          title: "Installs a permissive PAM authentication rule",
+          severity: "critical",
+          confidence: "high",
+          message: "Adds a PAM authentication rule whose sufficient module succeeds unconditionally.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",
