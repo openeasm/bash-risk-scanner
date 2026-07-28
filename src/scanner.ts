@@ -608,6 +608,41 @@ function bashStagesPrivateSshKeys(
   return findsPrivateKey && stagesPrivateKey;
 }
 
+function bashManifestsPrivateSshKeyLocations(text: string): boolean {
+  if (!/^\s*find(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words[0] !== "find" || words.some((word) =>
+    /^(?:-h|--help|--version)$/.test(word)
+  )) return false;
+
+  let findsPrivateKey = false;
+  for (let index = 1; index < words.length - 1; index += 1) {
+    if (!/^(?:-name|-iname)$/.test(words[index]!)) continue;
+    const pattern = words[index + 1]!;
+    if (
+      !/[$`;&|<>*?[\]]/.test(pattern)
+      && /^(?:id_rsa|id_ed25519|id_ecdsa|id_dsa)$/.test(pattern)
+    ) {
+      findsPrivateKey = true;
+    }
+    index += 1;
+  }
+  if (!findsPrivateKey) return false;
+
+  const redirects = text.matchAll(
+    /(?:^|\s)1?(?:>>|>)(?![&|])\s*(?:"([^"]+)"|'([^']+)'|([^\s;&|<>]+))/g,
+  );
+  for (const match of redirects) {
+    const target = match[1] ?? match[2] ?? match[3] ?? "";
+    if (
+      target
+      && !/[$`;&|<>]/.test(target)
+      && !/^(?:-|\/dev\/(?:null|stdout|stderr|fd\/[012])|\/proc\/self\/fd\/[012])$/.test(target)
+    ) return true;
+  }
+  return false;
+}
+
 function bashChangesToSafariCookieDirectory(text: string): boolean {
   if (!/^\s*cd(?:\s|$)/.test(text)) return false;
   const words = staticBashWords(text);
@@ -2160,9 +2195,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*(?:vi|vim|nvim|nano|emacs|ee)(?:\s|$)/m
       .test(source);
   const hasGnuPgDirectoryCandidate = source.toLowerCase().includes(".gnupg");
-  const hasPrivateSshKeyStageCandidate =
+  const hasPrivateSshKeyCandidate =
     /(?:id_rsa|id_ed25519|id_ecdsa|id_dsa)/.test(source)
-    && source.includes("-exec");
+    && (source.includes("-exec") || source.includes(">"));
   const hasKeychainFileStageCandidate =
     source.includes("Library/Keychains")
     && source.includes(">")
@@ -2610,7 +2645,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         });
       }
     }
-    if (hasPrivateSshKeyStageCandidate) {
+    if (hasPrivateSshKeyCandidate) {
       const directFind = /^\s*["']?find["']?(?:\s|$)/.test(statement.text);
       if (
         !(directFind && definedFunctions.has("find"))
@@ -2655,6 +2690,22 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Finds a statically named private SSH key and copies matches with the FreeBSD GNU cp command.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+      if (
+        !(directFind && definedFunctions.has("find"))
+        && variants.some((variant) => bashManifestsPrivateSshKeyLocations(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.private-key-location-manifest",
+          category: "credential_access",
+          title: "Writes discovered private SSH key locations to a manifest",
+          severity: "high",
+          confidence: "high",
+          message: "Finds a statically named private SSH key and redirects the discovered paths into a static file.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

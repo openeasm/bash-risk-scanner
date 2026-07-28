@@ -1426,6 +1426,43 @@ describe("scan", () => {
     }
   });
 
+  it("detects private SSH key location manifests without matching ordinary find output", () => {
+    const manifests = [
+      `find / -name id_rsa 2>/dev/null >> /tmp/keyfile_locations.txt`,
+      `find /home -iname id_ed25519 > "./private-key-locations.txt"`,
+      `sudo find /Users -name id_ecdsa 1>>~/key-manifest`,
+    ];
+    for (const source of manifests) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.private-key-location-manifest",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find / -name id_rsa",
+      "find / -name id_rsa -print",
+      "find / -name id_rsa 2>/tmp/find-errors.txt",
+      "find / -name id_rsa >/dev/null",
+      "find / -name id_rsa >/dev/stdout",
+      `find / -name "$key_name" > /tmp/keyfile_locations.txt`,
+      `find / -name '*.pem' > /tmp/keyfile_locations.txt`,
+      `find / -name id_rsa > "$output_file"`,
+      "find --help -name id_rsa > /tmp/keyfile_locations.txt",
+      `echo "find / -name id_rsa > /tmp/keyfile_locations.txt"`,
+      `find() { echo "project helper"; }
+       find / -name id_rsa > /tmp/keyfile_locations.txt`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.private-key-location-manifest"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects Safari cookie searches without joining unrelated commands or scopes", () => {
     const searches = [
       `cd ~/Library/Cookies
