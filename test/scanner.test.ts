@@ -1202,6 +1202,44 @@ describe("scan", () => {
     }
   });
 
+  it("detects disabled sudo tty tickets without matching normal sudoers administration", () => {
+    const disabled = [
+      `sudo sh -c "echo Defaults "'!'"tty_tickets >> /etc/sudoers"`,
+      `echo 'Defaults !tty_tickets' >> /etc/sudoers.d/cache`,
+      `printf '%s\\n' 'Defaults !tty_tickets' | sudo tee -a /usr/local/etc/sudoers`,
+      `sed -i '1i\\\\Defaults !tty_tickets' /etc/sudoers`,
+    ];
+    for (const source of disabled) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "defense.sudo-tty-tickets-disable",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `echo 'Defaults tty_tickets' >> /etc/sudoers`,
+      `sed -i 's/!tty_tickets/tty_tickets/' /etc/sudoers`,
+      `sed -i '\\\\,!tty_tickets,d' /etc/sudoers`,
+      `grep tty_tickets /etc/sudoers`,
+      `visudo -c -f /etc/sudoers`,
+      `echo 'Defaults !authenticate' >> /etc/sudoers`,
+      `echo 'Defaults !tty_tickets' > /tmp/sudoers-example`,
+      `setting='!tty_tickets'; echo "Defaults $setting" >> /etc/sudoers`,
+      `echo "Set Defaults !tty_tickets in /etc/sudoers"`,
+      `# echo 'Defaults !tty_tickets' >> /etc/sudoers`,
+      `echo() { printf '%s\\n' "$*"; }
+       echo 'Defaults !tty_tickets' >> /etc/sudoers`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "defense.sudo-tty-tickets-disable"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 101 条离线语料：100 条完全匹配，precision 100%、recall 99.5%、
+当前基线为 102 条离线语料：101 条完全匹配，precision 100%、recall 99.5%、
 F1 99.8%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -328,6 +328,9 @@ validation 回归：
 - Atomic Red Team T1548.003 的 sudoers `timestamp_timeout` 负值现在识别为
   永不过期的凭据缓存；有限或零超时、从负值恢复、查询、visudo 校验、其他配置、
   动态值、非 sudoers 路径、文本和函数遮蔽均不命中。
+- Atomic Red Team T1548.003 的静态 `Defaults !tty_tickets` 写入现在识别为
+  禁用每终端 sudo 票据隔离；启用或恢复、查询、visudo 校验、其他设置、动态值、
+  非 sudoers 路径、文本和函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
@@ -336,16 +339,16 @@ test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI to
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
 已修复的 Atomic T1685.004、T1543.002、T1136.001 和 T1556.003 已转入
 validation；Atomic T1548.003 的 `timestamp_timeout=-1` 也已转入 validation。
-当前冻结样本改为同一技术中独立的 `Defaults !tty_tickets`，扫描器已识别
-sudoers 系统修改和 `sudo` 提权，但尚未识别禁用每终端票据隔离的防御规避语义
-`defense.sudo-tty-tickets-disable`。发布门禁继续要求整体
+`Defaults !tty_tickets` 也已转入 validation。当前冻结样本改为同一技术中的
+`sudo vim /etc/sudoers`；扫描器识别 `sudo` 提权，但尚未把交互编辑器打开敏感
+sudoers 文件识别为 `system.sudoers-editor`。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分真正写入 `!tty_tickets`
-与启用 `tty_tickets`、查询、visudo 校验、注释、动态 Defaults 内容、非 sudoers
-路径、文本和函数遮蔽。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分 Vim/Vi/Nano/Emacs 等编辑器
+打开 sudoers 与只读 cat/less、`sudo -l`、visudo 校验、普通文件编辑、文本和
+函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-144 个单元测试或当前小规模公开语料外推生产环境准确率。
+145 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

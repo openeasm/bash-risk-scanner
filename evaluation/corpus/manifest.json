@@ -2639,7 +2639,7 @@
     },
     {
       "id": "holdout-atomic-disable-sudo-tty-tickets-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/disable-sudo-tty-tickets.sh.txt",
@@ -2673,6 +2673,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single Linux executor command that disables per-terminal sudo credential tickets; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-edit-sudoers-with-vim-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/edit-sudoers-with-vim.sh.txt",
+      "sha256": "3b4726b4d48915d9155008a3990ac57e89eeb671f149c8859498754c99ff52c6",
+      "expectedCategories": ["privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "system_modification",
+          "ruleId": "system.sudoers-editor",
+          "evidencePattern": "vim\\s+/etc/sudoers"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+vim"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1548.003/T1548.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1548.003.yaml.txt",
+        "upstreamSha256": "50ebd910568df8766dfd7b1d0506c7e3b9564b6418743e56990333c4e0529441",
+        "upstreamId": "150c3a08-ee6e-48a6-aeaf-3659d24ceb4e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Linux executor command that opens sudoers in an interactive editor; the evaluation harness never executes it."
       }
     }
   ]

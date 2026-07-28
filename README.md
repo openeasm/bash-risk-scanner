@@ -169,10 +169,9 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 分层保留跨语言控制、iptables 规则删除、OCI session token、Linux ASLR、SCP
 方向、awk shell escape、密码哈希访问控制、信任存储修改、瞬态 systemd timer、
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
-已修复的 T1685.004“删除全部 auditd 规则”和 T1543.002 SysV 启动持久化进入
-validation；已修复的 T1136.001 本地账户创建也进入 validation，当前新增
-T1556.003 恶意 PAM 认证规则也已修复；当前新增 T1548.003 无限 sudo 凭据缓存
-已转入 validation，冻结 test 改为禁用 sudo `tty_tickets`。
+近期修复的 T1685.004、T1543.002、T1136.001、T1556.003，以及 T1548.003 的
+无限 sudo 缓存和 `!tty_tickets` 均已进入 validation；当前冻结 test 为使用
+Vim 直接编辑 sudoers。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

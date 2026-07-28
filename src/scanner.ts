@@ -503,6 +503,20 @@ function bashSetsUnlimitedSudoCache(text: string): boolean {
     && /(?:>>?|tee(?:\s+-a)?)\s*["']?(?:\/etc\/sudoers|\/usr\/local\/etc\/sudoers)/.test(text);
 }
 
+function bashDisablesSudoTtyTickets(text: string): boolean {
+  if (
+    !/(?:\/etc\/sudoers(?:[.]d\/[^ "';|&<>]+)?|\/usr\/local\/etc\/sudoers)\b/.test(text)
+    || !/!\s*["']*\s*tty_tickets\b/.test(text)
+  ) return false;
+  if (/^\s*sed(?:\s|$)/.test(text)) {
+    return /(?:^|\s)-i(?:\s|$|["'])/.test(text)
+      && !/!\s*tty_tickets[^"']*(?:,|\/)d(?:["']|\s|$)/.test(text)
+      && !/s([^A-Za-z0-9\s])!\s*tty_tickets\1tty_tickets\1/.test(text);
+  }
+  return /^\s*(?:echo|printf|tee)(?:\s|$)/.test(text)
+    && /(?:>>?|tee(?:\s+-a)?)\s*["']?(?:\/etc\/sudoers|\/usr\/local\/etc\/sudoers)/.test(text);
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1766,6 +1780,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const hasUnlimitedSudoCacheCandidate =
     source.includes("timestamp_timeout")
     && source.includes("sudoers");
+  const hasDisabledSudoTtyTicketsCandidate =
+    source.includes("tty_tickets")
+    && source.includes("sudoers");
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -1911,6 +1928,22 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "high",
         confidence: "high",
         message: "Sets a negative sudo timestamp timeout, keeping cached credentials valid until reboot.",
+        evidence: evidence(pipeline.text, maxEvidence),
+        range: rangeOf(pipeline),
+        language: "bash",
+      });
+    }
+  }
+  if (hasDisabledSudoTtyTicketsCandidate) {
+    for (const pipeline of tree.rootNode.descendantsOfType("pipeline")) {
+      if (!bashDisablesSudoTtyTickets(pipeline.text)) continue;
+      findings.push({
+        ruleId: "defense.sudo-tty-tickets-disable",
+        category: "defense_evasion",
+        title: "Disables per-terminal sudo credential tickets",
+        severity: "high",
+        confidence: "high",
+        message: "Allows cached sudo authentication to be reused across terminal sessions.",
         evidence: evidence(pipeline.text, maxEvidence),
         range: rangeOf(pipeline),
         language: "bash",
@@ -2099,6 +2132,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Sets a negative sudo timestamp timeout, keeping cached credentials valid until reboot.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (
+      hasDisabledSudoTtyTicketsCandidate
+      && variants.some((variant) => bashDisablesSudoTtyTickets(variant))
+    ) {
+      const directSudoersWriter = statement.text.match(
+        /^\s*["']?(sed|echo|printf|tee)["']?(?:\s|$)/,
+      )?.[1];
+      if (!(directSudoersWriter && definedFunctions.has(directSudoersWriter))) {
+        findings.push({
+          ruleId: "defense.sudo-tty-tickets-disable",
+          category: "defense_evasion",
+          title: "Disables per-terminal sudo credential tickets",
+          severity: "high",
+          confidence: "high",
+          message: "Allows cached sudo authentication to be reused across terminal sessions.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",
