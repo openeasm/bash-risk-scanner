@@ -2738,7 +2738,7 @@
     },
     {
       "id": "holdout-atomic-stage-private-ssh-keys-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/stage-private-ssh-keys.sh.txt",
@@ -2762,6 +2762,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the command that discovers and stages private SSH keys; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-search-safari-cookies-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/search-safari-cookies.sh.txt",
+      "sha256": "66a09e0a6125db70cc8df707028ae4f7346879e044c97b2a4c624fb69bee0599",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.browser-cookie-search",
+          "evidencePattern": "cd\\s+~/Library/Cookies.*grep\\s+-q\\s+[\"']?coinbase"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1555.003/T1555.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1555.003.yaml.txt",
+        "upstreamSha256": "3539f7b97c78e46263e74cca5a4828a5e855254ad3c3c3c0c85af0f31e87cda6",
+        "upstreamId": "c1402f7b-67ca-43a8-b5f3-3143abedc01b",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic search_string placeholder with its inert default and copied only the two Safari cookie-search commands; the evaluation harness never executes them."
       }
     }
   ]

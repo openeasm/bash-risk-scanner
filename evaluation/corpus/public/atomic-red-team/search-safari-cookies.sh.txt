@@ -1,0 +1,2 @@
+cd ~/Library/Cookies
+grep -q "coinbase" "Cookies.binarycookies"

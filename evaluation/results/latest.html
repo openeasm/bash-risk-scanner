@@ -13,16 +13,16 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">103/104</div>样本通过</div>
+<div class="card"><div class="big">104/105</div>样本通过</div>
 <div class="card"><div class="big">100.0%</div>Precision</div>
 <div class="card"><div class="big">100.0%</div>Recall</div>
 <div class="card"><div class="big">100.0%</div>F1</div>
-<div class="card"><div class="big">98.04 ms</div>P95</div>
+<div class="card"><div class="big">91.70 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>133</td><td>0</td><td>0</td>
+    <td>bash</td><td>134</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -36,7 +36,7 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>public-derived</td><td>92</td><td>0</td><td>0</td>
+    <td>public-derived</td><td>93</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -58,13 +58,13 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>validation</td><td>172</td><td>0</td><td>0</td>
+    <td>validation</td><td>173</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>credential_access</td><td>19</td><td>0</td><td>0</td>
+    <td>credential_access</td><td>20</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -113,11 +113,11 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>缺少指定 finding</th><th>禁止 finding</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-atomic-stage-private-ssh-keys-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/stage-private-ssh-keys.sh.txt</span></td>
+<tr><td><code>holdout-atomic-search-safari-cookies-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/search-safari-cookies.sh.txt</span></td>
 <td>credential_access</td><td>credential_access</td>
 <td class="pass">无</td>
-<td class="fail">credential.private-key-stage</td>
+<td class="fail">credential.browser-cookie-search</td>
 <td class="pass">无</td>
-<td><code>credential.sensitive-path</code>: find / -name id_rsa 2&gt;/dev/null -exec cp --parents {} /tmp/art-staging \;</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T20:59:52.141Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<td><code>credential.sensitive-path</code>: grep -q &quot;coinbase&quot; &quot;Cookies.binarycookies&quot;</td></tr></tbody></table>
+<p class="muted">生成时间：2026-07-28T21:04:43.989Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

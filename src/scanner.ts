@@ -555,6 +555,46 @@ function bashAccessesGnuPgDirectory(text: string): boolean {
   return words.slice(1).some(isStaticGnuPgPath);
 }
 
+function bashStagesPrivateSshKeys(text: string): boolean {
+  if (!/^\s*find(?:\s|$)/.test(text) || !/\s-exec(?:dir)?\s/.test(text)) {
+    return false;
+  }
+  const words = staticBashWords(text);
+  if (words[0] !== "find") return false;
+  if (words.some((word) => /^(?:-h|--help|--version)$/.test(word))) {
+    return false;
+  }
+
+  let findsPrivateKey = false;
+  let stagesWithCp = false;
+  for (let index = 1; index < words.length - 1; index += 1) {
+    const word = words[index]!;
+    if (/^(?:-name|-iname)$/.test(word)) {
+      const pattern = words[index + 1]!;
+      findsPrivateKey = !/[$`;&|<>*?[\]]/.test(pattern)
+        && /^(?:id_rsa|id_ed25519|id_ecdsa|id_dsa)$/.test(pattern);
+      index += 1;
+      continue;
+    }
+    if (!/^-exec(?:dir)?$/.test(word)) continue;
+    const command = words[index + 1]!;
+    if (!/^(?:\/(?:usr\/)?bin\/)?cp$/.test(command)) continue;
+    const execWords: string[] = [];
+    for (let cursor = index + 2; cursor < words.length; cursor += 1) {
+      const execWord = words[cursor]!;
+      if (/^(?:\\;|;|\+)$/.test(execWord)) break;
+      execWords.push(execWord);
+    }
+    const placeholder = execWords.indexOf("{}");
+    const staticDestination = execWords.slice(placeholder + 1)
+      .find((candidate) =>
+        !candidate.startsWith("-") && !/[$`;&|<>]/.test(candidate)
+      );
+    stagesWithCp = placeholder >= 0 && staticDestination !== undefined;
+  }
+  return findsPrivateKey && stagesWithCp;
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1826,6 +1866,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*(?:vi|vim|nvim|nano|emacs|ee)(?:\s|$)/m
       .test(source);
   const hasGnuPgDirectoryCandidate = source.toLowerCase().includes(".gnupg");
+  const hasPrivateSshKeyStageCandidate =
+    /(?:id_rsa|id_ed25519|id_ecdsa|id_dsa)/.test(source)
+    && source.includes("-exec");
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2238,6 +2281,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Locates, copies, synchronizes, or archives a static GnuPG credential directory.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasPrivateSshKeyStageCandidate) {
+      const directFind = /^\s*["']?find["']?(?:\s|$)/.test(statement.text);
+      if (
+        !(directFind && definedFunctions.has("find"))
+        && variants.some((variant) => bashStagesPrivateSshKeys(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.private-key-stage",
+          category: "credential_access",
+          title: "Discovers and stages private SSH keys",
+          severity: "high",
+          confidence: "high",
+          message: "Finds a statically named private SSH key and copies matches to a static staging path.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

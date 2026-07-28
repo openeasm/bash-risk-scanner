@@ -1319,6 +1319,42 @@ describe("scan", () => {
     }
   });
 
+  it("detects private SSH key discovery followed by staging without matching partial behavior", () => {
+    const stagingChains = [
+      `find / -name id_rsa 2>/dev/null -exec cp --parents {} /tmp/art-staging \\;`,
+      `find /home -iname id_ed25519 -exec /bin/cp {} /tmp/keys +`,
+      `sudo find /Users -name id_ecdsa -execdir cp -p {} /tmp/stage \\;`,
+    ];
+    for (const source of stagingChains) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.private-key-stage",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find / -name id_rsa",
+      `find / -name "$key_name" -exec cp {} /tmp/stage \\;`,
+      `find / -name '*.pem' -exec cp {} /tmp/stage \\;`,
+      `find / -name id_rsa -print`,
+      `find / -name id_rsa -exec cat {} \\;`,
+      `find / -name id_rsa -exec cp {} "$stage_dir" \\;`,
+      `find --help -exec cp id_rsa /tmp/stage \\;`,
+      `echo "find / -name id_rsa -exec cp {} /tmp/stage"`,
+      "# find / -name id_rsa -exec cp {} /tmp/stage",
+      `find() { echo "project helper"; }
+       find / -name id_rsa -exec cp {} /tmp/stage \\;`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.private-key-stage"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",
