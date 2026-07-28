@@ -138,6 +138,41 @@ function bashArchiveOutputVariable(text: string): string | undefined {
   return output[2];
 }
 
+function normalizedStaticBashPath(text: string): string | undefined {
+  const value = text.trim().replace(/^(["'])(.*)\1$/, "$2");
+  if (!value || /[$`;&|<>\s]/.test(value)) return undefined;
+  return value.replace(/^\.\//, "");
+}
+
+function bashStaticDownloadOutput(text: string): string | undefined {
+  if (!/^\s*(?:curl|wget)\b/i.test(text)) return undefined;
+  const explicit = /^\s*curl\b/i.test(text)
+    ? text.match(
+      /(?:^|\s)(?:-o|--output(?:=|\s+))\s*(["']?[^"'$\s;|&<>]+["']?)/i,
+    )
+    : text.match(
+      /(?:^|\s)(?:-O|--output-document(?:=|\s+))\s*(["']?[^"'$\s;|&<>]+["']?)/,
+    );
+  if (explicit) return normalizedStaticBashPath(explicit[1]!);
+
+  if (/^\s*curl\b/i.test(text) && /(?:^|\s)-[A-Za-z]*O[A-Za-z]*(?:\s|$)/.test(text)) {
+    const remote = text.match(/https?:\/\/[^"'$\s;|&<>]+/i)?.[0];
+    if (!remote) return undefined;
+    try {
+      const pathname = new URL(remote).pathname.replace(/\/+$/, "");
+      return normalizedStaticBashPath(pathname.slice(pathname.lastIndexOf("/") + 1));
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+function bashCommandReferencesPath(text: string, path: string): boolean {
+  const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?:^|\\s)["']?(?:\\./)?${escaped}["']?(?:\\s|$)`).test(text);
+}
+
 function bashInvokesVariable(text: string, variable: string): boolean {
   const escaped = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(
@@ -1338,6 +1373,42 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
       language: "bash",
     }, maxEvidence);
   });
+  for (const download of commandVariants) {
+    const outputPath = download.variants
+      .map((variant) => bashStaticDownloadOutput(variant))
+      .find((path) => path !== undefined);
+    if (!outputPath || isAllowedDownload(download.statement.text, options)) continue;
+    const later = commandVariants.filter((candidate) =>
+      candidate.scopeId === download.scopeId
+      && candidate.statement.range.startIndex > download.statement.range.startIndex
+      && candidate.statement.range.startIndex - download.statement.range.startIndex <= 5_000,
+    );
+    const chmod = later.find((candidate) => candidate.variants.some((variant) =>
+      /^\s*chmod\b(?=[^;\n]*(?:[ugoa]*\+x|[0-7]*[1357][0-7]{2})(?:\s|$))/i.test(variant)
+      && bashCommandReferencesPath(variant, outputPath),
+    ));
+    const escapedOutput = outputPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const execute = chmod && later.find((candidate) =>
+      candidate.statement.range.startIndex > chmod.statement.range.startIndex
+      && candidate.variants.some((variant) =>
+        (
+          /^\s*(?:bash|sh)\s+/i.test(variant)
+          || new RegExp(`^\\s*(?:\\./)?${escapedOutput}(?:\\s|$)`).test(variant)
+        )
+        && bashCommandReferencesPath(variant, outputPath),
+      ),
+    );
+    if (!chmod || !execute) continue;
+    addChainFinding(findings, download.statement, execute.statement, {
+      ruleId: "chain.second-stage-downloaded-script",
+      category: "second_stage_payload",
+      title: "Runs a downloaded script as a second-stage payload",
+      severity: "critical",
+      confidence: "high",
+      message: "The same static path is downloaded, made executable, and passed to a shell or invoked.",
+      language: "bash",
+    }, maxEvidence);
+  }
   for (const download of commandVariants) {
     const archiveVariable = download.variants
       .map((variant) => bashArchiveOutputVariable(variant))
