@@ -382,6 +382,30 @@ function bashSubmitsAtJob(text: string): boolean {
   return false;
 }
 
+function bashEnablesSysvStartup(text: string): boolean {
+  if (!/^\s*(?:update-rc\.d|chkconfig|service|sysrc)(?:\s|$)/.test(text)) {
+    return false;
+  }
+  const words = staticBashWords(text);
+  const command = words[0];
+  if (command === "update-rc.d") {
+    return words.length >= 3 && /^(?:defaults|enable)$/.test(words[2]!);
+  }
+  if (command === "chkconfig") {
+    const offset = words[1] === "--level" ? 2 : 0;
+    return words.length >= 3 + offset && words[2 + offset] === "on";
+  }
+  if (command === "service") {
+    return words.length >= 3 && words[2] === "enable";
+  }
+  if (command !== "sysrc") return false;
+  return words.slice(1)
+    .filter((word) => !word.startsWith("-"))
+    .some((word) =>
+      /^[A-Za-z_][A-Za-z0-9_]*_enable=(?:YES|"YES"|'YES')$/.test(word)
+    );
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1630,6 +1654,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const parseErrors: SourceRange[] = [];
   const commandWrappers = staticBashCommandWrappers(source);
   const functionSummaries = bashFunctionSummaries(source);
+  const hasSysvStartupCommand =
+    /(?:^|\n)[\t ]*(?:(?:(?:sudo|doas|command|builtin|env)\b|\$(?:\{)?[A-Za-z_]\w*\}?)\s+)*(?:update-rc\.d|chkconfig|service|sysrc)(?:\s|$)/m
+      .test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -1845,6 +1872,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         range: statement.range,
         language: "bash",
       });
+    }
+    if (hasSysvStartupCommand) {
+      const directSysvCommand = statement.text.match(
+        /^\s*["']?(update-rc\.d|chkconfig|service|sysrc)["']?(?:\s|$)/,
+      )?.[1];
+      if (
+        !(directSysvCommand && definedFunctions.has(directSysvCommand))
+        && variants.some((variant) => bashEnablesSysvStartup(variant))
+      ) {
+        findings.push({
+          ruleId: "persistence.sysv-enable",
+          category: "persistence",
+          title: "Enables a SysV or rc.d service at startup",
+          severity: "high",
+          confidence: "high",
+          message: "Registers or enables a service to run automatically during system startup.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
     }
     for (const rule of COMMAND_RULES) {
       if (

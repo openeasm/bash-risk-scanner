@@ -982,6 +982,67 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects SysV and rc.d startup enablement without matching service administration", () => {
+    const enablements = [
+      "update-rc.d T1543.002 defaults",
+      "sudo update-rc.d nginx enable",
+      "chkconfig audit-helper on",
+      "chkconfig --level 345 audit-helper on",
+      "sudo service art-test enable",
+      "sysrc art_test_enable=YES",
+      `sysrc nginx_enable="YES"`,
+    ];
+    for (const source of enablements) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "persistence.sysv-enable",
+          category: "persistence",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "update-rc.d nginx defaults-disabled",
+      "update-rc.d nginx disable",
+      "update-rc.d -f nginx remove",
+      "update-rc.d --help",
+      "chkconfig audit-helper off",
+      "chkconfig --list audit-helper",
+      "chkconfig audit-helper",
+      "service art-test start",
+      "service art-test status",
+      "service art-test disable",
+      "sysrc art_test_enable",
+      "sysrc -x art_test_enable",
+      "sysrc art_test_enable=NO",
+      `sysrc art_test_enable="$enabled"`,
+      "echo 'update-rc.d nginx defaults'",
+      "# chkconfig audit-helper on",
+      `update-rc.d() { echo "project helper"; }
+       update-rc.d nginx defaults`,
+      `service() { echo "project helper"; }
+       service art-test enable`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.sysv-enable"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      update-rc.d() { echo "project helper"; }
+      service() { echo "project helper"; }
+      command update-rc.d nginx defaults
+      sudo update-rc.d nginx enable
+      command service art-test enable
+      sudo service art-test enable
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "persistence.sysv-enable"
+    )).toHaveLength(4);
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

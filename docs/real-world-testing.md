@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 97 条离线语料：96 条完全匹配，precision 100%、recall 99.5%、
+当前基线为 98 条离线语料：97 条完全匹配，precision 100%、recall 99.5%、
 F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -312,23 +312,27 @@ validation 回归：
 - Atomic Red Team T1685.004 的 `auditctl -D/--delete-all` 现在识别删除全部
   auditd 规则的防御规避；小写 `-d` 单条删除、`-l/-s` 查询、`-e 1/2`
   启用或锁定、添加规则和 watch、帮助、文本及同名 shell 函数遮蔽均不命中。
+- Atomic Red Team T1543.002 的 Debian `update-rc.d ... defaults/enable`、RHEL
+  `chkconfig ... on`、FreeBSD `service ... enable` 和静态
+  `sysrc <service>_enable=YES` 现在识别启动持久化；禁用、移除、查询、仅启动、
+  动态值、帮助、文本和同名 shell 函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
 test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI token、ASLR、SCP
 方向、awk shell escape、密码哈希访问控制、信任存储修改、瞬态 systemd timer、
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
-已修复的 Atomic T1685.004 `auditctl -D` 已转入 validation；当前新增 Atomic
-T1543.002 的 `update-rc.d T1543.002 defaults` 冻结样本，扫描器尚未识别其 SysV
-启动持久化语义。发布门禁继续要求整体
+已修复的 Atomic T1685.004 `auditctl -D` 和 T1543.002
+`update-rc.d T1543.002 defaults` 已转入 validation；当前新增 Atomic T1136.001
+的 `useradd -M -N -r -s /bin/bash -c evil_account evil_user` 冻结样本，扫描器
+尚未识别本地账户创建的系统修改语义。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应覆盖 Debian
-`update-rc.d <service> defaults/enable`、RHEL `chkconfig <service> on`，并评估
-FreeBSD `sysrc <service>_enable=YES` 与 `service <service> enable`；同时排除
-remove/disable/off、查询、帮助、注释、文本和函数遮蔽。
+`maximum.forbiddenFindingCount` 为 0。下一轮应覆盖 Linux `useradd/adduser`、
+FreeBSD `pw useradd` 和 macOS `dscl . -create /Users/...`，同时区分 userdel、
+usermod、查询、帮助、动态子命令、注释、文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-140 个单元测试或当前小规模公开语料外推生产环境准确率。
+141 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
