@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 78 条离线语料：77 条完全匹配，precision 100%、recall 99.4%、
-F1 99.7%。前面的冻结集缺口均已转为带具体
+当前基线为 79 条离线语料：78 条完全匹配，precision 100%、recall 98.8%、
+F1 99.4%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -240,16 +240,21 @@ validation 回归：
   openssl`，且同一调用包含明确加密动作、输入、输出和所需密钥参数时才报告
   破坏行为；解密、密钥生成、证书请求、摘要、帮助、缺参数、未知或被覆盖变量
   和文本均不命中。
+- Atomic Red Team T1686 `ufw logging off` 现在同时报告防御规避和防火墙日志
+  配置修改；日志级别调整、状态查询、规则管理、整机启停、dry-run、帮助和文本
+  不命中日志配置修改规则。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-新冻结的 Atomic Red Team T1686 test 样本执行 `ufw logging off`。当前已识别
-防御规避，但未识别其对防火墙日志配置的系统修改，所以 test recall 基线为 50%；
-test precision 仍要求 100%，recall 门槛恢复为 50%。发布门禁继续要求整体
-precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应只对关闭 UFW 日志报告系统修改，
-并以日志级别调整、状态查询、规则管理、启停防火墙、其他 `logging` 子命令、
-帮助和文本作为 hard-negative。
+新冻结的 Atomic Red Team T1059.006 test 样本通过可信发现的 Python 变量执行
+`-c` 内嵌代码，使用 `requests.get` 下载文件并交给 `os.system` 执行。当前已识别
+解释器逃逸和动态执行，但没有把内嵌 Python AST 回接到 Bash 调用，因此漏掉
+网络外联和下载执行，test recall 基线为 50%。test precision 仍要求 100%，
+recall 门槛为 50%；发布门禁继续要求整体 precision 95%、recall 90%、
+regression 完全匹配，且 `maximum.forbiddenFindingCount` 为 0。下一轮应只在
+变量被证明为 Python 且 `-c` 参数是静态字面量时解析内嵌代码，并要求下载内容
+写入的路径与后续执行目标存在数据流关联；动态 payload、只下载、只执行、
+不同路径、文档字符串和未知解释器变量应作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
 122 个单元测试或当前小规模公开语料外推生产环境准确率。

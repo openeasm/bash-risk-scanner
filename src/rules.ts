@@ -159,6 +159,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:ufw\s+disable\b|systemctl\s+(?:stop|disable)\s+(?:ufw|firewalld|iptables|nftables)(?:\.service)?\b|service\s+(?:ufw|firewalld|iptables|nftables|pf)\s+(?:stop|disable)\b|pfctl\s+-d\b)/i,
   },
   {
+    id: "system.firewall-logging-disable",
+    category: "system_modification",
+    title: "Disables host firewall logging",
+    severity: "high",
+    confidence: "high",
+    message: "Changes the UFW configuration to stop recording firewall events.",
+    pattern: /^(?![^;\n]*(?:^|\s)--dry-run(?:\s|$))\s*ufw\s+logging\s+off(?:\s|$)/i,
+  },
+  {
     id: "persistence.shell-rc-replace",
     category: "persistence",
     title: "Replaces a shell startup file",

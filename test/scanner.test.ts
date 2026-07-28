@@ -990,12 +990,24 @@ describe("scan", () => {
     expect(scan("ufw logging off").findings.some((finding) =>
       finding.ruleId === "defense.security-control"
     )).toBe(true);
+    expect(scan("sudo ufw logging off").findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "system.firewall-logging-disable",
+        category: "system_modification",
+        confidence: "high",
+      }),
+    ]));
 
     const hardNegatives = [
       "ufw status verbose",
       "ufw enable",
       "ufw prepend deny from 192.0.2.10",
       "ufw --help",
+      "ufw logging on",
+      "ufw logging low",
+      "ufw logging medium",
+      "ufw logging high",
+      "ufw --dry-run logging off",
       "systemctl status ufw",
       "systemctl start firewalld",
       "service pf status",
@@ -1004,6 +1016,7 @@ describe("scan", () => {
     for (const source of hardNegatives) {
       expect(scan(source).findings.some((finding) =>
         finding.ruleId === "system.firewall-disable"
+        || finding.ruleId === "system.firewall-logging-disable"
         || finding.ruleId === "defense.security-control"
       )).toBe(false);
     }
