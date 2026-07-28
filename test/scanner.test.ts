@@ -52,12 +52,48 @@ describe("scan", () => {
       `runner=python3; $runner -c "$code"`,
       `runner=$(which python3); $runner --version`,
       `runner=$(which python3); $runner /tmp/script.py`,
+      `runner=$(which python3); runner=/tmp/custom; $runner -c "$code"`,
       `echo '$which_python -c "print(1)"'`,
     ];
     for (const source of hardNegatives) {
       expect(scan(source).findings.some((finding) =>
         finding.ruleId === "escape.discovered-python"
         || finding.ruleId === "dynamic.discovered-python-command"
+      )).toBe(false);
+    }
+  });
+
+  it("detects symmetric encryption only through a proven GPG executable variable", () => {
+    const encryptionCommands = [
+      `which_gpg=$(command -v gpg)
+       printf '%s' "$password" | $which_gpg --batch --passphrase-fd 0 -o /tmp/data.gpg -c /tmp/data`,
+      `gpg_bin=$(which gpg2)
+       "$gpg_bin" --symmetric --output=/tmp/data.gpg /tmp/data`,
+    ];
+    for (const source of encryptionCommands) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "destructive.discovered-gpg-encryption",
+          category: "destructive_behavior",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `tool=$(command -v openssl); $tool -o /tmp/data.gpg -c /tmp/data`,
+      `tool=gpg; $tool -o /tmp/data.gpg -c /tmp/data`,
+      `$unknown_gpg -o /tmp/data.gpg -c /tmp/data`,
+      `tool=$(command -v gpg); tool=/tmp/custom; $tool -o /tmp/data.gpg -c /tmp/data`,
+      `tool=$(command -v gpg); $tool --decrypt --output /tmp/plain /tmp/data.gpg`,
+      `tool=$(command -v gpg); $tool --sign --output /tmp/data.sig /tmp/data`,
+      `tool=$(command -v gpg); $tool --verify /tmp/data.sig /tmp/data`,
+      `tool=$(command -v gpg); $tool --list-keys`,
+      `tool=$(command -v gpg); $tool -c /tmp/data`,
+      `tool=$(command -v gpg); echo '$tool -o /tmp/data.gpg -c /tmp/data'`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "destructive.discovered-gpg-encryption"
       )).toBe(false);
     }
   });

@@ -163,23 +163,30 @@ function staticBashPathArgument(text: string): string | undefined {
   return match?.[2];
 }
 
-function bashDiscoveredPythonVariables(root: SyntaxNode): Set<string> {
-  const variables = new Set<string>();
+function bashDiscoveredCommandVariables(
+  root: SyntaxNode,
+  commandPattern: RegExp,
+): Set<string> {
+  const assignments = new Map<string, boolean>();
   for (const assignment of root.descendantsOfType("variable_assignment")) {
     const name = assignment.childForFieldName("name")?.text;
     const value = assignment.childForFieldName("value");
-    if (!name || value?.type !== "command_substitution") continue;
-    const commands = value.descendantsOfType("command");
-    if (
-      commands.length > 0
-      && commands.every((command) =>
-        /^(?:which|command\s+-v)\s+python(?:\d+(?:\.\d+)*)?\s*$/.test(command.text),
-      )
-    ) {
-      variables.add(name);
-    }
+    if (!name) continue;
+    const commands = value?.type === "command_substitution"
+      ? value.descendantsOfType("command")
+      : [];
+    const trusted = commands.length > 0
+      && commands.every((command) => {
+        commandPattern.lastIndex = 0;
+        return commandPattern.test(command.text);
+      });
+    assignments.set(name, (assignments.get(name) ?? true) && trusted);
   }
-  return variables;
+  return new Set(
+    [...assignments]
+      .filter(([, trusted]) => trusted)
+      .map(([name]) => name),
+  );
 }
 
 function bashCommandVariants(
@@ -1136,7 +1143,14 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const commandWrappers = staticBashCommandWrappers(source);
   const functionSummaries = bashFunctionSummaries(source);
   const shellStartupVariables = bashShellStartupVariables(source);
-  const discoveredPythonVariables = bashDiscoveredPythonVariables(tree.rootNode);
+  const discoveredPythonVariables = bashDiscoveredCommandVariables(
+    tree.rootNode,
+    /^(?:which|command\s+-v)\s+python(?:\d+(?:\.\d+)*)?\s*$/,
+  );
+  const discoveredGpgVariables = bashDiscoveredCommandVariables(
+    tree.rootNode,
+    /^(?:which|command\s+-v)\s+gpg2?\s*$/,
+  );
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -1212,6 +1226,26 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "high",
         confidence: "high",
         message: "Passes inline code to a variable proven to reference a Python interpreter.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    for (const variable of discoveredGpgVariables) {
+      const escapedVariable = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const invokesSymmetricEncryption = variants.some((variant) =>
+        new RegExp(
+          `^\\s*["']?\\$(?:\\{)?${escapedVariable}\\}?["']?(?=[^;\\n]*(?:^|\\s)(?:-c|--symmetric)(?:\\s|$))(?=[^;\\n]*(?:^|\\s)(?:-o|--output)(?:=|\\s))`,
+        ).test(variant),
+      );
+      if (!invokesSymmetricEncryption) continue;
+      findings.push({
+        ruleId: "destructive.discovered-gpg-encryption",
+        category: "destructive_behavior",
+        title: "Encrypts a file with a discovered GPG executable",
+        severity: "critical",
+        confidence: "high",
+        message: "Invokes a variable proven to reference GPG with symmetric encryption and an explicit output file.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",
