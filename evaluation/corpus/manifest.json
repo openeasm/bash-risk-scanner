@@ -1608,12 +1608,19 @@
     },
     {
       "id": "holdout-atomic-emond-persistence-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/emond-persistence.sh.txt",
       "sha256": "7d82e0196207d2a07d6d01f4d17560cd8a7c8919b6cfe6fd735f394878afd1ac",
       "expectedCategories": ["persistence", "privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.emond",
+          "evidencePattern": "(?:/etc/emond[.]d/rules|/private/var/db/emondClients)"
+        }
+      ],
       "provenance": {
         "type": "public-derived",
         "repository": "redcanaryco/atomic-red-team",
@@ -1625,6 +1632,27 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced script_location, destination filename, and trigger filename with atomic-evaluation paths."
+      }
+    },
+    {
+      "id": "holdout-atomic-python-http-server-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/python-http-server.sh.txt",
+      "sha256": "772cade9d2d545b125e6da20e2e85dd63ba74260e30c6fd47646a1357f0593a3",
+      "expectedCategories": ["data_exfiltration", "interpreter_escape", "network_egress"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1048.003/T1048.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1048.003.yaml.txt",
+        "upstreamSha256": "127930b947c082bcbd72b6d4727cad8234c700c20a5eb4a108b27e9a36a2add5",
+        "upstreamId": "3ea1f938-f80a-4305-9aa8-431bc4867313",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Changed the served directory and port to inert evaluation values; retained the executor control flow."
       }
     }
   ]

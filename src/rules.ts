@@ -51,6 +51,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:crontab(?:\s+(?:-u|--user)\s+\S+)?\s+(?:-(?=\s|$)|"[^"]*"|'[^']*'|[^-\s]\S*)\s*$|systemctl\s+(?:enable|daemon-reload)\b|launchctl\s+(?:load|bootstrap)\b|schtasks\b)|(?:>>?|tee|install|cp|mv)[^;\n]*\/(?:etc\/cron|Library\/LaunchAgents|Library\/LaunchDaemons)\b/i,
   },
   {
+    id: "persistence.emond",
+    category: "persistence",
+    title: "Installs a macOS emond persistence rule",
+    severity: "high",
+    confidence: "high",
+    message: "Writes an emond rule or creates the client marker that activates event-monitor persistence.",
+    pattern: /^\s*(?:(?:cp|mv|install)\b[^;\n]*\s["']?\/(?:etc\/emond\.d\/rules|private\/var\/db\/emondClients)(?:\/[^"'\s;]+)?["']?\s*$|(?:touch|tee(?:\s+-a)?)\b[^;\n]*\s["']?\/private\/var\/db\/emondClients(?:\/[^"'\s;]+)?["']?(?:\s*<[^;\n]*)?\s*$|tee(?:\s+-a)?\b[^;\n]*\s["']?\/etc\/emond\.d\/rules(?:\/[^"'\s;]+)?["']?(?:\s*<[^;\n]*)?\s*$|[^;\n]*>>?\s*["']?\/(?:etc\/emond\.d\/rules|private\/var\/db\/emondClients)(?:\/[^"'\s;]+)?["']?\s*$)/i,
+  },
+  {
     id: "persistence.shell-rc",
     category: "persistence",
     title: "Writes a shell startup file",

@@ -1,0 +1,2 @@
+[ "$(uname)" = 'FreeBSD' ] && alias python3=python3.9
+if [ $(which python3) ]; then cd /tmp/atomic-share; python3 -m http.server 19090 & PID=$!; sleep 10; kill $PID; unset PID; fi

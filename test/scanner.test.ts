@@ -243,6 +243,40 @@ describe("scan", () => {
     }
   });
 
+  it("detects emond rule installation and activation without matching path mentions", () => {
+    const persistenceWrites = [
+      "sudo cp /tmp/payload.plist /etc/emond.d/rules/com.example.agent.plist",
+      "install -m 600 /tmp/payload.plist '/etc/emond.d/rules/com.example.agent.plist'",
+      "printf '%s' \"$plist\" > /etc/emond.d/rules/com.example.agent.plist",
+      "sudo touch /private/var/db/emondClients/com.example.agent",
+      "tee /private/var/db/emondClients/com.example.agent </dev/null",
+    ];
+    for (const source of persistenceWrites) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.emond"
+      )).toBe(true);
+    }
+
+    const hardNegatives = [
+      "ls -la /etc/emond.d/rules",
+      "cat /etc/emond.d/rules/com.apple.emond.plist",
+      "find /private/var/db/emondClients -type f",
+      "cp /etc/emond.d/rules/com.example.agent.plist /tmp/emond-backup.plist",
+      "cp /private/var/db/emondClients/com.example.agent /tmp/emond-client-backup",
+      "rm -f /etc/emond.d/rules/com.example.agent.plist",
+      "rm -f /private/var/db/emondClients/com.example.agent",
+      "cp /tmp/input.plist /tmp/emond-rule.plist",
+      "touch /tmp/emondClients",
+      "echo '/etc/emond.d/rules/com.example.agent.plist'",
+      "# touch /private/var/db/emondClients/com.example.agent",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.emond"
+      )).toBe(false);
+    }
+  });
+
   it("does not scan comments or ordinary string contents as commands", () => {
     const result = scan(`
       # curl https://example.test/a | bash
