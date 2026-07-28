@@ -227,8 +227,13 @@ function collectAliases(source: string, language: "python" | "javascript"): Map<
     for (const match of source.matchAll(/^\s*import\s+([\w.]+)\s+as\s+(\w+)/gm)) {
       aliases.set(match[2]!, match[1]!);
     }
-    for (const match of source.matchAll(/^\s*from\s+([\w.]+)\s+import\s+(\w+)(?:\s+as\s+(\w+))?/gm)) {
-      aliases.set(match[3] ?? match[2]!, `${match[1]}.${match[2]}`);
+    for (const match of source.matchAll(/^\s*from\s+([\w.]+)\s+import\s+([^\n#]+)/gm)) {
+      for (const binding of match[2]!.replace(/[()]/g, "").split(",")) {
+        const parts = binding.trim().split(/\s+as\s+/);
+        if (parts[0] && /^\w+$/.test(parts[0])) {
+          aliases.set(parts[1] ?? parts[0], `${match[1]}.${parts[0]}`);
+        }
+      }
     }
     return aliases;
   }
@@ -281,7 +286,7 @@ function canonicalizeCallee(callee: string, aliases: Map<string, string>): strin
   return replacement ? `${replacement}${callee.slice(identifier.length)}` : callee;
 }
 
-function collectPythonClientBindings(
+function collectPythonObjectBindings(
   root: SyntaxNode,
   aliases: Map<string, string>,
 ): void {
@@ -308,6 +313,7 @@ function collectPythonClientBindings(
       || constructor === "requests.Session"
       || constructor === "requests.session"
       || constructor === "twine.utils.make_requests_session"
+      || constructor === "adafruit_shell.Shell"
     ) {
       aliases.set(
         localName,
@@ -354,7 +360,7 @@ function scanAstLanguage(
   const parseErrors: SourceRange[] = [];
   const interestingNodes: SyntaxNode[] = [];
   const aliases = collectAliases(source, language);
-  if (language === "python") collectPythonClientBindings(tree.rootNode, aliases);
+  if (language === "python") collectPythonObjectBindings(tree.rootNode, aliases);
   const javascriptShadows = language === "javascript"
     ? collectJavaScriptShadows(tree.rootNode)
     : new Set<string>();
@@ -374,6 +380,85 @@ function scanAstLanguage(
     const analysisText = text.startsWith(originalCallee)
       ? `${callee}${text.slice(originalCallee.length)}`
       : text;
+    if (language === "python" && callee === "adafruit_shell.Shell.run_command") {
+      if (/\b(?:curl|wget)\b/i.test(text)) {
+        findings.push({
+          ruleId: "python.wrapper.adafruit-shell-network",
+          category: "network_egress",
+          title: "Downloads through Adafruit Shell",
+          severity: "medium",
+          confidence: "high",
+          message: "An Adafruit Shell command wrapper invokes a download utility.",
+          evidence: evidence(text, maxEvidence),
+          range: rangeOf(node),
+          language,
+        });
+      }
+      if (/\bsystemctl\s+enable\b/i.test(text)) {
+        findings.push({
+          ruleId: "python.wrapper.adafruit-shell-persistence",
+          category: "persistence",
+          title: "Enables a systemd service through Adafruit Shell",
+          severity: "high",
+          confidence: "high",
+          message: "An Adafruit Shell command wrapper enables a service at boot.",
+          evidence: evidence(text, maxEvidence),
+          range: rangeOf(node),
+          language,
+        });
+      }
+    }
+    if (
+      language === "python"
+      && /^adafruit_shell\.Shell\.(?:write_text_file|move|pattern_replace|remove)$/.test(callee)
+      && /(?:\/etc\/|\/usr\/local\/|\/boot\/)/.test(text)
+    ) {
+      findings.push({
+        ruleId: "python.wrapper.adafruit-shell-system",
+        category: "system_modification",
+        title: "Modifies a system path through Adafruit Shell",
+        severity: "high",
+        confidence: "high",
+        message: "An Adafruit Shell file helper targets a system configuration or installation path.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
+    if (
+      language === "python"
+      && callee === "adafruit_shell.Shell.remove"
+    ) {
+      findings.push({
+        ruleId: "python.wrapper.adafruit-shell-remove",
+        category: "destructive_behavior",
+        title: "Removes a file through Adafruit Shell",
+        severity: "high",
+        confidence: "high",
+        message: "An Adafruit Shell helper removes an installed or configuration file.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
+    if (
+      language === "python"
+      && callee === "pyanaconda.core.util.execWithRedirect"
+      && /["']auditctl["']/.test(text)
+      && /["']-e["']\s*,\s*["']0["']/.test(text)
+    ) {
+      findings.push({
+        ruleId: "python.defense-evasion.audit-disable",
+        category: "defense_evasion",
+        title: "Disables Linux auditing",
+        severity: "critical",
+        confidence: "high",
+        message: "Invokes auditctl with parameters that disable kernel auditing.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
     const javascriptRoot = originalCallee.match(/^[A-Za-z_$][\w$]*/)?.[0];
     const importedJavaScriptModule = javascriptRoot
       ? aliases.get(javascriptRoot)
@@ -450,6 +535,10 @@ function scanAstLanguage(
 
   const callText = interestingNodes.map((node) => source.slice(node.startIndex, node.endIndex)).join("\n");
   const callees = interestingNodes.map(calleeOf);
+  const canonicalCalls = interestingNodes.map((node) => ({
+    callee: canonicalizeCallee(calleeOf(node), aliases),
+    text: source.slice(node.startIndex, node.endIndex),
+  }));
   const rootRange = rangeOf(tree.rootNode);
   const addWholeSourceChain = (finding: Omit<Finding, "range" | "evidence" | "language">): void => {
     findings.push({
@@ -459,6 +548,32 @@ function scanAstLanguage(
       language,
     });
   };
+  if (
+    language === "python"
+    && canonicalCalls.some((call) =>
+      call.callee === "adafruit_shell.Shell.run_command"
+      && /\b(?:curl|wget)\b/i.test(call.text),
+    )
+    && canonicalCalls.some((call) =>
+      (
+        call.callee === "adafruit_shell.Shell.move"
+        && /\/usr\/local\/bin\//.test(call.text)
+      )
+      || (
+        call.callee === "os.chmod"
+        && /\/usr\/local\/bin\//.test(call.text)
+      ),
+    )
+  ) {
+    addWholeSourceChain({
+      ruleId: "python.chain.adafruit-download-install",
+      category: "download_execution",
+      title: "Downloads and installs an executable through Adafruit Shell",
+      severity: "critical",
+      confidence: "high",
+      message: "A wrapped download is moved into an executable system path or made executable.",
+    });
+  }
   const readCallee = language === "python"
     ? /(?:^|\.)(?:open|read_text|read_bytes)$/
     : /(?:^|\.)(?:readFile|readFileSync)$/;

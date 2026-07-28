@@ -330,6 +330,58 @@ rimraf(label)
 `);
     expect(localResult.findings.some((finding) => finding.category === "destructive_behavior")).toBe(false);
   });
+
+  it("summarizes source-bound Adafruit Shell installer behavior", () => {
+    const result = scanPython(`
+from adafruit_shell import Shell
+import os
+shell = Shell()
+shell.run_command("curl -f -o /tmp/tool https://example.invalid/tool")
+shell.move("/tmp/tool", "/usr/local/bin/tool")
+os.chmod("/usr/local/bin/tool", 0o755)
+shell.write_text_file("/etc/systemd/system/tool.service", unit)
+shell.run_command("systemctl enable tool.service")
+shell.remove("/etc/systemd/system/old-tool.service")
+`);
+    for (const category of [
+      "download_execution",
+      "network_egress",
+      "persistence",
+      "system_modification",
+      "destructive_behavior",
+    ] as const) {
+      expect(result.findings.some((finding) => finding.category === category)).toBe(true);
+    }
+
+    const localResult = scanPython(`
+class Shell:
+    def run_command(self, value):
+        return value
+shell = Shell()
+shell.run_command("curl documentation")
+`);
+    expect(localResult.findings).toHaveLength(0);
+  });
+
+  it("distinguishes disabling audit from querying audit state", () => {
+    const disabled = scanPython(`
+from pyanaconda.core import constants, path, util
+util.execWithRedirect("auditctl", ["-e", "0"])
+`);
+    expect(disabled.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "python.defense-evasion.audit-disable",
+        category: "defense_evasion",
+      }),
+    ]));
+
+    const query = scanPython(`
+from pyanaconda.core import util
+util.execWithRedirect("auditctl", ["-l"])
+util.execWithRedirect("auditctl", ["-s"])
+`);
+    expect(query.findings.some((finding) => finding.category === "defense_evasion")).toBe(false);
+  });
 });
 
 describe("embedded interpreter payloads", () => {

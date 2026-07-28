@@ -45,10 +45,10 @@
   </header>
 
   <div class="cards">
-    <div class="card"><div class="metric">77 / 77</div><div>单元测试通过</div></div>
+    <div class="card"><div class="metric">79 / 79</div><div>单元测试通过</div></div>
     <div class="card"><div class="metric">2 / 2</div><div>测试文件通过</div></div>
-    <div class="card"><div class="metric">36 / 38</div><div>语料完全匹配</div></div>
-    <div class="card"><div class="metric">90.9%</div><div>语料总体召回率</div></div>
+    <div class="card"><div class="metric">38 / 40</div><div>语料完全匹配</div></div>
+    <div class="card"><div class="metric">97.2%</div><div>语料总体召回率</div></div>
   </div>
 
   <section>
@@ -56,7 +56,7 @@
     <p class="pass">通过：Bash、Python 和 Node.js 均能在精选样例中检出全部 12 类风险。</p>
     <p>额外测试覆盖行为链、可信下载域名、私网 IP、源码位置、语法错误、
       Bash 内嵌 Python/Node.js、静态管道、heredoc、扫描限制和已知误报边界。</p>
-    <p class="muted">报告基线：2 个测试文件、77 个测试。详细断言和耗时见
+    <p class="muted">报告基线：2 个测试文件、79 个测试。详细断言和耗时见
       <a href="./test-report.html">Vitest HTML 报告</a>。</p>
   </section>
 
@@ -109,10 +109,10 @@
 
   <section class="warning">
     <h2>当前结论边界</h2>
-    <p>38 条离线语料得到 precision 100%、recall 90.9%、F1 95.2%，但样本规模仍小，
-      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。上一轮 Twine session
-      工厂和 rimraf 缺口已修复；新的冻结 test 集保留 6 个 FN：Adafruit 安装器
-      wrapper 内的下载执行、网络、持久化、系统修改、删除，以及 Anaconda 关闭审计。
+    <p>40 条离线语料得到 precision 100%、recall 97.2%、F1 98.6%，但样本规模仍小，
+      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。上一轮 Adafruit
+      wrapper 和 Anaconda 关闭审计的 6 个缺口已修复；新的冻结 test 集检出 3 类行为，
+      同时保留 2 个 FN：promisified exec 的 SUID chmod，以及复制 udev 规则的系统修改。
       这些新缺口没有在本轮针对测试集调参。</p>
   </section>
 

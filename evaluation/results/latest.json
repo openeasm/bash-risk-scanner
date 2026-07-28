@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T14:56:43.457Z",
+  "generatedAt": "2026-07-28T15:04:58.717Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -42,20 +42,20 @@
     "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 38,
-    "passedSamples": 36,
+    "sampleCount": 40,
+    "passedSamples": 38,
     "failedSamples": 2,
-    "tp": 60,
+    "tp": 69,
     "fp": 0,
-    "fn": 6,
+    "fn": 2,
     "precision": 1,
-    "recall": 0.9090909090909091,
-    "f1": 0.9523809523809523,
-    "parseErrorRate": 0.02631578947368421,
+    "recall": 0.971830985915493,
+    "f1": 0.9857142857142858,
+    "parseErrorRate": 0.025,
     "performance": {
-      "p50Milliseconds": 1.4870619999999946,
-      "p95Milliseconds": 62.05127199999998,
-      "maximumMilliseconds": 97.752917
+      "p50Milliseconds": 1.5368850000000407,
+      "p95Milliseconds": 34.260216000000014,
+      "maximumMilliseconds": 98.03614200000001
     }
   },
   "languages": {
@@ -68,20 +68,20 @@
       "f1": 1
     },
     "python": {
-      "tp": 21,
+      "tp": 29,
       "fp": 0,
-      "fn": 6,
+      "fn": 1,
       "precision": 1,
-      "recall": 0.7777777777777778,
-      "f1": 0.8750000000000001
+      "recall": 0.9666666666666667,
+      "f1": 0.983050847457627
     },
     "node": {
-      "tp": 20,
+      "tp": 21,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.9545454545454546,
+      "f1": 0.9767441860465117
     }
   },
   "provenanceGroups": {
@@ -94,12 +94,12 @@
       "f1": 1
     },
     "public-snapshot": {
-      "tp": 29,
+      "tp": 38,
       "fp": 0,
-      "fn": 6,
+      "fn": 2,
       "precision": 1,
-      "recall": 0.8285714285714286,
-      "f1": 0.90625
+      "recall": 0.95,
+      "f1": 0.9743589743589743
     },
     "synthetic-realistic": {
       "tp": 25,
@@ -120,15 +120,15 @@
       "f1": 1
     },
     "test": {
-      "tp": 0,
+      "tp": 3,
       "fp": 0,
-      "fn": 6,
+      "fn": 2,
       "precision": 1,
-      "recall": 0,
-      "f1": 0
+      "recall": 0.6,
+      "f1": 0.7499999999999999
     },
     "validation": {
-      "tp": 35,
+      "tp": 41,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -154,31 +154,31 @@
       "f1": 1
     },
     "defense_evasion": {
-      "tp": 1,
-      "fp": 0,
-      "fn": 1,
-      "precision": 1,
-      "recall": 0.5,
-      "f1": 0.6666666666666666
-    },
-    "destructive_behavior": {
-      "tp": 5,
-      "fp": 0,
-      "fn": 1,
-      "precision": 1,
-      "recall": 0.8333333333333334,
-      "f1": 0.9090909090909091
-    },
-    "download_execution": {
       "tp": 2,
       "fp": 0,
-      "fn": 1,
+      "fn": 0,
       "precision": 1,
-      "recall": 0.6666666666666666,
-      "f1": 0.8
+      "recall": 1,
+      "f1": 1
+    },
+    "destructive_behavior": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "download_execution": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
     },
     "dynamic_execution": {
-      "tp": 4,
+      "tp": 6,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -194,28 +194,28 @@
       "f1": 1
     },
     "network_egress": {
-      "tp": 21,
-      "fp": 0,
-      "fn": 1,
-      "precision": 1,
-      "recall": 0.9545454545454546,
-      "f1": 0.9767441860465117
-    },
-    "persistence": {
-      "tp": 3,
-      "fp": 0,
-      "fn": 1,
-      "precision": 1,
-      "recall": 0.75,
-      "f1": 0.8571428571428571
-    },
-    "privilege_escalation": {
-      "tp": 1,
+      "tp": 22,
       "fp": 0,
       "fn": 0,
       "precision": 1,
       "recall": 1,
       "f1": 1
+    },
+    "persistence": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "privilege_escalation": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.6666666666666666,
+      "f1": 0.8
     },
     "second_stage_payload": {
       "tp": 3,
@@ -226,12 +226,12 @@
       "f1": 1
     },
     "system_modification": {
-      "tp": 1,
+      "tp": 2,
       "fp": 0,
       "fn": 1,
       "precision": 1,
-      "recall": 0.5,
-      "f1": 0.6666666666666666
+      "recall": 0.6666666666666666,
+      "f1": 0.8
     }
   },
   "samples": [
@@ -278,7 +278,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 12.634248,
+      "durationMilliseconds": 15.203206000000009,
       "passed": true
     },
     {
@@ -337,7 +337,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7735720000000015,
+      "durationMilliseconds": 0.9936549999999897,
       "passed": true
     },
     {
@@ -375,7 +375,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.5574860000000115,
+      "durationMilliseconds": 0.7463699999999989,
       "passed": true
     },
     {
@@ -413,7 +413,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.8820829999999944,
+      "durationMilliseconds": 1.1804160000000081,
       "passed": true
     },
     {
@@ -439,7 +439,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3653359999999992,
+      "durationMilliseconds": 0.39760599999999613,
       "passed": true
     },
     {
@@ -465,7 +465,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9692600000000056,
+      "durationMilliseconds": 1.2718169999999986,
       "passed": true
     },
     {
@@ -503,7 +503,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.8479289999999935,
+      "durationMilliseconds": 6.443455000000014,
       "passed": true
     },
     {
@@ -549,7 +549,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.4870619999999946,
+      "durationMilliseconds": 2.061458999999985,
       "passed": true
     },
     {
@@ -587,7 +587,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0339910000000003,
+      "durationMilliseconds": 1.2029480000000206,
       "passed": true
     },
     {
@@ -646,7 +646,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.2243759999999924,
+      "durationMilliseconds": 2.2619860000000074,
       "passed": true
     },
     {
@@ -684,7 +684,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.8611269999999962,
+      "durationMilliseconds": 0.8715860000000077,
       "passed": true
     },
     {
@@ -710,7 +710,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1009770000000003,
+      "durationMilliseconds": 1.212855999999988,
       "passed": true
     },
     {
@@ -736,7 +736,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.2275769999999966,
+      "durationMilliseconds": 0.2581340000000125,
       "passed": true
     },
     {
@@ -782,7 +782,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.414091000000013,
+      "durationMilliseconds": 5.459606999999977,
       "passed": true
     },
     {
@@ -820,7 +820,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.806190000000015,
+      "durationMilliseconds": 1.6387360000000228,
       "passed": true
     },
     {
@@ -874,7 +874,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.5174690000000055,
+      "durationMilliseconds": 1.664223000000021,
       "passed": true
     },
     {
@@ -928,7 +928,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2472319999999968,
+      "durationMilliseconds": 1.2369309999999984,
       "passed": true
     },
     {
@@ -966,7 +966,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6121189999999785,
+      "durationMilliseconds": 0.7641040000000032,
       "passed": true
     },
     {
@@ -992,7 +992,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6509920000000022,
+      "durationMilliseconds": 0.6398010000000056,
       "passed": true
     },
     {
@@ -1018,7 +1018,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.2730019999999911,
+      "durationMilliseconds": 0.27408499999998526,
       "passed": true
     },
     {
@@ -1086,7 +1086,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 62.05127199999998,
+      "durationMilliseconds": 71.17834000000002,
       "passed": true
     },
     {
@@ -1290,7 +1290,7 @@
       "findingCount": 32,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 97.752917,
+      "durationMilliseconds": 98.03614200000001,
       "passed": true
     },
     {
@@ -1340,7 +1340,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.3602539999999976,
+      "durationMilliseconds": 1.1661090000000058,
       "passed": true
     },
     {
@@ -1382,7 +1382,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.2427449999999567,
+      "durationMilliseconds": 0.20645700000000033,
       "passed": true
     },
     {
@@ -1424,7 +1424,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4047400000000039,
+      "durationMilliseconds": 0.3371620000000348,
       "passed": true
     },
     {
@@ -1474,7 +1474,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.494638000000009,
+      "durationMilliseconds": 0.4122340000000122,
       "passed": true
     },
     {
@@ -1545,7 +1545,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 35.317102000000034,
+      "durationMilliseconds": 33.21428300000002,
       "passed": true
     },
     {
@@ -1609,7 +1609,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 9.581988999999965,
+      "durationMilliseconds": 8.867725000000007,
       "passed": true
     },
     {
@@ -1674,7 +1674,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.221126999999967,
+      "durationMilliseconds": 3.8963229999999953,
       "passed": true
     },
     {
@@ -1745,7 +1745,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 26.783751999999993,
+      "durationMilliseconds": 27.514103999999975,
       "passed": true
     },
     {
@@ -1785,7 +1785,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.6571080000000507,
+      "durationMilliseconds": 3.4348269999999843,
       "passed": true
     },
     {
@@ -1825,7 +1825,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.996209999999962,
+      "durationMilliseconds": 6.422354999999982,
       "passed": true
     },
     {
@@ -1873,7 +1873,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2422320000000013,
+      "durationMilliseconds": 1.5368850000000407,
       "passed": true
     },
     {
@@ -1913,7 +1913,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7742130000000316,
+      "durationMilliseconds": 0.7041909999999802,
       "passed": true
     },
     {
@@ -1974,7 +1974,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 16.682709999999986,
+      "durationMilliseconds": 18.59507199999996,
       "passed": true
     },
     {
@@ -2014,12 +2014,12 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.587251999999978,
+      "durationMilliseconds": 5.424441000000002,
       "passed": true
     },
     {
       "id": "holdout-adafruit-retrogame-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/adafruit-retrogame/retrogame.py.txt",
@@ -2039,27 +2039,119 @@
         "persistence",
         "system_modification"
       ],
-      "actualCategories": [],
-      "actualFindings": [],
-      "truePositives": [],
-      "falsePositives": [],
-      "falseNegatives": [
+      "actualCategories": [
         "destructive_behavior",
         "download_execution",
         "network_egress",
         "persistence",
         "system_modification"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.chain.adafruit-download-install",
+          "category": "download_execution",
+          "evidence": "Shell() shell.write_text_file( \"/etc/systemd/system/retrogame.service\", \"\"\"[Unit] Description=Adafruit Retrogame GPIO-to-keypress daemon After=multi-user.target [Service] Type=simple ExecStart=/usr/local/bin/retrogame Restart=on-failure Re…"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.write_text_file( \"/etc/systemd/system/retrogame.service\", \"\"\"[Unit] Description=Adafruit Retrogame GPIO-to-keypress daemon After=multi-user.target [Service] Type=simple ExecStart=/usr/local/bin/retrogame Restart=on-failure RestartSec…"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-persistence",
+          "category": "persistence",
+          "evidence": "shell.run_command(\"systemctl enable retrogame.service\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.remove(\"/etc/systemd/system/retrogame.service\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-remove",
+          "category": "destructive_behavior",
+          "evidence": "shell.remove(\"/etc/systemd/system/retrogame.service\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.remove(\"/usr/local/bin/retrogame\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-remove",
+          "category": "destructive_behavior",
+          "evidence": "shell.remove(\"/usr/local/bin/retrogame\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.remove(\"/etc/udev/rules.d/10-retrogame.rules\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-remove",
+          "category": "destructive_behavior",
+          "evidence": "shell.remove(\"/etc/udev/rules.d/10-retrogame.rules\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.pattern_replace( \"/etc/rc.local\", r\"[^\\n]*retrogame[^\\n]*\\n\", multi_line=True )"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.remove(\"/boot/retrogame.cfg\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-remove",
+          "category": "destructive_behavior",
+          "evidence": "shell.remove(\"/boot/retrogame.cfg\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-network",
+          "category": "network_egress",
+          "evidence": "shell.run_command(f\"curl -f -s -o /tmp/retrogame {RETROGAME_URL}\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.move(\"/tmp/retrogame\", \"/usr/local/bin/retrogame\")"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-network",
+          "category": "network_egress",
+          "evidence": "shell.run_command( f\"curl -f -s -o /boot/retrogame.cfg {RETROGAME_CFG_BASE}/retrogame.cfg.{config_name}\" )"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.write_text_file( \"/etc/udev/rules.d/10-retrogame.rules\", 'SUBSYSTEM==\"input\", ATTRS{name}==\"retrogame\", ENV{ID_INPUT_KEYBOARD}=\"1\"', append=False, )"
+        },
+        {
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "category": "system_modification",
+          "evidence": "shell.pattern_replace( \"/etc/rc.local\", r\"[^\\n]*retrogame[^\\n]*\\n\", multi_line=True )"
+        }
+      ],
+      "truePositives": [
+        "destructive_behavior",
+        "download_execution",
+        "network_egress",
+        "persistence",
+        "system_modification"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 0,
+      "findingCount": 17,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 11.613623000000018,
-      "passed": false
+      "durationMilliseconds": 10.381416000000002,
+      "passed": true
     },
     {
       "id": "holdout-anaconda-audit-disable-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/anaconda/anaconda.py.txt",
@@ -2075,18 +2167,140 @@
       "expectedCategories": [
         "defense_evasion"
       ],
-      "actualCategories": [],
-      "actualFindings": [],
-      "truePositives": [],
-      "falsePositives": [],
-      "falseNegatives": [
+      "actualCategories": [
         "defense_evasion"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.defense-evasion.audit-disable",
+          "category": "defense_evasion",
+          "evidence": "util.execWithRedirect(\"auditctl\", [\"-e\", \"0\"])"
+        }
+      ],
+      "truePositives": [
+        "defense_evasion"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 0,
+      "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 32.113467999999955,
+      "durationMilliseconds": 34.260216000000014,
+      "passed": true
+    },
+    {
+      "id": "holdout-electorrent-suid-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/electorrent/after-pack.js.txt",
+      "sha256": "7d37dc6ab8d29e16ff131afbab4e4f94c4f7d2cf68635dcc64da627d2772dcbd",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "tympanix/Electorrent",
+        "commit": "89eb958ece9cf5eaacec529bb75c4c2ab619210f",
+        "sourceUrl": "https://github.com/tympanix/Electorrent/blob/89eb958ece9cf5eaacec529bb75c4c2ab619210f/util/after-pack.js",
+        "license": "GPL-3.0-only",
+        "licenseFile": "public/electorrent/LICENSE"
+      },
+      "expectedCategories": [
+        "dynamic_execution",
+        "privilege_escalation"
+      ],
+      "actualCategories": [
+        "dynamic_execution"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "exec(`chmod 4755 ${chromeSandbox}`)"
+        }
+      ],
+      "truePositives": [
+        "dynamic_execution"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        "privilege_escalation"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.456354000000033,
+      "passed": false
+    },
+    {
+      "id": "holdout-whad-capabilities-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/whad-client/setup.py.txt",
+      "sha256": "ae4aca4ba3ec7acd9950216164322679e92cd40600fe0d9cd7953389b189c100",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "whad-team/whad-client",
+        "commit": "57f7370e58cc9d0d318f3986ac3808335251cea7",
+        "sourceUrl": "https://github.com/whad-team/whad-client/blob/57f7370e58cc9d0d318f3986ac3808335251cea7/setup.py",
+        "license": "MIT",
+        "licenseFile": "public/whad-client/LICENSE"
+      },
+      "expectedCategories": [
+        "dynamic_execution",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "actualCategories": [
+        "dynamic_execution",
+        "privilege_escalation"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "python.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "Popen(['udevadm', 'control', '--reload-rules'], stderr=PIPE, stdout=PIPE)"
+        },
+        {
+          "ruleId": "python.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "Popen(['udevadm', 'trigger'], stderr=PIPE, stdout=PIPE)"
+        },
+        {
+          "ruleId": "python.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "Popen(['usermod', '-a', '-G', group, getlogin()], stdout=PIPE, stderr=PIPE)"
+        },
+        {
+          "ruleId": "python.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "Popen(['getcap', interpreter], stdout=PIPE, stderr=PIPE)"
+        },
+        {
+          "ruleId": "python.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "Popen(['setcap', 'cap_net_admin,cap_net_raw+eip',interpreter], stdout=PIPE, stderr=PIPE)"
+        },
+        {
+          "ruleId": "python.privilege",
+          "category": "privilege_escalation",
+          "evidence": "Popen(['setcap', 'cap_net_admin,cap_net_raw+eip',interpreter], stdout=PIPE, stderr=PIPE)"
+        }
+      ],
+      "truePositives": [
+        "dynamic_execution",
+        "privilege_escalation"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        "system_modification"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 6,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 8.913180000000011,
       "passed": false
     }
   ]

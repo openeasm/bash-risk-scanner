@@ -13,11 +13,11 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">36/38</div>样本通过</div>
+<div class="card"><div class="big">38/40</div>样本通过</div>
 <div class="card"><div class="big">100.0%</div>Precision</div>
-<div class="card"><div class="big">90.9%</div>Recall</div>
-<div class="card"><div class="big">95.2%</div>F1</div>
-<div class="card"><div class="big">62.05 ms</div>P95</div>
+<div class="card"><div class="big">97.2%</div>Recall</div>
+<div class="card"><div class="big">98.6%</div>F1</div>
+<div class="card"><div class="big">34.26 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
@@ -26,12 +26,12 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>python</td><td>21</td><td>0</td><td>6</td>
-    <td>100.0%</td><td>77.8%</td><td>87.5%</td>
+    <td>python</td><td>29</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>96.7%</td><td>98.3%</td>
   </tr>
 <tr>
-    <td>node</td><td>20</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>node</td><td>21</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>95.5%</td><td>97.7%</td>
   </tr></tbody></table>
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
@@ -40,8 +40,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>public-snapshot</td><td>29</td><td>0</td><td>6</td>
-    <td>100.0%</td><td>82.9%</td><td>90.6%</td>
+    <td>public-snapshot</td><td>38</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>95.0%</td><td>97.4%</td>
   </tr>
 <tr>
     <td>synthetic-realistic</td><td>25</td><td>0</td><td>0</td>
@@ -54,11 +54,11 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>test</td><td>0</td><td>0</td><td>6</td>
-    <td>100.0%</td><td>0.0%</td><td>0.0%</td>
+    <td>test</td><td>3</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>60.0%</td><td>75.0%</td>
   </tr>
 <tr>
-    <td>validation</td><td>35</td><td>0</td><td>0</td>
+    <td>validation</td><td>41</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
@@ -72,19 +72,19 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>defense_evasion</td><td>1</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>50.0%</td><td>66.7%</td>
+    <td>defense_evasion</td><td>2</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>destructive_behavior</td><td>5</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>83.3%</td><td>90.9%</td>
+    <td>destructive_behavior</td><td>6</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>download_execution</td><td>2</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>66.7%</td><td>80.0%</td>
+    <td>download_execution</td><td>3</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>dynamic_execution</td><td>4</td><td>0</td><td>0</td>
+    <td>dynamic_execution</td><td>6</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -92,34 +92,34 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>network_egress</td><td>21</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>95.5%</td><td>97.7%</td>
-  </tr>
-<tr>
-    <td>persistence</td><td>3</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>75.0%</td><td>85.7%</td>
-  </tr>
-<tr>
-    <td>privilege_escalation</td><td>1</td><td>0</td><td>0</td>
+    <td>network_egress</td><td>22</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>persistence</td><td>4</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>privilege_escalation</td><td>2</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>66.7%</td><td>80.0%</td>
   </tr>
 <tr>
     <td>second_stage_payload</td><td>3</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>system_modification</td><td>1</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>50.0%</td><td>66.7%</td>
+    <td>system_modification</td><td>2</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>66.7%</td><td>80.0%</td>
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-adafruit-retrogame-001</code><br>adafruit/Raspberry-Pi-Installer-Scripts<br><span class="muted">public/adafruit-retrogame/retrogame.py.txt</span></td>
-<td>destructive_behavior, download_execution, network_egress, persistence, system_modification</td><td>无</td>
-<td class="fail">destructive_behavior, download_execution, network_egress, persistence, system_modification</td>
-<td>无</td></tr>
-<tr><td><code>holdout-anaconda-audit-disable-001</code><br>rhinstaller/anaconda<br><span class="muted">public/anaconda/anaconda.py.txt</span></td>
-<td>defense_evasion</td><td>无</td>
-<td class="fail">defense_evasion</td>
-<td>无</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T14:56:43.457Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<tr><td><code>holdout-electorrent-suid-001</code><br>tympanix/Electorrent<br><span class="muted">public/electorrent/after-pack.js.txt</span></td>
+<td>dynamic_execution, privilege_escalation</td><td>dynamic_execution</td>
+<td class="fail">privilege_escalation</td>
+<td><code>javascript.dynamic-code</code>: exec(`chmod 4755 ${chromeSandbox}`)</td></tr>
+<tr><td><code>holdout-whad-capabilities-001</code><br>whad-team/whad-client<br><span class="muted">public/whad-client/setup.py.txt</span></td>
+<td>dynamic_execution, privilege_escalation, system_modification</td><td>dynamic_execution, privilege_escalation</td>
+<td class="fail">system_modification</td>
+<td><code>python.dynamic-code</code>: Popen(['udevadm', 'control', '--reload-rules'], stderr=PIPE, stdout=PIPE)<br><code>python.dynamic-code</code>: Popen(['udevadm', 'trigger'], stderr=PIPE, stdout=PIPE)<br><code>python.dynamic-code</code>: Popen(['usermod', '-a', '-G', group, getlogin()], stdout=PIPE, stderr=PIPE)<br><code>python.dynamic-code</code>: Popen(['getcap', interpreter], stdout=PIPE, stderr=PIPE)<br><code>python.dynamic-code</code>: Popen(['setcap', 'cap_net_admin,cap_net_raw+eip',interpreter], stdout=PIPE, stderr=PIPE)<br><code>python.privilege</code>: Popen(['setcap', 'cap_net_admin,cap_net_raw+eip',interpreter], stdout=PIPE, stderr=PIPE)</td></tr></tbody></table>
+<p class="muted">生成时间：2026-07-28T15:04:58.717Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

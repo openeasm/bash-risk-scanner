@@ -602,7 +602,7 @@
     },
     {
       "id": "holdout-adafruit-retrogame-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/adafruit-retrogame/retrogame.py.txt",
@@ -613,6 +613,32 @@
         "persistence",
         "system_modification",
         "destructive_behavior"
+      ],
+      "expectedFindings": [
+        {
+          "category": "download_execution",
+          "ruleId": "python.chain.adafruit-download-install"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "python.wrapper.adafruit-shell-network",
+          "evidencePattern": "curl"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "python.wrapper.adafruit-shell-persistence",
+          "evidencePattern": "systemctl enable"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "evidencePattern": "/etc/systemd/system"
+        },
+        {
+          "category": "destructive_behavior",
+          "ruleId": "python.wrapper.adafruit-shell-remove",
+          "evidencePattern": "shell[.]remove"
+        }
       ],
       "provenance": {
         "type": "public-snapshot",
@@ -625,12 +651,19 @@
     },
     {
       "id": "holdout-anaconda-audit-disable-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/anaconda/anaconda.py.txt",
       "sha256": "d726cca651d791df8a33c6f2b739f954b20ced42e814e1df4d8a6ab8f631caec",
       "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "python.defense-evasion.audit-disable",
+          "evidencePattern": "auditctl"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "rhinstaller/anaconda",
@@ -638,6 +671,44 @@
         "sourceUrl": "https://github.com/rhinstaller/anaconda/blob/43a7fc4c561566fa16003752ed79db96ba3cee4e/anaconda.py",
         "license": "GPL-2.0-only",
         "licenseFile": "public/anaconda/COPYING"
+      }
+    },
+    {
+      "id": "holdout-electorrent-suid-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/electorrent/after-pack.js.txt",
+      "sha256": "7d37dc6ab8d29e16ff131afbab4e4f94c4f7d2cf68635dcc64da627d2772dcbd",
+      "expectedCategories": ["dynamic_execution", "privilege_escalation"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "tympanix/Electorrent",
+        "commit": "89eb958ece9cf5eaacec529bb75c4c2ab619210f",
+        "sourceUrl": "https://github.com/tympanix/Electorrent/blob/89eb958ece9cf5eaacec529bb75c4c2ab619210f/util/after-pack.js",
+        "license": "GPL-3.0-only",
+        "licenseFile": "public/electorrent/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-whad-capabilities-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/whad-client/setup.py.txt",
+      "sha256": "ae4aca4ba3ec7acd9950216164322679e92cd40600fe0d9cd7953389b189c100",
+      "expectedCategories": [
+        "dynamic_execution",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "whad-team/whad-client",
+        "commit": "57f7370e58cc9d0d318f3986ac3808335251cea7",
+        "sourceUrl": "https://github.com/whad-team/whad-client/blob/57f7370e58cc9d0d318f3986ac3808335251cea7/setup.py",
+        "license": "MIT",
+        "licenseFile": "public/whad-client/LICENSE"
       }
     }
   ]

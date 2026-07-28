@@ -147,6 +147,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/rhinstaller/anaconda/43a7fc4c561566fa16003752ed79db96ba3cee4e/COPYING",
     sha256: "4e5c6316d44ccbdc1260ab522076aecf51b8b4acd8bc073f60039e23b1852b72",
   },
+  {
+    target: "electorrent/after-pack.js.txt",
+    url: "https://raw.githubusercontent.com/tympanix/Electorrent/89eb958ece9cf5eaacec529bb75c4c2ab619210f/util/after-pack.js",
+    sha256: "7d37dc6ab8d29e16ff131afbab4e4f94c4f7d2cf68635dcc64da627d2772dcbd",
+  },
+  {
+    target: "electorrent/LICENSE",
+    url: "https://raw.githubusercontent.com/tympanix/Electorrent/89eb958ece9cf5eaacec529bb75c4c2ab619210f/LICENSE",
+    sha256: "07f4a2a6d6daeb7769bfa8d3f390f661ec320d6ef84cfe2b4e2207c0af3a5b0e",
+  },
+  {
+    target: "whad-client/setup.py.txt",
+    url: "https://raw.githubusercontent.com/whad-team/whad-client/57f7370e58cc9d0d318f3986ac3808335251cea7/setup.py",
+    sha256: "ae4aca4ba3ec7acd9950216164322679e92cd40600fe0d9cd7953389b189c100",
+  },
+  {
+    target: "whad-client/LICENSE",
+    url: "https://raw.githubusercontent.com/whad-team/whad-client/57f7370e58cc9d0d318f3986ac3808335251cea7/LICENSE",
+    sha256: "376a52eab9ed060dd46ff77d74923de04e16a7b5e210128746f4f30673fe0296",
+  },
 ];
 
 async function download(url) {
