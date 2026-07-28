@@ -13,25 +13,25 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">44/46</div>样本通过</div>
-<div class="card"><div class="big">100.0%</div>Precision</div>
-<div class="card"><div class="big">95.5%</div>Recall</div>
-<div class="card"><div class="big">97.7%</div>F1</div>
-<div class="card"><div class="big">90.54 ms</div>P95</div>
+<div class="card"><div class="big">46/48</div>样本通过</div>
+<div class="card"><div class="big">98.9%</div>Precision</div>
+<div class="card"><div class="big">93.8%</div>Recall</div>
+<div class="card"><div class="big">96.3%</div>F1</div>
+<div class="card"><div class="big">97.20 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>21</td><td>0</td><td>2</td>
-    <td>100.0%</td><td>91.3%</td><td>95.5%</td>
+    <td>bash</td><td>24</td><td>0</td><td>4</td>
+    <td>100.0%</td><td>85.7%</td><td>92.3%</td>
   </tr>
 <tr>
     <td>python</td><td>34</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>node</td><td>30</td><td>0</td><td>2</td>
-    <td>100.0%</td><td>93.8%</td><td>96.8%</td>
+    <td>node</td><td>32</td><td>1</td><td>2</td>
+    <td>97.0%</td><td>94.1%</td><td>95.5%</td>
   </tr></tbody></table>
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
@@ -40,8 +40,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>public-snapshot</td><td>54</td><td>0</td><td>4</td>
-    <td>100.0%</td><td>93.1%</td><td>96.4%</td>
+    <td>public-snapshot</td><td>59</td><td>1</td><td>6</td>
+    <td>98.3%</td><td>90.8%</td><td>94.4%</td>
   </tr>
 <tr>
     <td>synthetic-realistic</td><td>25</td><td>0</td><td>0</td>
@@ -54,11 +54,11 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>test</td><td>3</td><td>0</td><td>4</td>
-    <td>100.0%</td><td>42.9%</td><td>60.0%</td>
+    <td>test</td><td>1</td><td>1</td><td>6</td>
+    <td>50.0%</td><td>14.3%</td><td>22.2%</td>
   </tr>
 <tr>
-    <td>validation</td><td>57</td><td>0</td><td>0</td>
+    <td>validation</td><td>64</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
@@ -68,8 +68,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>data_exfiltration</td><td>9</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>90.0%</td><td>94.7%</td>
+    <td>data_exfiltration</td><td>10</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>90.9%</td><td>95.2%</td>
   </tr>
 <tr>
     <td>defense_evasion</td><td>2</td><td>0</td><td>0</td>
@@ -84,42 +84,42 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>dynamic_execution</td><td>8</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>dynamic_execution</td><td>8</td><td>1</td><td>1</td>
+    <td>88.9%</td><td>88.9%</td><td>88.9%</td>
   </tr>
 <tr>
     <td>interpreter_escape</td><td>5</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>network_egress</td><td>26</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>96.3%</td><td>98.1%</td>
+    <td>network_egress</td><td>27</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>93.1%</td><td>96.4%</td>
   </tr>
 <tr>
-    <td>persistence</td><td>4</td><td>0</td><td>1</td>
+    <td>persistence</td><td>5</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>83.3%</td><td>90.9%</td>
+  </tr>
+<tr>
+    <td>privilege_escalation</td><td>4</td><td>0</td><td>1</td>
     <td>100.0%</td><td>80.0%</td><td>88.9%</td>
-  </tr>
-<tr>
-    <td>privilege_escalation</td><td>3</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>75.0%</td><td>85.7%</td>
   </tr>
 <tr>
     <td>second_stage_payload</td><td>4</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>system_modification</td><td>4</td><td>0</td><td>0</td>
+    <td>system_modification</td><td>5</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-tailscale-installer-001</code><br>tailscale/tailscale<br><span class="muted">public/tailscale/installer.sh.txt</span></td>
-<td>network_egress, persistence, privilege_escalation, system_modification</td><td>network_egress, system_modification</td>
-<td class="fail">persistence, privilege_escalation</td>
-<td><code>system.sensitive-config</code>: curl -fsSL &quot;https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo&quot; &gt; /etc/yum.repos.d/tailscale.repo<br><code>network.tool</code>: curl -fsSL &quot;https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo&quot; &gt; /etc/yum.repos.d/tailscale.repo</td></tr>
-<tr><td><code>holdout-semantic-release-npm-publish-001</code><br>semantic-release/npm<br><span class="muted">public/semantic-release-npm/publish.js.txt</span></td>
-<td>data_exfiltration, dynamic_execution, network_egress</td><td>dynamic_execution</td>
+<tr><td><code>holdout-docker-installer-wrapper-001</code><br>docker/docker-install<br><span class="muted">public/docker-install/install.sh.txt</span></td>
+<td>dynamic_execution, network_egress, persistence, privilege_escalation, system_modification</td><td>system_modification</td>
+<td class="fail">dynamic_execution, network_egress, persistence, privilege_escalation</td>
+<td><code>system.sensitive-config</code>: $sh_c &quot;echo \&quot;$apt_repo\&quot; &gt; /etc/apt/sources.list.d/docker.list&quot;</td></tr>
+<tr><td><code>holdout-npm-cli-publish-001</code><br>npm/cli<br><span class="muted">public/npm-cli/publish.js.txt</span></td>
+<td>data_exfiltration, network_egress</td><td>dynamic_execution</td>
 <td class="fail">data_exfiltration, network_egress</td>
-<td><code>javascript.dynamic-code</code>: execa( &quot;npm&quot;, [&quot;publish&quot;, basePath, &quot;--userconfig&quot;, npmrc, &quot;--tag&quot;, distTag, &quot;--registry&quot;, registry], { cwd, env, preferLocal: true } )</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T15:37:55.226Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<td><code>javascript.dynamic-code</code>: this.exec(args)</td></tr></tbody></table>
+<p class="muted">生成时间：2026-07-28T15:45:25.228Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

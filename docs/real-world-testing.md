@@ -32,7 +32,8 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 node-gyp、aiohttp、pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
 Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop、
 CPython smtplib、Tailscale installer 和 semantic-release/npm 代码，以及
-Atomic Red Team 的 Bash 命令和 Python telnet client。
+Docker installer、npm CLI publish、Atomic Red Team 的 Bash 命令和 Python telnet
+client。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -110,8 +111,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 46 条离线语料：44 条完全匹配，precision 100%、recall 95.5%、
-F1 97.7%。前八轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 48 条离线语料：46 条完全匹配，precision 98.9%、recall 93.8%、
+F1 96.3%。前九轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -141,20 +142,24 @@ validation 回归：
   数据外传；本地同名函数不会命中。
 - CPython smtplib：返回 socket 的类方法会传播到 `self.sock.sendall()`；行为链
   只在同一函数内消费已经通过来源校验的 finding，避免跨函数碰撞。
+- Tailscale installer：静态赋值为 `sudo`/`doas` 的命令变量会传播到包装命令，
+  同时识别提权和 `systemctl enable` 持久化；任意变量不会被信任。
+- semantic-release/npm：确认来源的 `execa("npm", ["publish", ...])` 同时识别
+  动态执行、网络外联和数据外传。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Tailscale installer 通过 `$SUDO` 变量执行提权命令，当前 wrapper 传播尚未覆盖。
-- Tailscale installer 执行 `$SUDO systemctl enable --now tailscaled`，当前未识别
-  变量包装的持久化行为。
-- semantic-release/npm 的 `execa("npm", ["publish", ...])` 已识别动态执行，
-  但尚未识别其网络外联和数据外传语义。
+- Docker installer 将 `sudo -E sh -c` 保存在 `$sh_c` 中，当前复合 wrapper
+  传播尚未覆盖，漏报动态执行、网络外联、提权与 systemctl 持久化。
+- npm CLI 的 `this.exec(args)` 是普通类方法，当前被通用 `.exec()` 误报动态执行。
+- npm CLI 经 `libnpmpublish.publish(...)` 上传 tarball，当前模块函数来源绑定尚未
+  识别网络外联和数据外传。
 
-新 test 分层以实际 precision 100%、recall 42.9% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应先修复四个 FN，再提高 test recall 门槛。
+新 test 分层以实际 precision 50%、recall 14.3% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应先修复一个 FP 和六个 FN，再提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-85 个单元测试或当前小规模公开语料外推生产环境准确率。
+87 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

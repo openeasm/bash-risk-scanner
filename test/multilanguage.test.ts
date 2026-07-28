@@ -289,6 +289,31 @@ execa('git', ['push'])
     )).toBe(false);
   });
 
+  it("classifies package-sourced npm publish as network egress and data exfiltration", () => {
+    const result = scanJavaScript(`
+import { execa } from "execa"
+await execa("npm", ["publish", packagePath, "--registry", registry])
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.network.npm-publish",
+        category: "network_egress",
+      }),
+      expect.objectContaining({
+        ruleId: "javascript.exfiltration.npm-publish",
+        category: "data_exfiltration",
+      }),
+    ]));
+
+    const install = scanJavaScript(`
+import { execa } from "execa"
+await execa("npm", ["install", "--ignore-scripts"])
+`);
+    expect(install.findings.some((finding) =>
+      finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
   it("detects a relative Node.js download wrapper with a URL argument", () => {
     const result = scanJavaScript(`
 const { download } = require('./download')

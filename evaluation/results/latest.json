@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T15:37:55.226Z",
+  "generatedAt": "2026-07-28T15:45:25.228Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -19,8 +19,8 @@
     },
     "minimumBySplit": {
       "test": {
-        "precision": 1,
-        "recall": 0.42857142857142855
+        "precision": 0.5,
+        "recall": 0.14285714285714285
       }
     },
     "requiredPerfectSplits": [
@@ -42,30 +42,30 @@
     "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 46,
-    "passedSamples": 44,
+    "sampleCount": 48,
+    "passedSamples": 46,
     "failedSamples": 2,
-    "tp": 85,
-    "fp": 0,
-    "fn": 4,
-    "precision": 1,
-    "recall": 0.9550561797752809,
-    "f1": 0.9770114942528736,
-    "parseErrorRate": 0.021739130434782608,
+    "tp": 90,
+    "fp": 1,
+    "fn": 6,
+    "precision": 0.989010989010989,
+    "recall": 0.9375,
+    "f1": 0.9625668449197862,
+    "parseErrorRate": 0.020833333333333332,
     "performance": {
-      "p50Milliseconds": 2.1131750000000125,
-      "p95Milliseconds": 90.53902399999993,
-      "maximumMilliseconds": 107.07740100000001
+      "p50Milliseconds": 3.2819009999999764,
+      "p95Milliseconds": 97.200928,
+      "maximumMilliseconds": 108.29568199999994
     }
   },
   "languages": {
     "bash": {
-      "tp": 21,
+      "tp": 24,
       "fp": 0,
-      "fn": 2,
+      "fn": 4,
       "precision": 1,
-      "recall": 0.9130434782608695,
-      "f1": 0.9545454545454545
+      "recall": 0.8571428571428571,
+      "f1": 0.923076923076923
     },
     "python": {
       "tp": 34,
@@ -76,12 +76,12 @@
       "f1": 1
     },
     "node": {
-      "tp": 30,
-      "fp": 0,
+      "tp": 32,
+      "fp": 1,
       "fn": 2,
-      "precision": 1,
-      "recall": 0.9375,
-      "f1": 0.967741935483871
+      "precision": 0.9696969696969697,
+      "recall": 0.9411764705882353,
+      "f1": 0.955223880597015
     }
   },
   "provenanceGroups": {
@@ -94,12 +94,12 @@
       "f1": 1
     },
     "public-snapshot": {
-      "tp": 54,
-      "fp": 0,
-      "fn": 4,
-      "precision": 1,
-      "recall": 0.9310344827586207,
-      "f1": 0.9642857142857143
+      "tp": 59,
+      "fp": 1,
+      "fn": 6,
+      "precision": 0.9833333333333333,
+      "recall": 0.9076923076923077,
+      "f1": 0.944
     },
     "synthetic-realistic": {
       "tp": 25,
@@ -120,15 +120,15 @@
       "f1": 1
     },
     "test": {
-      "tp": 3,
-      "fp": 0,
-      "fn": 4,
-      "precision": 1,
-      "recall": 0.42857142857142855,
-      "f1": 0.6
+      "tp": 1,
+      "fp": 1,
+      "fn": 6,
+      "precision": 0.5,
+      "recall": 0.14285714285714285,
+      "f1": 0.22222222222222224
     },
     "validation": {
-      "tp": 57,
+      "tp": 64,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -146,12 +146,12 @@
       "f1": 1
     },
     "data_exfiltration": {
-      "tp": 9,
+      "tp": 10,
       "fp": 0,
       "fn": 1,
       "precision": 1,
-      "recall": 0.9,
-      "f1": 0.9473684210526316
+      "recall": 0.9090909090909091,
+      "f1": 0.9523809523809523
     },
     "defense_evasion": {
       "tp": 2,
@@ -179,11 +179,11 @@
     },
     "dynamic_execution": {
       "tp": 8,
-      "fp": 0,
-      "fn": 0,
-      "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.8888888888888888,
+      "recall": 0.8888888888888888,
+      "f1": 0.8888888888888888
     },
     "interpreter_escape": {
       "tp": 5,
@@ -194,28 +194,28 @@
       "f1": 1
     },
     "network_egress": {
-      "tp": 26,
+      "tp": 27,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1,
+      "recall": 0.9310344827586207,
+      "f1": 0.9642857142857143
+    },
+    "persistence": {
+      "tp": 5,
       "fp": 0,
       "fn": 1,
       "precision": 1,
-      "recall": 0.9629629629629629,
-      "f1": 0.9811320754716981
+      "recall": 0.8333333333333334,
+      "f1": 0.9090909090909091
     },
-    "persistence": {
+    "privilege_escalation": {
       "tp": 4,
       "fp": 0,
       "fn": 1,
       "precision": 1,
       "recall": 0.8,
       "f1": 0.888888888888889
-    },
-    "privilege_escalation": {
-      "tp": 3,
-      "fp": 0,
-      "fn": 1,
-      "precision": 1,
-      "recall": 0.75,
-      "f1": 0.8571428571428571
     },
     "second_stage_payload": {
       "tp": 4,
@@ -226,7 +226,7 @@
       "f1": 1
     },
     "system_modification": {
-      "tp": 4,
+      "tp": 5,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -278,7 +278,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 12.074669999999998,
+      "durationMilliseconds": 14.85139000000001,
       "passed": true
     },
     {
@@ -337,7 +337,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9027229999999946,
+      "durationMilliseconds": 1.136400000000009,
       "passed": true
     },
     {
@@ -375,7 +375,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6670479999999941,
+      "durationMilliseconds": 0.6802009999999967,
       "passed": true
     },
     {
@@ -413,7 +413,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.047786000000002,
+      "durationMilliseconds": 1.110161000000005,
       "passed": true
     },
     {
@@ -439,7 +439,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.35264499999999543,
+      "durationMilliseconds": 0.389963999999992,
       "passed": true
     },
     {
@@ -465,7 +465,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2051929999999942,
+      "durationMilliseconds": 1.2226420000000076,
       "passed": true
     },
     {
@@ -503,7 +503,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.5345530000000025,
+      "durationMilliseconds": 7.408091999999982,
       "passed": true
     },
     {
@@ -549,7 +549,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.9054529999999943,
+      "durationMilliseconds": 2.390652000000017,
       "passed": true
     },
     {
@@ -587,7 +587,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.555273000000014,
+      "durationMilliseconds": 1.8258790000000147,
       "passed": true
     },
     {
@@ -646,7 +646,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.6859050000000195,
+      "durationMilliseconds": 3.2819009999999764,
       "passed": true
     },
     {
@@ -684,7 +684,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2774890000000028,
+      "durationMilliseconds": 1.3714929999999868,
       "passed": true
     },
     {
@@ -710,7 +710,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6187620000000038,
+      "durationMilliseconds": 1.8236949999999865,
       "passed": true
     },
     {
@@ -736,7 +736,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4146519999999896,
+      "durationMilliseconds": 0.37930399999999054,
       "passed": true
     },
     {
@@ -782,7 +782,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.174552999999975,
+      "durationMilliseconds": 6.781841999999983,
       "passed": true
     },
     {
@@ -820,7 +820,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6525270000000205,
+      "durationMilliseconds": 1.8482110000000205,
       "passed": true
     },
     {
@@ -879,7 +879,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.781800000000004,
+      "durationMilliseconds": 1.9300649999999848,
       "passed": true
     },
     {
@@ -933,7 +933,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6308449999999937,
+      "durationMilliseconds": 1.7462089999999932,
       "passed": true
     },
     {
@@ -971,7 +971,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0334490000000187,
+      "durationMilliseconds": 1.1208809999999971,
       "passed": true
     },
     {
@@ -997,7 +997,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.8301160000000039,
+      "durationMilliseconds": 0.8994129999999814,
       "passed": true
     },
     {
@@ -1023,7 +1023,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3237799999999993,
+      "durationMilliseconds": 0.3516219999999919,
       "passed": true
     },
     {
@@ -1091,7 +1091,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 61.913995,
+      "durationMilliseconds": 69.35183999999998,
       "passed": true
     },
     {
@@ -1295,7 +1295,7 @@
       "findingCount": 32,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 96.270914,
+      "durationMilliseconds": 97.200928,
       "passed": true
     },
     {
@@ -1345,7 +1345,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.174004000000025,
+      "durationMilliseconds": 1.3851589999999874,
       "passed": true
     },
     {
@@ -1387,7 +1387,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.20858399999997346,
+      "durationMilliseconds": 0.2692870000000198,
       "passed": true
     },
     {
@@ -1429,7 +1429,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3327679999999873,
+      "durationMilliseconds": 0.41813700000000154,
       "passed": true
     },
     {
@@ -1479,7 +1479,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4235989999999674,
+      "durationMilliseconds": 0.4346689999999853,
       "passed": true
     },
     {
@@ -1550,7 +1550,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 56.733806000000016,
+      "durationMilliseconds": 59.666920000000005,
       "passed": true
     },
     {
@@ -1614,7 +1614,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 14.553224,
+      "durationMilliseconds": 15.716849000000025,
       "passed": true
     },
     {
@@ -1679,7 +1679,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.260079000000019,
+      "durationMilliseconds": 6.024885999999981,
       "passed": true
     },
     {
@@ -1750,7 +1750,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 47.65022700000003,
+      "durationMilliseconds": 39.96533599999998,
       "passed": true
     },
     {
@@ -1790,7 +1790,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.440674000000001,
+      "durationMilliseconds": 5.104202999999984,
       "passed": true
     },
     {
@@ -1830,7 +1830,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 7.88113199999998,
+      "durationMilliseconds": 8.621375999999998,
       "passed": true
     },
     {
@@ -1878,7 +1878,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.1131750000000125,
+      "durationMilliseconds": 2.4107399999999757,
       "passed": true
     },
     {
@@ -1918,7 +1918,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.8315180000000169,
+      "durationMilliseconds": 0.849459999999965,
       "passed": true
     },
     {
@@ -1979,7 +1979,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 29.374323000000004,
+      "durationMilliseconds": 31.195420000000013,
       "passed": true
     },
     {
@@ -2019,7 +2019,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 7.640788999999984,
+      "durationMilliseconds": 8.49859600000002,
       "passed": true
     },
     {
@@ -2151,7 +2151,7 @@
       "findingCount": 17,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 16.789281000000017,
+      "durationMilliseconds": 18.384924999999953,
       "passed": true
     },
     {
@@ -2191,7 +2191,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 50.98452499999996,
+      "durationMilliseconds": 52.4572720000001,
       "passed": true
     },
     {
@@ -2239,7 +2239,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.101742999999942,
+      "durationMilliseconds": 2.126305000000002,
       "passed": true
     },
     {
@@ -2315,7 +2315,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 14.222860999999966,
+      "durationMilliseconds": 14.791757000000075,
       "passed": true
     },
     {
@@ -2355,7 +2355,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.356143999999972,
+      "durationMilliseconds": 4.1975649999999405,
       "passed": true
     },
     {
@@ -2428,7 +2428,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 84.92089099999998,
+      "durationMilliseconds": 88.47475399999996,
       "passed": true
     },
     {
@@ -2623,7 +2623,7 @@
       "findingCount": 29,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 90.53902399999993,
+      "durationMilliseconds": 101.78925800000002,
       "passed": true
     },
     {
@@ -2681,12 +2681,12 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 107.07740100000001,
+      "durationMilliseconds": 108.29568199999994,
       "passed": true
     },
     {
       "id": "holdout-tailscale-installer-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/tailscale/installer.sh.txt",
@@ -2707,9 +2707,171 @@
       ],
       "actualCategories": [
         "network_egress",
+        "persistence",
+        "privilege_escalation",
         "system_modification"
       ],
       "actualFindings": [
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apt-get update"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apt-get install -y gnupg"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO mkdir -p --mode=0755 /usr/share/keyrings"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apt-key add -"
+        },
+        {
+          "ruleId": "system.sensitive-config",
+          "category": "system_modification",
+          "evidence": "$SUDO tee /etc/apt/sources.list.d/tailscale.list"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO tee /etc/apt/sources.list.d/tailscale.list"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO chmod 0644 /etc/apt/sources.list.d/tailscale.list"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO tee /usr/share/keyrings/tailscale-archive-keyring.gpg"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO chmod 0644 /usr/share/keyrings/tailscale-archive-keyring.gpg"
+        },
+        {
+          "ruleId": "system.sensitive-config",
+          "category": "system_modification",
+          "evidence": "$SUDO tee /etc/apt/sources.list.d/tailscale.list"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO tee /etc/apt/sources.list.d/tailscale.list"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO chmod 0644 /etc/apt/sources.list.d/tailscale.list"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apt-get update"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apt-get install -y \"tailscale=$TAILSCALE_VERSION\" tailscale-archive-keyring"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apt-get install -y tailscale tailscale-archive-keyring"
+        },
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO systemctl start tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO yum install yum-utils -y"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO yum-config-manager -y --add-repo \"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO yum install \"tailscale-$TAILSCALE_VERSION\" -y"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO yum install tailscale -y"
+        },
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO dnf install -y 'dnf-command(config-manager)'"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO dnf install -y 'dnf-command(config-manager)'"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO dnf config-manager --add-repo \"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO dnf config-manager addrepo --overwrite --from-repofile=\"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO dnf install -y \"tailscale-$TAILSCALE_VERSION\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO dnf install -y tailscale"
+        },
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
         {
           "ruleId": "system.sensitive-config",
           "category": "system_modification",
@@ -2719,27 +2881,166 @@
           "ruleId": "network.tool",
           "category": "network_egress",
           "evidence": "curl -fsSL \"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo\" > /etc/yum.repos.d/tailscale.repo"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO tdnf install -y \"tailscale-$TAILSCALE_VERSION\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO tdnf install -y tailscale"
+        },
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO rpm --import \"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/repo.gpg\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO zypper --non-interactive ar -g -r \"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO zypper --non-interactive --gpg-auto-import-keys refresh"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO zypper --non-interactive install \"tailscale=$TAILSCALE_VERSION\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO zypper --non-interactive install tailscale"
+        },
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO pacman -S \"tailscale=$TAILSCALE_VERSION\" --noconfirm"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO pacman -S tailscale --noconfirm"
+        },
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO systemctl enable --now tailscaled"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO pkg install --yes \"tailscale-$TAILSCALE_VERSION\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO pkg install --yes tailscale"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO service tailscaled enable"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO service tailscaled start"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO setup-apkrepos -c -1"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apk add \"tailscale=$TAILSCALE_VERSION\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO apk add tailscale"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO rc-update add tailscale"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO rc-service tailscale start"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO xbps-install \"tailscale-$TAILSCALE_VERSION\" -y"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO xbps-install tailscale -y"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO emerge --ask=n \"=net-vpn/tailscale-$TAILSCALE_VERSION\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$SUDO emerge --ask=n net-vpn/tailscale"
         }
       ],
       "truePositives": [
         "network_egress",
+        "persistence",
+        "privilege_escalation",
         "system_modification"
       ],
       "falsePositives": [],
-      "falseNegatives": [
-        "persistence",
-        "privilege_escalation"
-      ],
+      "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 2,
+      "findingCount": 62,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 45.96123100000011,
-      "passed": false
+      "durationMilliseconds": 55.93914900000004,
+      "passed": true
     },
     {
       "id": "holdout-semantic-release-npm-publish-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/semantic-release-npm/publish.js.txt",
@@ -2758,9 +3059,21 @@
         "network_egress"
       ],
       "actualCategories": [
-        "dynamic_execution"
+        "data_exfiltration",
+        "dynamic_execution",
+        "network_egress"
       ],
       "actualFindings": [
+        {
+          "ruleId": "javascript.network.npm-publish",
+          "category": "network_egress",
+          "evidence": "execa( \"npm\", [\"publish\", basePath, \"--userconfig\", npmrc, \"--tag\", distTag, \"--registry\", registry], { cwd, env, preferLocal: true } )"
+        },
+        {
+          "ruleId": "javascript.exfiltration.npm-publish",
+          "category": "data_exfiltration",
+          "evidence": "execa( \"npm\", [\"publish\", basePath, \"--userconfig\", npmrc, \"--tag\", distTag, \"--registry\", registry], { cwd, env, preferLocal: true } )"
+        },
         {
           "ruleId": "javascript.dynamic-code",
           "category": "dynamic_execution",
@@ -2768,9 +3081,101 @@
         }
       ],
       "truePositives": [
-        "dynamic_execution"
+        "data_exfiltration",
+        "dynamic_execution",
+        "network_egress"
       ],
       "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 3,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 4.087988999999993,
+      "passed": true
+    },
+    {
+      "id": "holdout-docker-installer-wrapper-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/docker-install/install.sh.txt",
+      "sha256": "b991f2806186f7287bb9e53362060c382e906d154599b2fb0982f34246bacfd4",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "docker/docker-install",
+        "commit": "5ce20f2eef3615d08fea941eda5a109e949e8ebf",
+        "sourceUrl": "https://github.com/docker/docker-install/blob/5ce20f2eef3615d08fea941eda5a109e949e8ebf/install.sh",
+        "license": "Apache-2.0",
+        "licenseFile": "public/docker-install/LICENSE"
+      },
+      "expectedCategories": [
+        "dynamic_execution",
+        "network_egress",
+        "persistence",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "actualCategories": [
+        "system_modification"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "system.sensitive-config",
+          "category": "system_modification",
+          "evidence": "$sh_c \"echo \\\"$apt_repo\\\" > /etc/apt/sources.list.d/docker.list\""
+        }
+      ],
+      "truePositives": [
+        "system_modification"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        "dynamic_execution",
+        "network_egress",
+        "persistence",
+        "privilege_escalation"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 54.57922899999994,
+      "passed": false
+    },
+    {
+      "id": "holdout-npm-cli-publish-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/npm-cli/publish.js.txt",
+      "sha256": "a1b91f9172fd17527865a16381bebddf0aa8b9a61feb545f951118a8a69bd138",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "npm/cli",
+        "commit": "834408e8f0f2295d02205d8ff5d011c859835225",
+        "sourceUrl": "https://github.com/npm/cli/blob/834408e8f0f2295d02205d8ff5d011c859835225/lib/commands/publish.js",
+        "license": "Artistic-2.0",
+        "licenseFile": "public/npm-cli/LICENSE"
+      },
+      "expectedCategories": [
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "dynamic_execution"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "this.exec(args)"
+        }
+      ],
+      "truePositives": [],
+      "falsePositives": [
+        "dynamic_execution"
+      ],
       "falseNegatives": [
         "data_exfiltration",
         "network_egress"
@@ -2779,7 +3184,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.280170999999996,
+      "durationMilliseconds": 34.51218599999993,
       "passed": false
     }
   ]

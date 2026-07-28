@@ -159,5 +159,5 @@ npm pack --dry-run
 Homebrew、aiohttp、npm pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
 Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop 与
 CPython smtplib、Tailscale installer、semantic-release/npm 的许可快照；CI 使用
-仓库内快照，不联网下载，也不会执行样本。冻结 test 分层不用于本轮规则调参，
-报告会如实保留 FP/FN。
+仓库内快照，不联网下载，也不会执行样本。当前还包括 Docker installer 与 npm CLI
+publish 的完整许可快照。冻结 test 分层不用于本轮规则调参，报告会如实保留 FP/FN。

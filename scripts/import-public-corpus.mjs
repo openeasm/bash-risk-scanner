@@ -222,6 +222,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/semantic-release/npm/43332788f38a2e0fef69d9cf230b10639fbb457e/LICENSE",
     sha256: "6c39086c72df12ce153282a6dc26cecde9f57f69635389a31e04e2001db147dd",
   },
+  {
+    target: "docker-install/install.sh.txt",
+    url: "https://raw.githubusercontent.com/docker/docker-install/5ce20f2eef3615d08fea941eda5a109e949e8ebf/install.sh",
+    sha256: "b991f2806186f7287bb9e53362060c382e906d154599b2fb0982f34246bacfd4",
+  },
+  {
+    target: "docker-install/LICENSE",
+    url: "https://raw.githubusercontent.com/docker/docker-install/5ce20f2eef3615d08fea941eda5a109e949e8ebf/LICENSE",
+    sha256: "b8a5ad153a7153e713c20537d64adfb737b31c026553678fddd917d295d0a6ac",
+  },
+  {
+    target: "npm-cli/publish.js.txt",
+    url: "https://raw.githubusercontent.com/npm/cli/834408e8f0f2295d02205d8ff5d011c859835225/lib/commands/publish.js",
+    sha256: "a1b91f9172fd17527865a16381bebddf0aa8b9a61feb545f951118a8a69bd138",
+  },
+  {
+    target: "npm-cli/LICENSE",
+    url: "https://raw.githubusercontent.com/npm/cli/834408e8f0f2295d02205d8ff5d011c859835225/LICENSE",
+    sha256: "7610d223851f421d315df5e77974f1c68a04b97e02060e5bbbcf13d95e3ca257",
+  },
 ];
 
 function githubContentsFallback(url) {

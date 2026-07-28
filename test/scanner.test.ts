@@ -109,6 +109,32 @@ describe("scan", () => {
     expect(result.findings.some((finding) => finding.category === "system_modification")).toBe(true);
   });
 
+  it("propagates statically elevated command variables without trusting arbitrary wrappers", () => {
+    const result = scan(`
+      SUDO=""
+      SUDO="sudo"
+      $SUDO systemctl enable --now tailscaled
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "privilege.sudo",
+        category: "privilege_escalation",
+      }),
+      expect.objectContaining({
+        ruleId: "persistence.scheduler",
+        category: "persistence",
+      }),
+    ]));
+
+    const harmless = scan(`
+      RUNNER="echo"
+      $RUNNER systemctl enable example
+    `);
+    expect(harmless.findings.some((finding) =>
+      finding.category === "privilege_escalation" || finding.category === "persistence",
+    )).toBe(false);
+  });
+
   it("distinguishes command discovery from wrapped Git network execution", () => {
     const discovery = scan("command -v curl >/dev/null");
     expect(discovery.findings.some((finding) => finding.category === "network_egress")).toBe(false);

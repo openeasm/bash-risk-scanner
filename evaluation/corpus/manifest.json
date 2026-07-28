@@ -860,7 +860,7 @@
     },
     {
       "id": "holdout-tailscale-installer-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/tailscale/installer.sh.txt",
@@ -870,6 +870,18 @@
         "system_modification",
         "privilege_escalation",
         "persistence"
+      ],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "[$]SUDO"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler",
+          "evidencePattern": "systemctl enable"
+        }
       ],
       "provenance": {
         "type": "public-snapshot",
@@ -882,7 +894,7 @@
     },
     {
       "id": "holdout-semantic-release-npm-publish-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/semantic-release-npm/publish.js.txt",
@@ -892,6 +904,23 @@
         "network_egress",
         "data_exfiltration"
       ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "npm.*publish"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.npm-publish",
+          "evidencePattern": "npm.*publish"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.npm-publish",
+          "evidencePattern": "npm.*publish"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "semantic-release/npm",
@@ -899,6 +928,46 @@
         "sourceUrl": "https://github.com/semantic-release/npm/blob/43332788f38a2e0fef69d9cf230b10639fbb457e/lib/publish.js",
         "license": "MIT",
         "licenseFile": "public/semantic-release-npm/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-docker-installer-wrapper-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/docker-install/install.sh.txt",
+      "sha256": "b991f2806186f7287bb9e53362060c382e906d154599b2fb0982f34246bacfd4",
+      "expectedCategories": [
+        "dynamic_execution",
+        "network_egress",
+        "system_modification",
+        "privilege_escalation",
+        "persistence"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "docker/docker-install",
+        "commit": "5ce20f2eef3615d08fea941eda5a109e949e8ebf",
+        "sourceUrl": "https://github.com/docker/docker-install/blob/5ce20f2eef3615d08fea941eda5a109e949e8ebf/install.sh",
+        "license": "Apache-2.0",
+        "licenseFile": "public/docker-install/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-npm-cli-publish-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/npm-cli/publish.js.txt",
+      "sha256": "a1b91f9172fd17527865a16381bebddf0aa8b9a61feb545f951118a8a69bd138",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "npm/cli",
+        "commit": "834408e8f0f2295d02205d8ff5d011c859835225",
+        "sourceUrl": "https://github.com/npm/cli/blob/834408e8f0f2295d02205d8ff5d011c859835225/lib/commands/publish.js",
+        "license": "Artistic-2.0",
+        "licenseFile": "public/npm-cli/LICENSE"
       }
     }
   ]

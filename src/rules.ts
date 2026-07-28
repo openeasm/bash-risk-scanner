@@ -84,7 +84,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "high",
     confidence: "high",
     message: "Invokes a command through sudo or su.",
-    pattern: /^\s*(?:(?:\/usr\/bin\/)?sudo|su|execute_sudo)(?:\s|$)/i,
+    pattern: /^\s*(?:(?:\/usr\/bin\/)?sudo|doas|su|execute_sudo)(?:\s|$)/i,
   },
   {
     id: "privilege.suid-capability",

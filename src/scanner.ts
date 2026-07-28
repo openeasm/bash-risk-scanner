@@ -64,29 +64,58 @@ function statements(root: SyntaxNode, source: string): Statement[] {
   return result.sort((a, b) => a.range.startIndex - b.range.startIndex);
 }
 
-function bashCommandVariants(text: string): string[] {
-  const variants = [text];
-  let current = text;
-  for (let depth = 0; depth < 4; depth++) {
-    let next = current;
-    next = next.replace(
-      /^\s*(?:command|builtin)\s+(?:(?:-p|--)\s+)*/i,
-      "",
-    );
-    next = next.replace(
-      /^\s*env\s+(?:(?:-[A-Za-z]+|--[\w-]+(?:=\S+)?|[A-Za-z_]\w*=\S+)\s+)*/i,
-      "",
-    );
-    next = next.replace(
-      /^\s*(?:nohup|sudo|\/usr\/bin\/sudo|execute_sudo|execute|retry)\s+/i,
-      "",
-    );
-    next = next.replace(/^\s*(["'])([^"']+)\1/, "$2");
-    if (next === current) break;
-    variants.push(next);
-    current = next;
+function elevatedBashWrappers(source: string): Map<string, Set<string>> {
+  const wrappers = new Map<string, Set<string>>();
+  for (const match of source.matchAll(
+    /^\s*([A-Za-z_]\w*)\s*=\s*(?:(["'])(sudo|doas)\2|(sudo|doas))\s*$/gmi,
+  )) {
+    const name = match[1]!;
+    const command = (match[3] ?? match[4])!.toLowerCase();
+    const commands = wrappers.get(name) ?? new Set<string>();
+    commands.add(command);
+    wrappers.set(name, commands);
   }
-  return [...new Set(variants)];
+  return wrappers;
+}
+
+function bashCommandVariants(
+  text: string,
+  elevatedWrappers: Map<string, Set<string>> = new Map(),
+): string[] {
+  const initial = [text];
+  const wrapped = text.match(/^\s*\$(?:\{([A-Za-z_]\w*)\}|([A-Za-z_]\w*))\s+/);
+  const wrapperName = wrapped?.[1] ?? wrapped?.[2];
+  if (wrapperName) {
+    const remainder = text.slice(wrapped![0].length);
+    for (const command of elevatedWrappers.get(wrapperName) ?? []) {
+      initial.push(`${command} ${remainder}`);
+    }
+  }
+
+  const variants = new Set<string>(initial);
+  for (const start of initial) {
+    let current = start;
+    for (let depth = 0; depth < 4; depth++) {
+      let next = current;
+      next = next.replace(
+        /^\s*(?:command|builtin)\s+(?:(?:-p|--)\s+)*/i,
+        "",
+      );
+      next = next.replace(
+        /^\s*env\s+(?:(?:-[A-Za-z]+|--[\w-]+(?:=\S+)?|[A-Za-z_]\w*=\S+)\s+)*/i,
+        "",
+      );
+      next = next.replace(
+        /^\s*(?:nohup|sudo|doas|\/usr\/bin\/sudo|execute_sudo|execute|retry)\s+/i,
+        "",
+      );
+      next = next.replace(/^\s*(["'])([^"']+)\1/, "$2");
+      if (next === current) break;
+      variants.add(next);
+      current = next;
+    }
+  }
+  return [...variants];
 }
 
 function evidence(text: string, max: number): string {
@@ -637,6 +666,34 @@ function scanAstLanguage(
         language,
       });
     }
+    if (
+      language === "javascript"
+      && /^execa\.(?:execa|execaCommand)$/.test(callee)
+      && /^\s*[\w$]+\s*\(\s*["']npm["']\s*,\s*\[\s*["']publish["']/s.test(text)
+    ) {
+      findings.push({
+        ruleId: "javascript.network.npm-publish",
+        category: "network_egress",
+        title: "Publishes a package to an npm registry",
+        severity: "medium",
+        confidence: "high",
+        message: "A confirmed execa import invokes npm publish with static arguments.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+      findings.push({
+        ruleId: "javascript.exfiltration.npm-publish",
+        category: "data_exfiltration",
+        title: "Uploads a package to an npm registry",
+        severity: "high",
+        confidence: "high",
+        message: "A confirmed execa import invokes npm publish with static arguments.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
     const javascriptRoot = originalCallee.match(/^[A-Za-z_$][\w$]*/)?.[0];
     const importedJavaScriptModule = javascriptRoot
       ? aliases.get(javascriptRoot)
@@ -828,6 +885,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const commands = statements(tree.rootNode, source);
   const findings: Finding[] = [];
   const parseErrors: SourceRange[] = [];
+  const elevatedWrappers = elevatedBashWrappers(source);
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -835,7 +893,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
 
   for (const statement of commands) {
     for (const rule of COMMAND_RULES) {
-      const matched = bashCommandVariants(statement.text).some((variant) => {
+      const matched = bashCommandVariants(statement.text, elevatedWrappers).some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);
       });
