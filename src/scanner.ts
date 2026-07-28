@@ -197,7 +197,7 @@ const CALLEE_BY_CATEGORY: Record<
   },
   javascript: {
     download_execution: /(?:^|\.)(?:eval|Function|exec|execSync|spawn|spawnSync)$/,
-    dynamic_execution: /(?:^|\.)(?:eval|Function|runIn\w+|compileFunction|exec|execSync|spawn|spawnSync)$/,
+    dynamic_execution: /(?:^|\.)(?:eval|Function|runIn\w+|compileFunction|exec|execSync|spawn|spawnSync|execa|execaCommand)$/,
     persistence: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
     credential_access: /(?:^|\.)(?:readFile|readFileSync|readdir|readdirSync|stat|statSync|access|accessSync|keys|values|entries|stringify)$/,
     system_modification: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
@@ -215,6 +215,26 @@ function calleeOf(node: SyntaxNode): string {
   return node.childForFieldName("function")?.text
     ?? node.childForFieldName("constructor")?.text
     ?? "";
+}
+
+function executionScopeId(
+  node: SyntaxNode,
+  language: "python" | "javascript",
+): number {
+  const scopeTypes = language === "python"
+    ? new Set(["function_definition", "lambda"])
+    : new Set([
+      "function_declaration",
+      "function_expression",
+      "arrow_function",
+      "generator_function",
+      "generator_function_declaration",
+      "method_definition",
+    ]);
+  for (let current = node.parent; current; current = current.parent) {
+    if (scopeTypes.has(current.type)) return current.id;
+  }
+  return node.tree.rootNode.id;
 }
 
 function moduleName(value: string): string {
@@ -280,6 +300,23 @@ function collectAliases(source: string, language: "python" | "javascript"): Map<
 }
 
 function canonicalizeCallee(callee: string, aliases: Map<string, string>): string {
+  const exactReplacement = aliases.get(callee);
+  if (exactReplacement) return exactReplacement;
+  let matchedPrefix = "";
+  let prefixReplacement: string | undefined;
+  for (const [candidate, replacement] of aliases) {
+    if (
+      candidate.includes(".")
+      && callee.startsWith(`${candidate}.`)
+      && candidate.length > matchedPrefix.length
+    ) {
+      matchedPrefix = candidate;
+      prefixReplacement = replacement;
+    }
+  }
+  if (prefixReplacement) {
+    return `${prefixReplacement}${callee.slice(matchedPrefix.length)}`;
+  }
   const identifier = callee.match(/^[A-Za-z_$][\w$]*/)?.[0];
   if (!identifier) return callee;
   const replacement = aliases.get(identifier);
@@ -290,6 +327,24 @@ function collectPythonObjectBindings(
   root: SyntaxNode,
   aliases: Map<string, string>,
 ): void {
+  walk(root, (node) => {
+    if (node.type !== "function_definition") return;
+    const name = node.childForFieldName("name")?.text;
+    const body = node.childForFieldName("body");
+    if (!name || !body) return;
+    let socketFactory = false;
+    walk(body, (child) => {
+      if (child.type !== "return_statement") return;
+      const returnedCall = child.namedChildren.find((candidate) => candidate.type === "call");
+      if (!returnedCall) return;
+      const returnedCallee = canonicalizeCallee(calleeOf(returnedCall), aliases);
+      if (/^socket\.(?:socket|create_connection)$/.test(returnedCallee)) {
+        socketFactory = true;
+      }
+    });
+    if (socketFactory) aliases.set(`self.${name}`, "socket.socket");
+  });
+
   walk(root, (node) => {
     let localName = "";
     let value: SyntaxNode | null = null;
@@ -304,7 +359,7 @@ function collectPythonObjectBindings(
         ?? node.namedChildren.find((child) => child.type === "call")
         ?? null;
     }
-    if (!/^[A-Za-z_]\w*$/.test(localName) || value?.type !== "call") return;
+    if (!/^[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*$/.test(localName) || value?.type !== "call") return;
     const constructor = canonicalizeCallee(calleeOf(value), aliases);
     if (
       constructor === "aiohttp.ClientSession"
@@ -315,6 +370,7 @@ function collectPythonObjectBindings(
       || constructor === "twine.utils.make_requests_session"
       || constructor === "adafruit_shell.Shell"
       || constructor === "socket.socket"
+      || constructor === "socket.create_connection"
     ) {
       aliases.set(
         localName,
@@ -564,6 +620,23 @@ function scanAstLanguage(
         });
       }
     }
+    if (
+      language === "javascript"
+      && /^execa\.(?:execa|execaCommand)$/.test(callee)
+      && /^\s*[\w$]+\s*\(\s*["']git["']\s*,\s*\[\s*["']push["']/s.test(text)
+    ) {
+      findings.push({
+        ruleId: "javascript.exfiltration.git-push",
+        category: "data_exfiltration",
+        title: "Pushes local repository data to a remote",
+        severity: "high",
+        confidence: "high",
+        message: "A confirmed execa import invokes git push with static arguments.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
     const javascriptRoot = originalCallee.match(/^[A-Za-z_$][\w$]*/)?.[0];
     const importedJavaScriptModule = javascriptRoot
       ? aliases.get(javascriptRoot)
@@ -652,11 +725,21 @@ function scanAstLanguage(
   }
 
   const callText = interestingNodes.map((node) => source.slice(node.startIndex, node.endIndex)).join("\n");
-  const callees = interestingNodes.map(calleeOf);
   const canonicalCalls = interestingNodes.map((node) => ({
     callee: canonicalizeCallee(calleeOf(node), aliases),
     text: source.slice(node.startIndex, node.endIndex),
+    scopeId: executionScopeId(node, language),
+    startIndex: node.startIndex,
   }));
+  const scopesWithFinding = (category: Finding["category"]): Set<number> =>
+    new Set(findings
+      .filter((finding) => finding.category === category)
+      .flatMap((finding) => {
+        const call = canonicalCalls.find((candidate) =>
+          candidate.startIndex === finding.range.startIndex,
+        );
+        return call ? [call.scopeId] : [];
+      }));
   const rootRange = rangeOf(tree.rootNode);
   const addWholeSourceChain = (finding: Omit<Finding, "range" | "evidence" | "language">): void => {
     findings.push({
@@ -695,9 +778,12 @@ function scanAstLanguage(
   const readCallee = language === "python"
     ? /(?:^|\.)(?:open|read_text|read_bytes)$/
     : /(?:^|\.)(?:readFile|readFileSync)$/;
+  const exfiltrationScopes = scopesWithFinding("data_exfiltration");
   if (
-    callees.some((callee) => readCallee.test(callee))
-    && findings.some((finding) => finding.category === "data_exfiltration")
+    canonicalCalls.some((readCall) =>
+      readCallee.test(readCall.callee)
+      && exfiltrationScopes.has(readCall.scopeId),
+    )
   ) {
     addWholeSourceChain({
       ruleId: `${language}.chain.read-upload`,
@@ -711,9 +797,12 @@ function scanAstLanguage(
   const downloadCallee = language === "python"
     ? /(?:^|\.)(?:get|urlopen|urlretrieve)$/
     : /(?:^|\.)(?:fetch|get)$/;
+  const dynamicExecutionScopes = scopesWithFinding("dynamic_execution");
   if (
-    callees.some((callee) => downloadCallee.test(callee))
-    && findings.some((finding) => finding.category === "dynamic_execution")
+    canonicalCalls.some((downloadCall) =>
+      downloadCallee.test(downloadCall.callee)
+      && dynamicExecutionScopes.has(downloadCall.scopeId),
+    )
     && !isAllowedDownload(callText, options)
   ) {
     addWholeSourceChain({

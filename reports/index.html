@@ -45,10 +45,10 @@
   </header>
 
   <div class="cards">
-    <div class="card"><div class="metric">83 / 83</div><div>单元测试通过</div></div>
+    <div class="card"><div class="metric">85 / 85</div><div>单元测试通过</div></div>
     <div class="card"><div class="metric">2 / 2</div><div>测试文件通过</div></div>
-    <div class="card"><div class="metric">42 / 44</div><div>语料完全匹配</div></div>
-    <div class="card"><div class="metric">96.3%</div><div>语料总体召回率</div></div>
+    <div class="card"><div class="metric">44 / 46</div><div>语料完全匹配</div></div>
+    <div class="card"><div class="metric">95.5%</div><div>语料总体召回率</div></div>
   </div>
 
   <section>
@@ -56,7 +56,7 @@
     <p class="pass">通过：Bash、Python 和 Node.js 均能在精选样例中检出全部 12 类风险。</p>
     <p>额外测试覆盖行为链、可信下载域名、私网 IP、源码位置、语法错误、
       Bash 内嵌 Python/Node.js、静态管道、heredoc、扫描限制和已知误报边界。</p>
-    <p class="muted">报告基线：2 个测试文件、83 个测试。详细断言和耗时见
+    <p class="muted">报告基线：2 个测试文件、85 个测试。详细断言和耗时见
       <a href="./test-report.html">Vitest HTML 报告</a>。</p>
   </section>
 
@@ -109,11 +109,11 @@
 
   <section class="warning">
     <h2>当前结论边界</h2>
-    <p>44 条离线语料得到 precision 100%、recall 96.3%、F1 98.1%，但样本规模仍小，
-      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。上一轮环境凭据漏报
-      和 APT 本地协议 <code>self.send()</code> 误报已修复；新的冻结 test 集保留
-      Epicshop 的 <code>execa()</code> 动态执行与 git push 外传 FN，以及 CPython
-      smtplib 字段 socket 的 sendall 外传 FN。
+    <p>46 条离线语料得到 precision 100%、recall 95.5%、F1 97.7%，但样本规模仍小，
+      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。上一轮
+      <code>execa()</code>、git push 和字段 socket 来源传播缺口已修复；新的冻结
+      test 集保留 Tailscale 的变量包装 sudo/systemctl 两个 FN，以及
+      semantic-release/npm 的 npm publish 网络外联和数据外传两个 FN。
       这些新缺口没有在本轮针对测试集调参。</p>
   </section>
 

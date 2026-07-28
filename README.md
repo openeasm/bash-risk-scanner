@@ -158,5 +158,6 @@ npm pack --dry-run
 当前公开语料包括 nvm、Atomic Red Team、pipx、pnpm self-installer、node-gyp、
 Homebrew、aiohttp、npm pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
 Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop 与
-CPython smtplib 的许可快照；CI 使用仓库内快照，不联网下载，也不会执行样本。
-冻结 test 分层不用于本轮规则调参，报告会如实保留 FP/FN。
+CPython smtplib、Tailscale installer、semantic-release/npm 的许可快照；CI 使用
+仓库内快照，不联网下载，也不会执行样本。冻结 test 分层不用于本轮规则调参，
+报告会如实保留 FP/FN。

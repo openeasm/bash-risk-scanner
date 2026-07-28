@@ -202,21 +202,71 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/python/cpython/2ffab083782968a4d732738f4f1dff6bbd69d2b0/LICENSE",
     sha256: "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
   },
+  {
+    target: "tailscale/installer.sh.txt",
+    url: "https://raw.githubusercontent.com/tailscale/tailscale/c0c453334a5fa421134767de995c816d7db21811/scripts/installer.sh",
+    sha256: "805e85ed6f6f81a7ea2e70d52d47e7d5290863299e5c922b2787d71aa312f22e",
+  },
+  {
+    target: "tailscale/LICENSE",
+    url: "https://raw.githubusercontent.com/tailscale/tailscale/c0c453334a5fa421134767de995c816d7db21811/LICENSE",
+    sha256: "a7ca6186a7963a0a60740f6047760eecd7a0234e8c38bd7e1e0bbcb324bda45b",
+  },
+  {
+    target: "semantic-release-npm/publish.js.txt",
+    url: "https://raw.githubusercontent.com/semantic-release/npm/43332788f38a2e0fef69d9cf230b10639fbb457e/lib/publish.js",
+    sha256: "45b83787edffc472f0372f0855c7793e7722a0db1ab5dd1dbb2b7875e5b5f6db",
+  },
+  {
+    target: "semantic-release-npm/LICENSE",
+    url: "https://raw.githubusercontent.com/semantic-release/npm/43332788f38a2e0fef69d9cf230b10639fbb457e/LICENSE",
+    sha256: "6c39086c72df12ce153282a6dc26cecde9f57f69635389a31e04e2001db147dd",
+  },
 ];
+
+function githubContentsFallback(url) {
+  const parsed = new URL(url);
+  if (parsed.hostname !== "raw.githubusercontent.com") return undefined;
+  const [owner, repository, ref, ...path] = parsed.pathname.split("/").filter(Boolean);
+  if (!owner || !repository || !ref || path.length === 0) return undefined;
+  return `https://api.github.com/repos/${owner}/${repository}/contents/${path.join("/")}?ref=${ref}`;
+}
 
 async function download(url) {
   let lastError;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const response = await fetch(url, {
-        headers: { "user-agent": "bash-risk-scanner-corpus-importer" },
-        signal: AbortSignal.timeout(15_000),
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return Buffer.from(await response.arrayBuffer());
-    } catch (error) {
-      lastError = error;
-      if (attempt < 3) await new Promise((resolveRetry) => setTimeout(resolveRetry, 500 * attempt));
+  const fallback = githubContentsFallback(url);
+  const candidates = [
+    ...(
+      fallback
+        ? [{
+            url: fallback,
+            accept: "application/vnd.github.raw+json",
+          }]
+        : []
+    ),
+    {
+      url,
+      accept: "application/octet-stream",
+    },
+  ];
+  for (const candidate of candidates) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const response = await fetch(candidate.url, {
+          headers: {
+            accept: candidate.accept,
+            "user-agent": "bash-risk-scanner-corpus-importer",
+          },
+          signal: AbortSignal.timeout(15_000),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return Buffer.from(await response.arrayBuffer());
+      } catch (error) {
+        lastError = error;
+        if (attempt < 3) {
+          await new Promise((resolveRetry) => setTimeout(resolveRetry, 500 * attempt));
+        }
+      }
     }
   }
   throw new Error(`Failed to download ${url}: ${lastError instanceof Error ? lastError.message : lastError}`);

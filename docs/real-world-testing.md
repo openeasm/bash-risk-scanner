@@ -30,9 +30,9 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 
 公开来源语料还包括固定 commit 的完整 nvm、Homebrew、pipx、pnpm self-installer、
 node-gyp、aiohttp、pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
-Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop
-和 CPython smtplib 代码，以及 Atomic Red Team 的 Bash 命令和 Python telnet
-client。
+Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop、
+CPython smtplib、Tailscale installer 和 semantic-release/npm 代码，以及
+Atomic Red Team 的 Bash 命令和 Python telnet client。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -110,8 +110,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 44 条离线语料：42 条完全匹配，precision 100%、recall 96.3%、
-F1 98.1%。前七轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 46 条离线语料：44 条完全匹配，precision 100%、recall 95.5%、
+F1 97.7%。前八轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -137,19 +137,24 @@ validation 回归：
 - apt-transport-s3：`os.environ.get("AWS_SECRET_ACCESS_KEY")` 识别为凭据访问；
   本地 APT method 的 `self.send(...)` 不再误报外传，而确认来源的 socket send
   仍保持检出。
+- Epicshop：确认来源的 `execa(...)` 识别为动态执行，静态 `git push` 参数识别为
+  数据外传；本地同名函数不会命中。
+- CPython smtplib：返回 socket 的类方法会传播到 `self.sock.sendall()`；行为链
+  只在同一函数内消费已经通过来源校验的 finding，避免跨函数碰撞。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Epicshop 的第三方 `execa(...)` 进程执行尚未识别为动态执行。
-- Epicshop 的 `execa("git", ["push"])` 尚未识别为数据外传。
-- CPython smtplib 将 socket 保存到 `self.sock` 后调用 `sendall()`，当前对象来源
-  传播尚未覆盖字段赋值，因此漏报数据外传。
+- Tailscale installer 通过 `$SUDO` 变量执行提权命令，当前 wrapper 传播尚未覆盖。
+- Tailscale installer 执行 `$SUDO systemctl enable --now tailscaled`，当前未识别
+  变量包装的持久化行为。
+- semantic-release/npm 的 `execa("npm", ["publish", ...])` 已识别动态执行，
+  但尚未识别其网络外联和数据外传语义。
 
-新 test 分层以实际 precision 100%、recall 62.5% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应先修复三个 FN，再提高 test recall 门槛。
+新 test 分层以实际 precision 100%、recall 42.9% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应先修复四个 FN，再提高 test recall 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-83 个单元测试或当前小规模公开语料外推生产环境准确率。
+85 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

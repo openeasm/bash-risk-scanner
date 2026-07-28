@@ -795,7 +795,7 @@
     },
     {
       "id": "holdout-epicshop-workshop-updater-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/epicshop/update-workshops.js.txt",
@@ -808,6 +808,18 @@
         "destructive_behavior",
         "second_stage_payload"
       ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "execa"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.git-push",
+          "evidencePattern": "git.*push"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "epicweb-dev/epicshop",
@@ -819,12 +831,24 @@
     },
     {
       "id": "holdout-cpython-smtplib-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/cpython/smtplib.py.txt",
       "sha256": "fc846e9b3154d39593a25de7c5815de50c7ab22f5dd04a8ad65d5da99a7f25ef",
       "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "create_connection"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "self[.]sock[.]sendall"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "python/cpython",
@@ -832,6 +856,49 @@
         "sourceUrl": "https://github.com/python/cpython/blob/2ffab083782968a4d732738f4f1dff6bbd69d2b0/Lib/smtplib.py",
         "license": "Python-2.0",
         "licenseFile": "public/cpython/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-tailscale-installer-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/tailscale/installer.sh.txt",
+      "sha256": "805e85ed6f6f81a7ea2e70d52d47e7d5290863299e5c922b2787d71aa312f22e",
+      "expectedCategories": [
+        "network_egress",
+        "system_modification",
+        "privilege_escalation",
+        "persistence"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "tailscale/tailscale",
+        "commit": "c0c453334a5fa421134767de995c816d7db21811",
+        "sourceUrl": "https://github.com/tailscale/tailscale/blob/c0c453334a5fa421134767de995c816d7db21811/scripts/installer.sh",
+        "license": "BSD-3-Clause",
+        "licenseFile": "public/tailscale/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-semantic-release-npm-publish-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/semantic-release-npm/publish.js.txt",
+      "sha256": "45b83787edffc472f0372f0855c7793e7722a0db1ab5dd1dbb2b7875e5b5f6db",
+      "expectedCategories": [
+        "dynamic_execution",
+        "network_egress",
+        "data_exfiltration"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "semantic-release/npm",
+        "commit": "43332788f38a2e0fef69d9cf230b10639fbb457e",
+        "sourceUrl": "https://github.com/semantic-release/npm/blob/43332788f38a2e0fef69d9cf230b10639fbb457e/lib/publish.js",
+        "license": "MIT",
+        "licenseFile": "public/semantic-release-npm/LICENSE"
       }
     }
   ]

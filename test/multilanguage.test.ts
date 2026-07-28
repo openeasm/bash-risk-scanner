@@ -232,6 +232,63 @@ self.send(200, {"Filename": local_path})
     )).toBe(false);
   });
 
+  it("tracks sockets returned by class factories into object fields", () => {
+    const result = scanPython(`
+import socket
+class Client:
+    def _get_socket(self):
+        return socket.create_connection(("mail.example", 25))
+    def connect(self):
+        self.sock = self._get_socket()
+    def send(self, payload):
+        self.sock.sendall(payload)
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "python.exfiltration",
+        category: "data_exfiltration",
+      }),
+    ]));
+
+    const localFactory = scanPython(`
+class Renderer:
+    def _get_socket(self):
+        return Buffer()
+    def render(self):
+        self.sock = self._get_socket()
+        self.sock.sendall("local preview")
+`);
+    expect(localFactory.findings.some((finding) =>
+      finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
+  it("recognizes imported execa and only classifies static git pushes as exfiltration", () => {
+    const result = scanJavaScript(`
+import { execa as run } from 'execa'
+await run('npm', ['install', '--ignore-scripts'])
+await run('git', ['push'])
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.dynamic-code",
+        category: "dynamic_execution",
+      }),
+      expect.objectContaining({
+        ruleId: "javascript.exfiltration.git-push",
+        category: "data_exfiltration",
+      }),
+    ]));
+
+    const local = scanJavaScript(`
+const execa = (command, args) => ({ command, args })
+execa('git', ['push'])
+`);
+    expect(local.findings.some((finding) =>
+      finding.category === "dynamic_execution" || finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
   it("detects a relative Node.js download wrapper with a URL argument", () => {
     const result = scanJavaScript(`
 const { download } = require('./download')
