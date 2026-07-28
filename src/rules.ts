@@ -87,6 +87,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:cat|head|tail|less|more|cp|grep)\b[^;\n]*(?:^|\/)\.netrc(?:["']?\s|$)/i,
   },
   {
+    id: "credential.macos-keychain",
+    category: "credential_access",
+    title: "Extracts credentials from macOS Keychain",
+    severity: "high",
+    confidence: "high",
+    message: "Dumps a Keychain or requests the plaintext value of a stored password.",
+    pattern: /^\s*security\s+(?:dump-keychain\b|find-(?:generic|internet)-password\b(?=[^;\n]*\s-w(?:\s|$)))/i,
+  },
+  {
     id: "system.sensitive-config",
     category: "system_modification",
     title: "Modifies sensitive system configuration",

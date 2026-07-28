@@ -329,6 +329,35 @@ describe("scan", () => {
     }
   });
 
+  it("detects macOS Keychain credential extraction without flagging certificate operations", () => {
+    const credentialCommands = [
+      "security dump-keychain -d login.keychain",
+      "sudo security dump-keychain login.keychain-db",
+      "security find-generic-password -s example -w",
+      "security find-internet-password -a user -w",
+    ];
+    for (const source of credentialCommands) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.macos-keychain"
+      )).toBe(true);
+    }
+
+    const hardNegatives = [
+      "security find-certificate -a -p",
+      "security import /tmp/cert.pem -k login.keychain",
+      "security list-keychains",
+      "security find-generic-password -s example",
+      "security find-internet-password -a user",
+      "security help dump-keychain",
+      "echo 'security dump-keychain login.keychain'",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.macos-keychain"
+      )).toBe(false);
+    }
+  });
+
   it("allows download-execute from an explicitly trusted exact host", () => {
     const result = scan("curl https://artifacts.corp.example/a.sh | sh", {
       allowedDownloadHosts: ["artifacts.corp.example"],

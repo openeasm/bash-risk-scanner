@@ -1,0 +1,2 @@
+sudo cp /tmp/atomic-emond.plist /etc/emond.d/rules/atomic-evaluation.plist
+sudo touch /private/var/db/emondClients/atomic-evaluation

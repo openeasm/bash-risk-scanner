@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 67 条离线语料：66 条完全匹配，precision 100%、recall 99.3%、
-F1 99.6%。前二十三轮冻结集暴露的缺口均已转为带具体
+当前基线为 68 条离线语料：67 条完全匹配，precision 100%、recall 99.3%、
+F1 99.6%。前二十四轮冻结集暴露的缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -202,23 +202,26 @@ validation 回归：
 - 静态 `python -c`、`perl/ruby -e`、`node --eval`、`php -r`、AppleScript 与
   PowerShell 内联参数识别动态执行；因此 Homebrew 的真实 `ruby -e` 同步补全了
   validation 标签和具体 finding。
+- Atomic Red Team Keychain：`security dump-keychain` 和带 `-w` 的
+  generic/internet password 提取识别凭据访问；证书查询/导入、Keychain 列表、
+  只查密码元数据、帮助命令和文本内容均不命中。
 
 本轮重新冻结的公开恶意样本尚未用于调参：
 
-- Atomic Red Team T1555.001 使用
-  `sudo security dump-keychain -d login.keychain` 转储 macOS Keychain。提权已
-  命中，`credential_access` 尚未命中，作为下一轮待修复 FN。
+- Atomic Red Team T1543.001 将 plist 复制到 `/etc/emond.d/rules`，再创建
+  `/private/var/db/emondClients` 触发文件。系统修改和提权已命中，
+  `persistence` 尚未命中，作为下一轮待修复 FN。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-新 test 分层有两个预期类别，提权命中而凭据访问漏报，因此 recall 基线为 50%；
-整体门槛仍保持 precision 95%、recall 90%，`maximum.forbiddenFindingCount`
-保持 0。下一轮应识别 `security dump-keychain` 与提取密码的
-`find-*-password -w`，同时用证书查询/导入、keychain 列表和帮助命令作为
+新 test 分层有三个预期类别，其中系统修改和提权命中、持久化漏报，因此 recall
+基线为 66.7%；整体门槛仍保持 precision 95%、recall 90%，
+`maximum.forbiddenFindingCount` 保持 0。下一轮应识别 emond 规则目录和触发文件
+写入，同时用读取规则、普通 `/tmp` plist、删除触发文件和路径仅出现在文本中作为
 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-111 个单元测试或当前小规模公开语料外推生产环境准确率。
+112 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
