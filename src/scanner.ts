@@ -295,6 +295,133 @@ function bashScpPushesLocalPath(text: string): boolean {
   );
 }
 
+function awkStaticSystemCommand(program: string): string | undefined {
+  let previousSignificant = "";
+  for (let index = 0; index < program.length;) {
+    const character = program[index]!;
+    if (/\s/.test(character)) {
+      index += 1;
+      continue;
+    }
+    if (character === "#") {
+      const newline = program.indexOf("\n", index + 1);
+      index = newline < 0 ? program.length : newline + 1;
+      continue;
+    }
+    if (character === "\"") {
+      index += 1;
+      while (index < program.length) {
+        if (program[index] === "\\") {
+          index += 2;
+          continue;
+        }
+        if (program[index] === "\"") {
+          index += 1;
+          break;
+        }
+        index += 1;
+      }
+      previousSignificant = "\"";
+      continue;
+    }
+    if (
+      character === "/"
+      && (previousSignificant === "" || /[~,(={!:;]/.test(previousSignificant))
+    ) {
+      index += 1;
+      while (index < program.length) {
+        if (program[index] === "\\") {
+          index += 2;
+          continue;
+        }
+        if (program[index] === "/") {
+          index += 1;
+          break;
+        }
+        index += 1;
+      }
+      previousSignificant = "/";
+      continue;
+    }
+    if (
+      program.startsWith("system", index)
+      && !/[A-Za-z0-9_]/.test(program[index - 1] ?? "")
+      && !/[A-Za-z0-9_]/.test(program[index + 6] ?? "")
+    ) {
+      let cursor = index + 6;
+      while (/\s/.test(program[cursor] ?? "")) cursor += 1;
+      if (program[cursor] !== "(") {
+        index += 6;
+        continue;
+      }
+      cursor += 1;
+      while (/\s/.test(program[cursor] ?? "")) cursor += 1;
+      if (program[cursor] !== "\"") {
+        index += 6;
+        continue;
+      }
+      cursor += 1;
+      let command = "";
+      let closed = false;
+      while (cursor < program.length) {
+        const value = program[cursor]!;
+        if (value === "\\") {
+          const escaped = program[cursor + 1];
+          if (escaped === undefined) break;
+          command += escaped === "n" ? "\n" : escaped;
+          cursor += 2;
+          continue;
+        }
+        if (value === "\"") {
+          cursor += 1;
+          closed = true;
+          break;
+        }
+        command += value;
+        cursor += 1;
+      }
+      if (!closed) return undefined;
+      while (/\s/.test(program[cursor] ?? "")) cursor += 1;
+      if (program[cursor] === ")") return command;
+      index += 6;
+      continue;
+    }
+    previousSignificant = character;
+    index += 1;
+  }
+  return undefined;
+}
+
+function bashAwkSpawnsStaticShell(text: string): boolean {
+  const words = staticBashWords(text);
+  if (!/^(?:awk|gawk|mawk|nawk)$/i.test(words[0] ?? "")) return false;
+
+  let program: string | undefined;
+  let optionsEnded = false;
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (!optionsEnded && word === "--") {
+      optionsEnded = true;
+      continue;
+    }
+    if (!optionsEnded && /^(?:-f|--file)$/.test(word)) return false;
+    if (!optionsEnded && /^(?:-v|--assign|--field-separator)$/.test(word)) {
+      index += 1;
+      continue;
+    }
+    if (!optionsEnded && /^-(?:F|v).+/.test(word)) continue;
+    if (!optionsEnded && word.startsWith("-")) continue;
+    program = word;
+    break;
+  }
+  if (!program) return false;
+  const command = awkStaticSystemCommand(program);
+  return command !== undefined
+    && !/[$`]/.test(command)
+    && /^\s*(?:exec\s+)?(?:(?:\/usr\/bin\/env\s+)?(?:\/(?:usr\/)?bin\/)?(?:ba|da|z|k|c|tc)?sh)(?:\s|$)/i
+      .test(command);
+}
+
 function bashDiscoveredCommandVariables(
   root: SyntaxNode,
   commandPattern: RegExp,
@@ -1449,6 +1576,30 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     ),
   }));
   for (const { statement, variants } of commandVariants) {
+    if (variants.some((variant) => bashAwkSpawnsStaticShell(variant))) {
+      findings.push({
+        ruleId: "dynamic.awk-system-shell",
+        category: "dynamic_execution",
+        title: "Executes a shell through awk",
+        severity: "high",
+        confidence: "high",
+        message: "Calls awk's system builtin with a static shell command.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+      findings.push({
+        ruleId: "escape.awk-system-shell",
+        category: "interpreter_escape",
+        title: "Escapes to a shell through awk",
+        severity: "high",
+        confidence: "high",
+        message: "Uses awk's system builtin to start another command interpreter.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
     if (variants.some((variant) => bashScpPushesLocalPath(variant))) {
       findings.push({
         ruleId: "exfil.scp-push",

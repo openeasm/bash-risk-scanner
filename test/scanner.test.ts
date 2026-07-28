@@ -285,6 +285,51 @@ describe("scan", () => {
     )).toBe(false);
   });
 
+  it("detects real awk system calls that statically launch a shell", () => {
+    const shellEscapes = [
+      `awk 'BEGIN {system("/bin/sh &")}'`,
+      `gawk -F: 'BEGIN { system("bash -i") }' /etc/passwd`,
+      `mawk -v mode=test '$1 == "run" {system("exec /bin/dash")}' /tmp/input`,
+      `nawk 'BEGIN {system("/usr/bin/env sh -c true")}'`,
+    ];
+    for (const source of shellEscapes) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "dynamic.awk-system-shell",
+          category: "dynamic_execution",
+          confidence: "high",
+        }),
+        expect.objectContaining({
+          ruleId: "escape.awk-system-shell",
+          category: "interpreter_escape",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `awk '{sum += $1} END {print sum}' /tmp/input`,
+      `awk 'BEGIN {print "system(\\"/bin/sh\\")"}'`,
+      `awk '/system\\(\\"\\/bin\\/sh\\"\\)/ {print}' /tmp/input`,
+      `awk 'BEGIN {# system("/bin/sh")\nprint "ok"}'`,
+      `awk 'function mysystem(value) {print value} BEGIN {mysystem("/bin/sh")}'`,
+      `awk 'BEGIN {system(command)}'`,
+      `awk 'BEGIN {system("$SHELL")}'`,
+      `awk 'BEGIN {system("date")}'`,
+      `awk 'BEGIN {system("python3 -c pass")}'`,
+      `awk -f /tmp/report.awk /tmp/input`,
+      `awk --help`,
+      `echo 'awk '\\''BEGIN {system("/bin/sh")} '\\'''`,
+      `# awk 'BEGIN {system("/bin/sh")}'`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "dynamic.awk-system-shell"
+        || finding.ruleId === "escape.awk-system-shell"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects Python HTTP file servers as network exposure and data exfiltration", () => {
     const servers = [
       "python3 -m http.server",

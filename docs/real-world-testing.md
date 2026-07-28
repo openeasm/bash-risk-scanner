@@ -116,8 +116,8 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 86 条离线语料：85 条完全匹配，precision 100%、recall 98.9%、
-F1 99.5%。前面的冻结集缺口均已转为带具体
+当前基线为 87 条离线语料：86 条完全匹配，precision 100%、recall 99.5%、
+F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -273,20 +273,24 @@ validation 回归：
 - Atomic Red Team T1105 的 SCP 只有在选项后的全部源操作数为静态本地路径、最终
   目标为静态远端地址时才报告高置信外传；远端 pull、远端到远端、本地复制、
   动态/歧义路径、帮助、注释和文本均不命中，读取后 pull 也不形成外传链。
+- Atomic Red Team T1059.004 先提取静态内联 awk 程序，再通过轻量词法扫描忽略
+  字符串、注释和正则字面量；只有真实 `system("...")` 调用的单一静态参数直接
+  启动 shell 时才同时报告动态执行和解释器逃逸。普通计算、打印 system 文本、
+  自定义函数、动态参数、非 shell 子进程和 `awk -f` 均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
 test 分层保留三条已经修复的 T1059.006 控制、iptables 规则删除、OCI token
-访问、ASLR 和 SCP 方向控制，并新增 Atomic T1059.004 通过
-`awk 'BEGIN {system("/bin/sh &")}'` 创建 shell 的样本。当前完全漏掉动态执行和
-解释器逃逸，test 分层 recall 87.5%、precision 100%。发布门禁继续要求整体
+访问、ASLR、SCP 方向和 awk shell escape 控制，并新增 Atomic T1003.008 读取
+`/etc/shadow` 后写入临时文件的样本。当前 sudo 提权已命中，但凭据访问仍漏报，
+test 分层 recall 93.8%、precision 100%。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应要求 awk 程序包含真实
-`system()` 调用且静态参数启动 shell；普通 awk 计算、打印包含 system 文本、
-自定义函数名、动态命令、非 shell 子进程、帮助、注释和文本应作为 hard-negative。
+`maximum.forbiddenFindingCount` 为 0。下一轮应要求读取/复制/枚举命令静态引用
+`/etc/shadow` 或 FreeBSD `/etc/master.passwd`；普通 `/etc/passwd`、shadow
+备份名、写入/删除、动态路径、帮助、注释和文本应作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-129 个单元测试或当前小规模公开语料外推生产环境准确率。
+130 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

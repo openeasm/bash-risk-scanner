@@ -2179,7 +2179,7 @@
     },
     {
       "id": "holdout-atomic-awk-shell-escape-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/awk-shell-escape.sh.txt",
@@ -2208,6 +2208,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single shell executor command without modification; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-read-shadow-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/read-shadow.sh.txt",
+      "sha256": "bf9702d8b6fc452795b3aae9541c7569c7ffa9074d97633dc32a2e74b1008ffc",
+      "expectedCategories": ["credential_access", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.shadow-read",
+          "evidencePattern": "cat\\s+/etc/shadow"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+cat\\s+/etc/shadow"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1003.008/T1003.008.yaml",
+        "upstreamFile": "public/atomic-red-team/T1003.008.yaml.txt",
+        "upstreamSha256": "7dcf4f55d4ba4eb215ea91a39c122f82cb3b3ced86cee4cb602f03f0ee5bcd63",
+        "upstreamId": "3723ab77-c546-403c-8fb4-bb577033b235",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the output argument with an inert /tmp path while preserving both executor commands; the evaluation harness never executes them."
       }
     }
   ]

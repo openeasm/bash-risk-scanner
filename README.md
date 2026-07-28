@@ -167,7 +167,8 @@ Atomic Red Team DNS 外传、timestomp、`.netrc`、crontab、SUID、UFW、GCS �
 GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行和 rsync 远程传输已转为 validation
 回归；UFW 日志关闭也已转为 validation。冻结 test 分层当前保留三条已修复的
 T1059.006 跨语言控制、iptables 规则删除、OCI session token 访问和 Linux ASLR
-控制、SCP 方向控制，并新增 T1059.004“通过 awk system() 创建 shell”盲测。
+控制、SCP 方向和 awk shell escape 控制，并新增 T1003.008“读取 `/etc/shadow`”
+盲测。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

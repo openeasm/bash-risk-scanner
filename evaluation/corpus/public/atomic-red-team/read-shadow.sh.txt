@@ -1,0 +1,2 @@
+sudo cat /etc/shadow > /tmp/atomic-shadow.txt
+cat /tmp/atomic-shadow.txt
