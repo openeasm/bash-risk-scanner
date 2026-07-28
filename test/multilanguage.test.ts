@@ -360,6 +360,43 @@ runCommand("bash -c id")
     ]));
   });
 
+  it("recognizes GitHub Octokit routes and local-file asset uploads", () => {
+    const result = scanJavaScript(`
+import { readFile } from "node:fs/promises"
+async function publish({ Octokit }) {
+  const octokit = new Octokit(options)
+  await octokit.request("POST /repos/{owner}/{repo}/releases", release)
+  const upload = {
+    method: "POST",
+    url: uploadUrl,
+    data: await readFile(assetPath),
+  }
+  await octokit.request(upload)
+}
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.network.octokit-request",
+        category: "network_egress",
+      }),
+      expect.objectContaining({
+        ruleId: "javascript.exfiltration.octokit-upload",
+        category: "data_exfiltration",
+      }),
+    ]));
+
+    const local = scanJavaScript(`
+class Octokit {
+  request(path) { return path }
+}
+const octokit = new Octokit()
+octokit.request("/local/status")
+`);
+    expect(local.findings.some((finding) =>
+      finding.category === "network_egress" || finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
   it("detects a relative Node.js download wrapper with a URL argument", () => {
     const result = scanJavaScript(`
 const { download } = require('./download')

@@ -161,7 +161,8 @@ Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop
 CPython smtplib、Tailscale installer、semantic-release/npm 的许可快照；CI 使用
 仓库内快照，不联网下载，也不会执行样本。当前还包括 Docker installer 与 npm CLI
 publish、Rustup installer 与 semantic-release/github 的完整许可快照。冻结 test
-分层不用于本轮规则调参，报告会如实保留 FP/FN。
+分层还加入 Bun installer 与 AWS CLI GameLift uploader；本轮不针对新 test 调参，
+报告会如实保留 FP/FN。
 
 导入器默认复核已有本地文件的 SHA-256，只下载缺失或不匹配的快照；使用
 `npm run evaluate:import-public:refresh` 可强制从固定 commit 重新获取全部文件。

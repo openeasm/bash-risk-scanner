@@ -13,25 +13,25 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">48/50</div>样本通过</div>
-<div class="card"><div class="big">100.0%</div>Precision</div>
-<div class="card"><div class="big">97.0%</div>Recall</div>
-<div class="card"><div class="big">98.5%</div>F1</div>
-<div class="card"><div class="big">94.16 ms</div>P95</div>
+<div class="card"><div class="big">50/52</div>样本通过</div>
+<div class="card"><div class="big">98.1%</div>Precision</div>
+<div class="card"><div class="big">96.3%</div>Recall</div>
+<div class="card"><div class="big">97.2%</div>F1</div>
+<div class="card"><div class="big">95.95 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>29</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>96.7%</td><td>98.3%</td>
+    <td>bash</td><td>32</td><td>0</td><td>3</td>
+    <td>100.0%</td><td>91.4%</td><td>95.5%</td>
   </tr>
 <tr>
-    <td>python</td><td>34</td><td>0</td><td>0</td>
+    <td>python</td><td>35</td><td>2</td><td>1</td>
+    <td>94.6%</td><td>97.2%</td><td>95.9%</td>
+  </tr>
+<tr>
+    <td>node</td><td>36</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
-  </tr>
-<tr>
-    <td>node</td><td>34</td><td>0</td><td>2</td>
-    <td>100.0%</td><td>94.4%</td><td>97.1%</td>
   </tr></tbody></table>
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
@@ -40,8 +40,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>public-snapshot</td><td>66</td><td>0</td><td>3</td>
-    <td>100.0%</td><td>95.7%</td><td>97.8%</td>
+    <td>public-snapshot</td><td>72</td><td>2</td><td>4</td>
+    <td>97.3%</td><td>94.7%</td><td>96.0%</td>
   </tr>
 <tr>
     <td>synthetic-realistic</td><td>25</td><td>0</td><td>0</td>
@@ -54,11 +54,11 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>test</td><td>1</td><td>0</td><td>3</td>
-    <td>100.0%</td><td>25.0%</td><td>40.0%</td>
+    <td>test</td><td>3</td><td>2</td><td>4</td>
+    <td>60.0%</td><td>42.9%</td><td>50.0%</td>
   </tr>
 <tr>
-    <td>validation</td><td>71</td><td>0</td><td>0</td>
+    <td>validation</td><td>75</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
@@ -68,44 +68,44 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>data_exfiltration</td><td>11</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>91.7%</td><td>95.7%</td>
+    <td>data_exfiltration</td><td>13</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
     <td>defense_evasion</td><td>2</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>destructive_behavior</td><td>7</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>destructive_behavior</td><td>7</td><td>1</td><td>0</td>
+    <td>87.5%</td><td>100.0%</td><td>93.3%</td>
   </tr>
 <tr>
-    <td>download_execution</td><td>3</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>75.0%</td><td>85.7%</td>
+    <td>download_execution</td><td>4</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>80.0%</td><td>88.9%</td>
   </tr>
 <tr>
     <td>dynamic_execution</td><td>9</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>interpreter_escape</td><td>5</td><td>0</td><td>0</td>
+    <td>interpreter_escape</td><td>6</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>network_egress</td><td>30</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>96.8%</td><td>98.4%</td>
+    <td>network_egress</td><td>32</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>97.0%</td><td>98.5%</td>
   </tr>
 <tr>
-    <td>persistence</td><td>6</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>persistence</td><td>6</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>85.7%</td><td>92.3%</td>
   </tr>
 <tr>
     <td>privilege_escalation</td><td>5</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>second_stage_payload</td><td>4</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>second_stage_payload</td><td>4</td><td>1</td><td>1</td>
+    <td>80.0%</td><td>80.0%</td><td>80.0%</td>
   </tr>
 <tr>
     <td>system_modification</td><td>5</td><td>0</td><td>0</td>
@@ -113,13 +113,13 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-rustup-init-download-execute-001</code><br>rust-lang/rustup<br><span class="muted">public/rustup/rustup-init.sh.txt</span></td>
-<td>download_execution, network_egress</td><td>network_egress</td>
-<td class="fail">download_execution</td>
-<td><code>network.tool</code>: curl $_retry --proto '=https' --tlsv1.2 --ciphers &quot;$_ciphersuites&quot; --silent --show-error --fail --location &quot;$1&quot; --output &quot;$2&quot; 2&gt;&amp;1<br><code>network.tool</code>: curl $_retry --silent --show-error --fail --location &quot;$1&quot; --output &quot;$2&quot; 2&gt;&amp;1<br><code>network.tool</code>: curl $_retry --proto '=https' --tlsv1.2 --silent --show-error --fail --location &quot;$1&quot; --output &quot;$2&quot; 2&gt;&amp;1<br><code>network.tool</code>: wget -V 2&gt;&amp;1<br><code>network.tool</code>: wget &quot;$1&quot; -O &quot;$2&quot; 2&gt;&amp;1<br><code>network.tool</code>: wget --https-only --secure-protocol=TLSv1_2 --ciphers &quot;$_ciphersuites&quot; &quot;$1&quot; -O &quot;$2&quot; 2&gt;&amp;1<br><code>network.tool</code>: wget &quot;$1&quot; -O &quot;$2&quot; 2&gt;&amp;1<br><code>network.tool</code>: wget --https-only --secure-protocol=TLSv1_2 &quot;$1&quot; -O &quot;$2&quot; 2&gt;&amp;1<br><code>network.tool</code>: curl -V<br><code>network.tool</code>: curl -V<br><code>network.tool</code>: curl -V<br><code>network.tool</code>: curl -V<br><code>network.tool</code>: wget -V<br><code>network.tool</code>: wget -V</td></tr>
-<tr><td><code>holdout-semantic-release-github-assets-001</code><br>semantic-release/github<br><span class="muted">public/semantic-release-github/publish.js.txt</span></td>
-<td>data_exfiltration, network_egress</td><td>无</td>
-<td class="fail">data_exfiltration, network_egress</td>
-<td>无</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T15:55:13.300Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<tr><td><code>holdout-bun-installer-001</code><br>oven-sh/bun<br><span class="muted">public/bun/install.sh.txt</span></td>
+<td>download_execution, interpreter_escape, network_egress, persistence, second_stage_payload</td><td>interpreter_escape, network_egress</td>
+<td class="fail">download_execution, persistence, second_stage_payload</td>
+<td><code>escape.interpreter</code>: powershell -c &quot;irm bun.sh/install.ps1|iex&quot;<br><code>network.tool</code>: curl --fail --location --progress-bar --output &quot;$exe.zip&quot; &quot;$bun_uri&quot;</td></tr>
+<tr><td><code>holdout-aws-cli-gamelift-upload-001</code><br>aws/aws-cli<br><span class="muted">public/aws-cli/uploadbuild.py.txt</span></td>
+<td>data_exfiltration, network_egress</td><td>data_exfiltration, destructive_behavior, second_stage_payload</td>
+<td class="fail">network_egress</td>
+<td><code>python.exfiltration</code>: s3_transfer_mgr.upload_file( temporary_zipfile, bucket, key, callback=ProgressPercentage( temporary_zipfile, label='Uploading ' + args.build_root + ':' ) )<br><code>python.destructive</code>: os.remove(temporary_zipfile)<br><code>python.second-stage</code>: zipfile.ZipFile(f, 'w', zipfile.ZIP_DEFLATED, True)</td></tr></tbody></table>
+<p class="muted">生成时间：2026-07-28T16:04:14.475Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

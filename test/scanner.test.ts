@@ -161,6 +161,46 @@ describe("scan", () => {
     expect(harmless.findings).toHaveLength(0);
   });
 
+  it("tracks a transparent download wrapper into chmod and variable execution", () => {
+    const result = scan(`
+      downloader() {
+        curl "$1" --output "$2"
+      }
+      ensure() {
+        if ! "$@"; then
+          exit 1
+        fi
+      }
+      ignore() {
+        "$@"
+      }
+      main() {
+        local file="$tmp/tool"
+        ensure downloader "$url" "$file"
+        ensure chmod u+x "$file"
+        ignore "$file" --install
+      }
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "chain.wrapper-download-execute",
+        category: "download_execution",
+      }),
+    ]));
+
+    const unrelated = scan(`
+      downloader() {
+        curl "$1" --output "$2"
+      }
+      downloader "$url" "$file"
+      chmod u+x "$other"
+      "$file"
+    `);
+    expect(unrelated.findings.some((finding) =>
+      finding.ruleId === "chain.wrapper-download-execute",
+    )).toBe(false);
+  });
+
   it("distinguishes command discovery from wrapped Git network execution", () => {
     const discovery = scan("command -v curl >/dev/null");
     expect(discovery.findings.some((finding) => finding.category === "network_egress")).toBe(false);

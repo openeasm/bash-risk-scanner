@@ -1006,13 +1006,25 @@
     },
     {
       "id": "holdout-rustup-init-download-execute-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/rustup/rustup-init.sh.txt",
       "sha256": "9a47c3dd4d35d36397cf8e3c8dd9319741393e81476f5d6f0c650590635ace77",
       "expectedCategories": ["network_egress", "download_execution"],
       "maximumParseErrors": 1,
+      "expectedFindings": [
+        {
+          "category": "download_execution",
+          "ruleId": "chain.wrapper-download-execute",
+          "evidencePattern": "ensure downloader.*ignore"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "curl|wget"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "rust-lang/rustup",
@@ -1025,12 +1037,24 @@
     },
     {
       "id": "holdout-semantic-release-github-assets-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/semantic-release-github/publish.js.txt",
       "sha256": "423e316e0ac5bab0c0d81fc195375aa4c1f6b4dbc946606b51b63f302815c305",
       "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.octokit-request",
+          "evidencePattern": "octokit[.]request"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.octokit-upload",
+          "evidencePattern": "upload"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "semantic-release/github",
@@ -1038,6 +1062,46 @@
         "sourceUrl": "https://github.com/semantic-release/github/blob/33e8734811bd66937809f9fe884cb283fef238b4/lib/publish.js",
         "license": "MIT",
         "licenseFile": "public/semantic-release-github/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-bun-installer-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/bun/install.sh.txt",
+      "sha256": "04882bf41679d49d9af108657a1e5515bf04fdf2940d12c0d0b1e5d79dc53be8",
+      "expectedCategories": [
+        "network_egress",
+        "download_execution",
+        "second_stage_payload",
+        "persistence",
+        "interpreter_escape"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "oven-sh/bun",
+        "commit": "789be97db9b746533cf692e8367146e2d3c0d7cb",
+        "sourceUrl": "https://github.com/oven-sh/bun/blob/789be97db9b746533cf692e8367146e2d3c0d7cb/src/runtime/cli/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/bun/LICENSE.md"
+      }
+    },
+    {
+      "id": "holdout-aws-cli-gamelift-upload-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/aws-cli/uploadbuild.py.txt",
+      "sha256": "90af33f0fcc0f645e668079a13f4026c744a59de2757b7d8b4431e25729e184f",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "aws/aws-cli",
+        "commit": "29b7877a85aa55270de844574d47bdbbdc300b76",
+        "sourceUrl": "https://github.com/aws/aws-cli/blob/29b7877a85aa55270de844574d47bdbbdc300b76/awscli/customizations/gamelift/uploadbuild.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/aws-cli/LICENSE.txt"
       }
     }
   ]

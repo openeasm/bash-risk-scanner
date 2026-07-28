@@ -34,6 +34,7 @@ Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop
 CPython smtplib、Tailscale installer 和 semantic-release/npm 代码，以及
 Docker installer、npm CLI publish、Atomic Red Team 的 Bash 命令和 Python telnet
 client，以及 Rustup installer 和 semantic-release/github release publisher。
+最新冻结集还包括 Bun installer 与 AWS CLI GameLift uploader。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -111,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 50 条离线语料：48 条完全匹配，precision 100%、recall 97.0%、
-F1 98.5%。前十轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 52 条离线语料：50 条完全匹配，precision 98.1%、recall 96.3%、
+F1 97.2%。前十一轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -152,19 +153,26 @@ validation 回归：
 - npm CLI：`libnpmpublish.publish` 的 CommonJS 来源绑定识别网络与外传；
   `this.exec(args)` 不再被任意 `.exec()` 规则误报。`node:` 内建模块先去引号再
   规范化，保留 `node:child_process` 回归。
+- Rustup：摘要实际调用 `"$@"` 的透明 wrapper 和包含 curl/wget 的下载 wrapper，
+  在同一函数、有限距离内关联同一目标变量的下载、`chmod u+x` 和执行。
+- semantic-release/github：`new Octokit()` 实例的 GitHub REST route 识别网络；
+  只有带 `data: readFile(...)` 的上传对象识别外传。额外 AST 遍历已合并，连续
+  两次 P95 保持在 100 ms 门槛内。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Rustup installer 经 `ensure downloader` 下载、`chmod u+x` 后通过
-  `ignore "$_file"` 执行，当前跨 wrapper/变量的数据流漏报下载执行。
-- semantic-release/github 经 `octokit.request(...)` 创建 release 并上传
-  `readFile()` 读取的资产，当前实例构造来源和 request 参数语义尚未覆盖网络与外传。
+- Bun installer 下载 zip、解压、移动并执行 `$exe completions`，当前漏报下载执行
+  和二阶段载荷；通过数组生成并写入 shell rc 的持久化也未覆盖。
+- AWS CLI GameLift uploader 的 `S3Transfer.upload_file()` 已识别外传，但未识别
+  网络外联。
+- AWS CLI 创建用于上传的临时 zip 被误报二阶段载荷，上传完成后删除单个临时文件
+  被误报破坏行为。
 
-新 test 分层以实际 precision 100%、recall 25% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应先修复三个 FN，再提高 test recall 门槛。
+新 test 分层以实际 precision 60%、recall 42.9% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应先修复两个 FP 和四个 FN，再提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-90 个单元测试或当前小规模公开语料外推生产环境准确率。
+92 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

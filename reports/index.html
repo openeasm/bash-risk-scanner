@@ -45,10 +45,10 @@
   </header>
 
   <div class="cards">
-    <div class="card"><div class="metric">90 / 90</div><div>单元测试通过</div></div>
+    <div class="card"><div class="metric">92 / 92</div><div>单元测试通过</div></div>
     <div class="card"><div class="metric">2 / 2</div><div>测试文件通过</div></div>
-    <div class="card"><div class="metric">48 / 50</div><div>语料完全匹配</div></div>
-    <div class="card"><div class="metric">97.0%</div><div>语料总体召回率</div></div>
+    <div class="card"><div class="metric">50 / 52</div><div>语料完全匹配</div></div>
+    <div class="card"><div class="metric">96.3%</div><div>语料总体召回率</div></div>
   </div>
 
   <section>
@@ -56,7 +56,7 @@
     <p class="pass">通过：Bash、Python 和 Node.js 均能在精选样例中检出全部 12 类风险。</p>
     <p>额外测试覆盖行为链、可信下载域名、私网 IP、源码位置、语法错误、
       Bash 内嵌 Python/Node.js、静态管道、heredoc、扫描限制和已知误报边界。</p>
-    <p class="muted">报告基线：2 个测试文件、90 个测试。详细断言和耗时见
+    <p class="muted">报告基线：2 个测试文件、92 个测试。详细断言和耗时见
       <a href="./test-report.html">Vitest HTML 报告</a>。</p>
   </section>
 
@@ -109,11 +109,11 @@
 
   <section class="warning">
     <h2>当前结论边界</h2>
-    <p>50 条离线语料得到 precision 100%、recall 97.0%、F1 98.5%，但样本规模仍小，
-      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。上一轮 Docker
-      复合 wrapper 与 npm CLI 的 1 FP/2 FN 已修复；新的冻结 test 集保留 Rustup
-      下载后二进制执行的 1 个 FN，以及 semantic-release/github Octokit 网络与
-      资产外传的 2 个 FN。
+    <p>52 条离线语料得到 precision 98.1%、recall 96.3%、F1 97.2%，但样本规模仍小，
+      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。上一轮 Rustup 和
+      Octokit 的 3 个 FN 已修复；新的冻结 test 集保留 Bun 下载执行、二阶段与
+      shell rc 持久化的 3 个 FN，以及 AWS CLI 的网络 FN、临时 zip/临时清理
+      两个 FP。
       这些新缺口没有在本轮针对测试集调参。</p>
   </section>
 

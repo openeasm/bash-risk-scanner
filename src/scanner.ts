@@ -82,9 +82,29 @@ function staticBashCommandWrappers(source: string): Map<string, Set<string>> {
   return wrappers;
 }
 
+function bashFunctionSummaries(source: string): {
+  transparent: Set<string>;
+  downloaders: Set<string>;
+} {
+  const transparent = new Set<string>();
+  const downloaders = new Set<string>();
+  for (const match of source.matchAll(
+    /^[ \t]*(?:function[ \t]+)?([A-Za-z_]\w*)[ \t]*(?:\(\s*\))?[ \t]*\{([\s\S]*?)^[ \t]*\}/gm,
+  )) {
+    const name = match[1]!;
+    const body = match[2]!;
+    if (/(?:^|[\s;])["']?\$@["']?(?:[\s;]|$)/m.test(body)) transparent.add(name);
+    if (/\b(?:curl|wget)\b/.test(body) && /\$1\b/.test(body) && /\$2\b/.test(body)) {
+      downloaders.add(name);
+    }
+  }
+  return { transparent, downloaders };
+}
+
 function bashCommandVariants(
   text: string,
   commandWrappers: Map<string, Set<string>> = new Map(),
+  transparentWrappers: Set<string> = new Set(),
 ): string[] {
   const initial = [text];
   const wrapped = text.match(/^\s*\$(?:\{([A-Za-z_]\w*)\}|([A-Za-z_]\w*))\s+/);
@@ -101,6 +121,10 @@ function bashCommandVariants(
     let current = start;
     for (let depth = 0; depth < 4; depth++) {
       let next = current;
+      const firstCommand = next.match(/^\s*([A-Za-z_]\w*)\s+/)?.[1];
+      if (firstCommand && transparentWrappers.has(firstCommand)) {
+        next = next.replace(/^\s*[A-Za-z_]\w*\s+/, "");
+      }
       next = next.replace(
         /^\s*(?:command|builtin)\s+(?:(?:-p|--)\s+)*/i,
         "",
@@ -267,6 +291,13 @@ function executionScopeId(
     ]);
   for (let current = node.parent; current; current = current.parent) {
     if (scopeTypes.has(current.type)) return current.id;
+  }
+  return node.tree.rootNode.id;
+}
+
+function bashExecutionScopeId(node: SyntaxNode): number {
+  for (let current = node.parent; current; current = current.parent) {
+    if (current.type === "function_definition") return current.id;
   }
   return node.tree.rootNode.id;
 }
@@ -496,11 +527,30 @@ function collectJavaScriptShadows(root: SyntaxNode): Set<string> {
 function collectJavaScriptDerivedAliases(
   root: SyntaxNode,
   aliases: Map<string, string>,
+  uploads: Set<string>,
 ): void {
   walk(root, (node) => {
     if (node.type !== "variable_declarator") return;
     const name = node.childForFieldName("name")?.text;
     const value = node.childForFieldName("value");
+    if (
+      name
+      && /^[A-Za-z_$][\w$]*$/.test(name)
+      && value?.type === "object"
+      && /(?:method\s*:\s*["'](?:POST|PUT|PATCH)["'])/i.test(value.text)
+      && /\bdata\s*:\s*(?:await\s+)?readFile\s*\(/s.test(value.text)
+    ) {
+      uploads.add(name);
+    }
+    if (
+      name
+      && /^[A-Za-z_$][\w$]*$/.test(name)
+      && value?.type === "new_expression"
+      && calleeOf(value) === "Octokit"
+    ) {
+      aliases.set(name, "octokit.Client");
+      return;
+    }
     if (!name || value?.type !== "call_expression") return;
     const wrapper = canonicalizeCallee(calleeOf(value), aliases);
     if (wrapper !== "util.promisify") return;
@@ -526,8 +576,11 @@ function scanAstLanguage(
   const parseErrors: SourceRange[] = [];
   const interestingNodes: SyntaxNode[] = [];
   const aliases = collectAliases(source, language);
+  const javascriptUploadObjects = new Set<string>();
   if (language === "python") collectPythonObjectBindings(tree.rootNode, aliases);
-  if (language === "javascript") collectJavaScriptDerivedAliases(tree.rootNode, aliases);
+  if (language === "javascript") {
+    collectJavaScriptDerivedAliases(tree.rootNode, aliases, javascriptUploadObjects);
+  }
   const javascriptShadows = language === "javascript"
     ? collectJavaScriptShadows(tree.rootNode)
     : new Set<string>();
@@ -700,6 +753,46 @@ function scanAstLanguage(
     }
     if (
       language === "javascript"
+      && callee === "octokit.Client.request"
+    ) {
+      const argumentsNode = node.childForFieldName("arguments");
+      const firstArgument = argumentsNode?.namedChildren[0]?.text ?? "";
+      const isGithubRoute = /["'](?:GET|POST|PUT|PATCH|DELETE) \/repos\//i.test(firstArgument);
+      const isUpload = javascriptUploadObjects.has(firstArgument)
+        || (
+          argumentsNode?.namedChildren[0]?.type === "object"
+          && /(?:method\s*:\s*["'](?:POST|PUT|PATCH)["'])/i.test(firstArgument)
+          && /\bdata\s*:\s*(?:await\s+)?readFile\s*\(/s.test(firstArgument)
+        );
+      if (isGithubRoute || isUpload) {
+        findings.push({
+          ruleId: "javascript.network.octokit-request",
+          category: "network_egress",
+          title: "Calls the GitHub API through Octokit",
+          severity: "medium",
+          confidence: "high",
+          message: "An Octokit instance sends a GitHub REST API request.",
+          evidence: evidence(text, maxEvidence),
+          range: rangeOf(node),
+          language,
+        });
+      }
+      if (isUpload) {
+        findings.push({
+          ruleId: "javascript.exfiltration.octokit-upload",
+          category: "data_exfiltration",
+          title: "Uploads file data through Octokit",
+          severity: "high",
+          confidence: "high",
+          message: "An Octokit request uploads data read from a local file.",
+          evidence: evidence(text, maxEvidence),
+          range: rangeOf(node),
+          language,
+        });
+      }
+    }
+    if (
+      language === "javascript"
       && /^execa\.(?:execa|execaCommand)$/.test(callee)
       && /^\s*[\w$]+\s*\(\s*["']npm["']\s*,\s*\[\s*["']publish["']/s.test(text)
     ) {
@@ -820,14 +913,15 @@ function scanAstLanguage(
     scopeId: executionScopeId(node, language),
     startIndex: node.startIndex,
   }));
+  const scopeByCallStart = new Map(
+    canonicalCalls.map((call) => [call.startIndex, call.scopeId]),
+  );
   const scopesWithFinding = (category: Finding["category"]): Set<number> =>
     new Set(findings
       .filter((finding) => finding.category === category)
       .flatMap((finding) => {
-        const call = canonicalCalls.find((candidate) =>
-          candidate.startIndex === finding.range.startIndex,
-        );
-        return call ? [call.scopeId] : [];
+        const scopeId = scopeByCallStart.get(finding.range.startIndex);
+        return scopeId === undefined ? [] : [scopeId];
       }));
   const rootRange = rangeOf(tree.rootNode);
   const addWholeSourceChain = (finding: Omit<Finding, "range" | "evidence" | "language">): void => {
@@ -918,6 +1012,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const findings: Finding[] = [];
   const parseErrors: SourceRange[] = [];
   const commandWrappers = staticBashCommandWrappers(source);
+  const functionSummaries = bashFunctionSummaries(source);
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -925,7 +1020,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
 
   for (const statement of commands) {
     for (const rule of COMMAND_RULES) {
-      const matched = bashCommandVariants(statement.text, commandWrappers).some((variant) => {
+      const matched = bashCommandVariants(
+        statement.text,
+        commandWrappers,
+        functionSummaries.transparent,
+      ).some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);
       });
@@ -942,6 +1041,54 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         range: statement.range,
         language: "bash",
       });
+    }
+  }
+
+  const commandVariants = commands.map((statement) => ({
+    statement,
+    scopeId: bashExecutionScopeId(statement.node),
+    variants: bashCommandVariants(
+      statement.text,
+      commandWrappers,
+      functionSummaries.transparent,
+    ),
+  }));
+  for (const download of commandVariants) {
+    let targetVariable: string | undefined;
+    for (const variant of download.variants) {
+      const match = variant.match(
+        /^\s*([A-Za-z_]\w*)\s+\S+\s+["']?\$(?:\{)?([A-Za-z_]\w*)\}?["']?(?:\s|$)/,
+      );
+      if (match && functionSummaries.downloaders.has(match[1]!)) {
+        targetVariable = match[2];
+        break;
+      }
+    }
+    if (!targetVariable) continue;
+    const later = commandVariants.filter((candidate) =>
+      candidate.scopeId === download.scopeId
+      && candidate.statement.range.startIndex > download.statement.range.startIndex
+      && candidate.statement.range.startIndex - download.statement.range.startIndex <= 5_000,
+    );
+    const variable = targetVariable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const chmod = later.find((candidate) => candidate.variants.some((variant) =>
+      new RegExp(
+        `^\\s*chmod\\s+(?:[ugo]*\\+x|[0-7]*[1357][0-7]{2})\\s+["']?\\$(?:\\{)?${variable}\\}?["']?(?:\\s|$)`,
+      ).test(variant),
+    ));
+    const execute = later.find((candidate) => candidate.variants.some((variant) =>
+      new RegExp(`^\\s*["']?\\$(?:\\{)?${variable}\\}?["']?(?:\\s|$)`).test(variant),
+    ));
+    if (chmod && execute) {
+      addChainFinding(findings, download.statement, execute.statement, {
+        ruleId: "chain.wrapper-download-execute",
+        category: "download_execution",
+        title: "Downloads and executes a wrapped binary",
+        severity: "critical",
+        confidence: "high",
+        message: "A download wrapper writes a path that is made executable and invoked in the same function.",
+        language: "bash",
+      }, maxEvidence);
     }
   }
 

@@ -179,7 +179,7 @@ export const COMMAND_RULES: Rule[] = [
 ];
 
 export const DOWNLOAD = /\b(?:curl|wget|fetch|aria2c)\b/i;
-export const EXECUTE = /(?:^|[\s;|&()])(?:bash|sh|source|\.)(?:\s|$)|\bchmod\s+\+x\b|\bexec\b/i;
+export const EXECUTE = /(?:^|[\s;|&()])(?:bash|sh|source|\.)(?:\s|$)|\bchmod\s+[ugo]*\+x\b|\bexec\b/i;
 export const ARCHIVE_DOWNLOAD = /\b(?:curl|wget|fetch|aria2c)\b[^;\n]*(?:\.tar(?:\.\w+)?|\.tgz|\.zip|\.gz|\.bz2|\.xz)\b/i;
 export const EXTRACT = /\b(?:tar|unzip|gunzip|7z)\b/i;
 export const INSTALL_OR_BINARY = /\b(?:\.\/)?(?:install(?:\.sh)?|setup(?:\.sh)?|run(?:\.sh)?)\b|\bchmod\s+\+x\b/i;

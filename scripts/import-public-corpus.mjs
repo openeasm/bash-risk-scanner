@@ -267,6 +267,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/semantic-release/github/33e8734811bd66937809f9fe884cb283fef238b4/LICENSE",
     sha256: "6c39086c72df12ce153282a6dc26cecde9f57f69635389a31e04e2001db147dd",
   },
+  {
+    target: "bun/install.sh.txt",
+    url: "https://raw.githubusercontent.com/oven-sh/bun/789be97db9b746533cf692e8367146e2d3c0d7cb/src/runtime/cli/install.sh",
+    sha256: "04882bf41679d49d9af108657a1e5515bf04fdf2940d12c0d0b1e5d79dc53be8",
+  },
+  {
+    target: "bun/LICENSE.md",
+    url: "https://raw.githubusercontent.com/oven-sh/bun/789be97db9b746533cf692e8367146e2d3c0d7cb/LICENSE.md",
+    sha256: "cea411f4d219a2963550908cfb46678a9da1d1c3b7531b7d591fa81695e4437e",
+  },
+  {
+    target: "aws-cli/uploadbuild.py.txt",
+    url: "https://raw.githubusercontent.com/aws/aws-cli/29b7877a85aa55270de844574d47bdbbdc300b76/awscli/customizations/gamelift/uploadbuild.py",
+    sha256: "90af33f0fcc0f645e668079a13f4026c744a59de2757b7d8b4431e25729e184f",
+  },
+  {
+    target: "aws-cli/LICENSE.txt",
+    url: "https://raw.githubusercontent.com/aws/aws-cli/29b7877a85aa55270de844574d47bdbbdc300b76/LICENSE.txt",
+    sha256: "a395e1165c2ed0e2bf041ae28e528245aedd4009b7e94ad407780257f704afc1",
+  },
 ];
 
 function githubContentsFallback(url) {
