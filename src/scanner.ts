@@ -158,6 +158,11 @@ function bashVariableSubcommand(
   )?.[1]?.toLowerCase();
 }
 
+function staticBashPathArgument(text: string): string | undefined {
+  const match = text.trim().match(/^(["']?)([^"'$\s;|&<>]+)\1$/);
+  return match?.[2];
+}
+
 function bashCommandVariants(
   text: string,
   commandWrappers: Map<string, Set<string>> = new Map(),
@@ -1169,6 +1174,56 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
       functionSummaries.transparent,
     ),
   }));
+  walk(tree.rootNode, (node) => {
+    if (node.type !== "for_statement") return;
+    const loopVariable = node.namedChildren.find((child) => child.type === "variable_name")?.text;
+    const substitution = node.namedChildren.find((child) => child.type === "command_substitution");
+    const body = node.namedChildren.find((child) => child.type === "do_group");
+    if (!loopVariable || !substitution || !body) return;
+
+    const readCommand = substitution.descendantsOfType("command").find((command) =>
+      /^\s*cat(?:\s|$)/.test(command.text),
+    );
+    const readPath = readCommand
+      ? staticBashPathArgument(readCommand.text.replace(/^\s*cat\s+/, ""))
+      : undefined;
+    if (!readPath) return;
+
+    const escapedVariable = loopVariable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const digCommand = body.descendantsOfType("command").find((command) =>
+      new RegExp(
+        `^\\s*dig(?:\\s+[^\\s;]+)*\\s+["']?\\$(?:\\{)?${escapedVariable}\\}?(?:\\.[A-Za-z0-9_-]+){2,}["']?\\s*$`,
+      ).test(command.text),
+    );
+    if (!digCommand) return;
+
+    const encoded = commands.find((candidate) => {
+      if (
+        candidate.range.startIndex >= node.startIndex
+        || bashExecutionScopeId(candidate.node) !== bashExecutionScopeId(node)
+        || node.startIndex - candidate.range.startIndex > 5_000
+      ) return false;
+      const match = candidate.text.match(
+        /^\s*xxd\s+(?:-[A-Za-z0-9]+\s+)*(["']?)([^"'$\s;|&<>]+)\1\s*>\s*(["']?)([^"'$\s;|&<>]+)\3\s*$/,
+      );
+      return match?.[4] === readPath && match[2] !== match[4];
+    });
+    if (!encoded) return;
+
+    addChainFinding(findings, encoded, {
+      node: digCommand,
+      text: digCommand.text,
+      range: rangeOf(digCommand),
+    }, {
+      ruleId: "chain.dns-file-exfiltration",
+      category: "data_exfiltration",
+      title: "Encodes and exfiltrates file data through DNS",
+      severity: "critical",
+      confidence: "high",
+      message: "A file is encoded, read into a loop variable, and embedded in DNS query names.",
+      language: "bash",
+    }, maxEvidence);
+  });
   for (const download of commandVariants) {
     const archiveVariable = download.variants
       .map((variant) => bashArchiveOutputVariable(variant))

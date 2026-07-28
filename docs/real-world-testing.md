@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 59 条离线语料：58 条完全匹配，precision 100%、recall 99.2%、
-F1 99.6%。前十五轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 60 条离线语料：59 条完全匹配，precision 100%、recall 99.2%、
+F1 99.6%。前十六轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -174,20 +174,26 @@ validation 回归：
 - Google Cloud Storage：支持以 `@` 开头的 scoped npm package 导入；只有确认来自
   `@google-cloud/storage` 的 `Storage` 实例，其 `bucket().upload()` 才识别网络
   和本地文件外传。
+- Atomic Red Team DNS 外传：在同一 Bash 作用域内关联
+  `xxd -p input > encoded`、`for value in $(cat encoded)` 和
+  `dig "$value.static.domain"`；中间文件不一致、普通循环、静态查询和缺少静态
+  域名后缀均不命中数据外传。
 
 本轮重新冻结的公开恶意样本尚未用于调参：
 
-- Atomic Red Team T1048.003 的 Linux DNS 外传步骤先用 `xxd` 编码文件，再循环读取
-  编码结果并放入 `dig` 查询名。网络外联已命中，跨命令/循环的数据外传尚未覆盖。
-- 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把输入替换为 `/tmp` 文本，
-  域名替换为保留的 `example.invalid`，评测器不会执行命令。
+- Atomic Red Team T1070.006 的 Linux timestomp 步骤使用
+  `touch -a -t 197001010000.00` 修改文件访问时间。目前未命中
+  `defense_evasion`，作为下一轮待修复 FN。
+- 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
+  `/tmp/atomic-timestomp.txt`，评测器不会执行命令。
 
-新 test 分层以实际 precision 100%、recall 50% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应修复 DNS 外传 FN，并用普通 `xxd` 转换、
-普通 `dig` 健康检查和不相关循环作为 hard-negative 后立即提高 test 门槛。
+新 test 分层只有一个预期正例且当前漏报，因此 recall 基线为 0；precision 没有
+预测正例，不能单独解读。整体门槛仍保持 precision 95%、recall 90%。下一轮应
+修复 timestomp FN，并用普通文件创建、保留当前时间、只修改非时间属性等
+hard-negative 约束误报后立即提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-102 个单元测试或当前小规模公开语料外推生产环境准确率。
+103 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
