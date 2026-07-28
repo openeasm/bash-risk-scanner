@@ -3135,7 +3135,7 @@
     },
     {
       "id": "holdout-atomic-sftp-remote-push-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/sftp-remote-push.sh.txt",
@@ -3159,6 +3159,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic remote and local path inputs with inert static defaults and copied the single executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-journald-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-journald.sh.txt",
+      "sha256": "234604541ff643e759e9120037eef333895adcf2faa48a02eae47e416b35db9c",
+      "expectedCategories": ["defense_evasion", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.journald-disable",
+          "evidencePattern": "systemctl\\s+stop\\s+systemd-journald"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+systemctl"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "c3a377f9-1203-4454-aa35-9d391d34768f",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without modification; the evaluation harness never executes it."
       }
     }
   ]

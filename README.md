@@ -175,8 +175,8 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 login.keychain 文件暂存、LaunchAgent plist 安装加载、广泛文件树密码模式搜索、
 AWS credentials、Azure token cache 和 GCP 凭据数据库发现均已进入
 validation；rsync、FreeBSD `gcp` 私钥暂存、私钥位置清单生成和
-`auditctl -e 0` 审计禁用、SCP 和 SFTP 远端到本地拉取也已修复，当前冻结
-test 为通过 SFTP `put` 上传本地文件的数据外传语义。
+`auditctl -e 0` 审计禁用、SCP/SFTP 远端拉取和 SFTP `put` 上传也已修复，
+当前冻结 test 为停止 `systemd-journald` 日志服务的防御规避语义。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

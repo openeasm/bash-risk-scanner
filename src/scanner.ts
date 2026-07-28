@@ -317,9 +317,9 @@ function isSftpRemoteOperand(value: string): boolean {
     .test(value);
 }
 
-function bashSftpPullsRemotePath(text: string): boolean {
+function staticSftpOperands(text: string): string[] | undefined {
   const words = staticBashWords(text);
-  if (words[0]?.toLowerCase() !== "sftp") return false;
+  if (words[0]?.toLowerCase() !== "sftp") return undefined;
 
   const operands: string[] = [];
   const optionsWithValue = new Set([
@@ -339,12 +339,45 @@ function bashSftpPullsRemotePath(text: string): boolean {
     }
     operands.push(word);
   }
+  return operands;
+}
 
+function bashSftpPullsRemotePath(text: string): boolean {
+  const operands = staticSftpOperands(text);
+  if (!operands) return false;
   if (operands.length !== 2 || !isSftpRemoteOperand(operands[0]!)) return false;
   const destination = operands[1]!;
   return destination.length > 0
     && !/[$`;&|<>]/.test(destination)
     && !isSftpRemoteOperand(destination);
+}
+
+function bashSftpPushesLocalPath(text: string): boolean {
+  const hereString = text.match(/^(.*?)\s+<<<\s+(.+?)\s*$/s);
+  if (!hereString) return false;
+  const operands = staticSftpOperands(hereString[1]!);
+  if (
+    !operands
+    || operands.length !== 1
+    || !isSftpRemoteOperand(operands[0]!)
+  ) return false;
+
+  const rawPayload = hereString[2]!.trim();
+  const payload = rawPayload.match(/^\$'((?:\\.|[^'\\])*)'$/)?.[1]
+    ?? rawPayload.match(/^'([^']*)'$/)?.[1]
+    ?? rawPayload.match(/^"([^"]*)"$/)?.[1];
+  if (!payload || /[$`;&|<>]/.test(payload)) return false;
+
+  const commandWords = staticBashWords(payload);
+  if (!/^(?:put|mput)$/.test(commandWords[0] ?? "")) return false;
+  const paths = commandWords.slice(1).filter((word) => !word.startsWith("-"));
+  if (paths.length === 0) return false;
+  const localPaths = commandWords[0] === "put" ? paths.slice(0, 1) : paths;
+  return localPaths.every((path) =>
+    path.length > 0
+    && !/[$`;&|<>]/.test(path)
+    && !isSftpRemoteOperand(path)
+  );
 }
 
 function bashSystemdRunSchedulesTimer(text: string): boolean {
@@ -2523,6 +2556,23 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "medium",
         confidence: "high",
         message: "Transfers a static remote SFTP path into a static local destination.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    if (
+      hasSftpCandidate
+      && !(directSftp && definedFunctions.has("sftp"))
+      && variants.some((variant) => bashSftpPushesLocalPath(variant))
+    ) {
+      findings.push({
+        ruleId: "exfil.sftp-push",
+        category: "data_exfiltration",
+        title: "Uploads local data with SFTP",
+        severity: "high",
+        confidence: "high",
+        message: "Sends a static local path to a static remote SFTP session with put or mput.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",
