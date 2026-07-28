@@ -2601,7 +2601,7 @@
     },
     {
       "id": "holdout-atomic-unlimited-sudo-cache-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/unlimited-sudo-cache.sh.txt",
@@ -2635,6 +2635,44 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single Linux executor command that sets an unlimited sudo credential-cache timeout; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-sudo-tty-tickets-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-sudo-tty-tickets.sh.txt",
+      "sha256": "065f5dd98736f7ddce209caf2e3eabedfd26f84a18ecde8edceebd17e005d89f",
+      "expectedCategories": ["defense_evasion", "privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.sudo-tty-tickets-disable",
+          "evidencePattern": "!.*tty_tickets"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+sh"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "/etc/sudoers"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1548.003/T1548.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1548.003.yaml.txt",
+        "upstreamSha256": "50ebd910568df8766dfd7b1d0506c7e3b9564b6418743e56990333c4e0529441",
+        "upstreamId": "91a60b03-fb75-4d24-a42e-2eb8956e8de1",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Linux executor command that disables per-terminal sudo credential tickets; the evaluation harness never executes it."
       }
     }
   ]

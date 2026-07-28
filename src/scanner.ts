@@ -486,6 +486,23 @@ function bashInstallsPamBypass(text: string): boolean {
     && /(?:>>?|tee(?:\s+-a)?)\s*["']?\/etc\/pam(?:[.]d\/|[.]conf\b)/.test(text);
 }
 
+function bashSetsUnlimitedSudoCache(text: string): boolean {
+  const timeoutSettings = [
+    ...text.matchAll(/\btimestamp_timeout\s*=\s*(-?\d+(?:[.]\d+)?)\b/g),
+  ];
+  if (
+    !/(?:\/etc\/sudoers(?:[.]d\/[^ "';|&<>]+)?|\/usr\/local\/etc\/sudoers)\b/.test(text)
+    || timeoutSettings.length === 0
+    || Number(timeoutSettings.at(-1)![1]) >= 0
+  ) return false;
+  if (/^\s*sed(?:\s|$)/.test(text)) {
+    return /(?:^|\s)-i(?:\s|$|["'])/.test(text)
+      && !/timestamp_timeout[^"']*(?:,|\/)d(?:["']|\s|$)/.test(text);
+  }
+  return /^\s*(?:echo|printf|tee)(?:\s|$)/.test(text)
+    && /(?:>>?|tee(?:\s+-a)?)\s*["']?(?:\/etc\/sudoers|\/usr\/local\/etc\/sudoers)/.test(text);
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1746,6 +1763,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
       source.includes("pam_permit.so")
       || source.includes("pam_succeed_if.so")
     );
+  const hasUnlimitedSudoCacheCandidate =
+    source.includes("timestamp_timeout")
+    && source.includes("sudoers");
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -1875,6 +1895,22 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "critical",
         confidence: "high",
         message: "Adds a PAM authentication rule whose sufficient module succeeds unconditionally.",
+        evidence: evidence(pipeline.text, maxEvidence),
+        range: rangeOf(pipeline),
+        language: "bash",
+      });
+    }
+  }
+  if (hasUnlimitedSudoCacheCandidate) {
+    for (const pipeline of tree.rootNode.descendantsOfType("pipeline")) {
+      if (!bashSetsUnlimitedSudoCache(pipeline.text)) continue;
+      findings.push({
+        ruleId: "defense.sudo-cache-unlimited",
+        category: "defense_evasion",
+        title: "Configures sudo credentials to never expire",
+        severity: "high",
+        confidence: "high",
+        message: "Sets a negative sudo timestamp timeout, keeping cached credentials valid until reboot.",
         evidence: evidence(pipeline.text, maxEvidence),
         range: rangeOf(pipeline),
         language: "bash",
@@ -2042,6 +2078,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "critical",
           confidence: "high",
           message: "Adds a PAM authentication rule whose sufficient module succeeds unconditionally.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasUnlimitedSudoCacheCandidate) {
+      const directSudoersWriter = statement.text.match(
+        /^\s*["']?(sed|echo|printf|tee)["']?(?:\s|$)/,
+      )?.[1];
+      if (
+        !(directSudoersWriter && definedFunctions.has(directSudoersWriter))
+        && variants.some((variant) => bashSetsUnlimitedSudoCache(variant))
+      ) {
+        findings.push({
+          ruleId: "defense.sudo-cache-unlimited",
+          category: "defense_evasion",
+          title: "Configures sudo credentials to never expire",
+          severity: "high",
+          confidence: "high",
+          message: "Sets a negative sudo timestamp timeout, keeping cached credentials valid until reboot.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

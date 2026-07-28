@@ -1164,6 +1164,44 @@ describe("scan", () => {
     )).toHaveLength(4);
   });
 
+  it("detects unlimited sudo credential caching without matching bounded timeout changes", () => {
+    const unlimited = [
+      `sudo sed -i 's/env_reset.*$/env_reset,timestamp_timeout=-1/' /etc/sudoers`,
+      `echo 'Defaults timestamp_timeout=-5' >> /etc/sudoers.d/cache`,
+      `printf '%s\\n' 'Defaults timestamp_timeout = -1.5' | sudo tee -a /usr/local/etc/sudoers`,
+      `sudo sh -c "echo 'Defaults timestamp_timeout=-1' >> /etc/sudoers"`,
+    ];
+    for (const source of unlimited) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "defense.sudo-cache-unlimited",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `sed -i 's/timestamp_timeout=-1/timestamp_timeout=5/' /etc/sudoers`,
+      `echo 'Defaults timestamp_timeout=0' >> /etc/sudoers`,
+      `echo 'Defaults timestamp_timeout=15' >> /etc/sudoers`,
+      `grep timestamp_timeout /etc/sudoers`,
+      `visudo -c -f /etc/sudoers`,
+      `echo 'Defaults passwd_timeout=-1' >> /etc/sudoers`,
+      `echo 'timestamp_timeout=-1' > /tmp/sudoers-example`,
+      `value=-1; echo "Defaults timestamp_timeout=$value" >> /etc/sudoers`,
+      `echo "Set timestamp_timeout=-1 in /etc/sudoers"`,
+      `# echo 'Defaults timestamp_timeout=-1' >> /etc/sudoers`,
+      `sed() { echo "project helper"; }
+       sed -i 's/env_reset/env_reset,timestamp_timeout=-1/' /etc/sudoers`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "defense.sudo-cache-unlimited"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

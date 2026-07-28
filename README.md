@@ -172,7 +172,7 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 已修复的 T1685.004“删除全部 auditd 规则”和 T1543.002 SysV 启动持久化进入
 validation；已修复的 T1136.001 本地账户创建也进入 validation，当前新增
 T1556.003 恶意 PAM 认证规则也已修复；当前新增 T1548.003 无限 sudo 凭据缓存
-盲测。
+已转入 validation，冻结 test 改为禁用 sudo `tty_tickets`。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 
