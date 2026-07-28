@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 93 条离线语料：92 条完全匹配，precision 100%、recall 99.5%、
+当前基线为 94 条离线语料：93 条完全匹配，precision 100%、recall 99.5%、
 F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -299,20 +299,24 @@ validation 回归：
   扫描；帮助、版本、接口/脚本帮助、仅输出配置、动态目标、文本和函数遮蔽均不
   命中。Bash `/dev/tcp`/`/dev/udp` 探测归为网络外联，只有交互 shell 或明确文件
   描述符回连模式才额外归为反向 shell 数据外传。
+- Atomic Red Team T1053.002 的管道/stdin、`-f/--file`、`-t/--time` 和 `batch`
+  作业提交现在识别定时持久化；列出、删除、查看作业内容、帮助、动态时间、文本
+  和函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
 test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI token、ASLR、SCP
 方向、awk shell escape、密码哈希访问控制、信任存储修改、瞬态 systemd timer、
-全局 swap 禁用和 nmap 扫描，并新增 Atomic T1053.002 将命令通过管道提交给
-`at 23:59` 的样本。当前完全漏掉该定时任务语义。发布门禁继续要求整体
+全局 swap 禁用、nmap 扫描和 at 作业，并新增 Atomic T1552.005 从 AWS EC2
+IMDSv2 IAM role endpoint 读取临时凭据的样本。当前能识别 curl 网络外联，但漏掉
+云凭据访问语义。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分管道输入、文件输入或 heredoc
-提交的 `at` 作业与 `at -l/atq` 查询、`at -r/atrm` 删除、帮助、动态命令名、注释
-和文本。
+`maximum.forbiddenFindingCount` 为 0。下一轮应覆盖 AWS、GCP、Azure 常见 metadata
+凭据路径，同时排除实例身份/区域/主机名等非凭据 metadata、普通 link-local HTTP
+请求、帮助、动态 URL、注释和文本。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-136 个单元测试或当前小规模公开语料外推生产环境准确率。
+137 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

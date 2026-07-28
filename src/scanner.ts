@@ -354,6 +354,34 @@ function bashNmapScansNetwork(text: string): boolean {
   return false;
 }
 
+function bashSubmitsAtJob(text: string): boolean {
+  if (!/^\s*(?:at|batch)(?:\s|$)/i.test(text)) return false;
+  const words = staticBashWords(text);
+  const command = words[0]?.toLowerCase();
+  if (command === "batch") {
+    return !words.some((word) => /^(?:-h|--help|-V|--version)$/.test(word));
+  }
+  if (command !== "at") return false;
+
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (/^(?:-l|--list|-r|--remove|-d|-c|--cat|-V|--version|-h|--help)$/.test(word)) {
+      return false;
+    }
+    if (/^(?:-f|--file|-q|--queue)$/.test(word)) {
+      index += 1;
+      continue;
+    }
+    if (/^(?:-t|--time)$/.test(word)) {
+      const value = words[index + 1];
+      return Boolean(value && !/[$`;&|<>]/.test(value));
+    }
+    if (word.startsWith("-")) continue;
+    return !/[$`;&|<>]/.test(word);
+  }
+  return false;
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1794,6 +1822,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "medium",
         confidence: "high",
         message: "Invokes nmap with a static IP address, network range, or domain target.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    const directAtCommand = statement.text.match(
+      /^\s*["']?(at|batch)["']?(?:\s|$)/,
+    )?.[1];
+    if (
+      !(directAtCommand && definedFunctions.has(directAtCommand))
+      && variants.some((variant) => bashSubmitsAtJob(variant))
+    ) {
+      findings.push({
+        ruleId: "persistence.scheduler-at",
+        category: "persistence",
+        title: "Submits a deferred at job",
+        severity: "high",
+        confidence: "high",
+        message: "Submits commands for later execution through at or batch.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",

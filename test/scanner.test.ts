@@ -1093,6 +1093,61 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects at job submission without matching at job administration", () => {
+    const submissions = [
+      `echo "id > /tmp/result" | at 23:59`,
+      "at -f /tmp/job.sh now + 1 hour",
+      "at --file /tmp/job.sh noon",
+      "at -q b -f /tmp/job.sh midnight",
+      "at -t 202607292359 <<'EOF'\nid\nEOF",
+      "batch <<'EOF'\nid\nEOF",
+    ];
+    for (const source of submissions) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "persistence.scheduler-at",
+          category: "persistence",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "at",
+      "at -l",
+      "at --list",
+      "atq",
+      "at -r 42",
+      "at --remove 42",
+      "at -d 42",
+      "atrm 42",
+      "at -c 42",
+      "at --cat 42",
+      "at --help",
+      "at -V",
+      "at -f /tmp/job.sh",
+      "at \"$when\"",
+      "echo 'echo id | at 23:59'",
+      "# at -f /tmp/job.sh noon",
+      `at() { echo "project helper"; }
+       at 23:59`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.scheduler-at"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      at() { echo "project helper"; }
+      command at 23:59
+      sudo at noon
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "persistence.scheduler-at"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",
