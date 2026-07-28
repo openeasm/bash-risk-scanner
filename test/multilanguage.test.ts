@@ -510,6 +510,43 @@ await client.get(url)
     expect(asyncResult.findings.some((finding) => finding.category === "network_egress")).toBe(true);
   });
 
+  it("recognizes the imported Hugging Face HTTP stream wrapper only by source", () => {
+    const result = scanPython(`
+      from .utils._http import (
+          retry_request,
+          http_stream_backoff,
+      )
+with http_stream_backoff(method="GET", url=url) as response:
+    response.iter_bytes()
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "python.network", category: "network_egress" }),
+    ]));
+
+    const local = scanPython(`
+def http_stream_backoff(**kwargs):
+    return local_cache(kwargs["url"])
+http_stream_backoff(method="GET", url=path)
+`);
+    expect(local.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+  });
+
+  it("recognizes a callable node-fetch module without matching a local binding", () => {
+    const result = scanJavaScript(`
+const fetchBinary = require("node-fetch")
+fetchBinary(uri, { agent })
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "javascript.network", category: "network_egress" }),
+    ]));
+
+    const local = scanJavaScript(`
+const fetchBinary = uri => localCache.get(uri)
+fetchBinary(path)
+`);
+    expect(local.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+  });
+
   it("does not treat a local Python Client class as an HTTP client", () => {
     const result = scanPython(`
 class Client:

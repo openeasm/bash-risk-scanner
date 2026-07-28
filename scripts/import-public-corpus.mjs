@@ -327,6 +327,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/mapbox/node-pre-gyp/14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5/LICENSE",
     sha256: "5e3b2b8138f20dbf2e7558d81b8bcad48d0f45b731eb276fa4de21b94f4447bd",
   },
+  {
+    target: "ansible/get_url.py.txt",
+    url: "https://raw.githubusercontent.com/ansible/ansible/67c6b7c5dd9a029d46c6a3792c14f9b61f66580e/lib/ansible/modules/get_url.py",
+    sha256: "691bd57e3cd32377c0fdf763481f715eebfb8e4740c618aef6723b7740be4833",
+  },
+  {
+    target: "ansible/COPYING",
+    url: "https://raw.githubusercontent.com/ansible/ansible/67c6b7c5dd9a029d46c6a3792c14f9b61f66580e/COPYING",
+    sha256: "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+  },
+  {
+    target: "google-cloud-storage/uploadFile.js.txt",
+    url: "https://raw.githubusercontent.com/googleapis/nodejs-storage/189663a279d85451a65614b47a748d667d7eb3db/samples/uploadFile.js",
+    sha256: "883677c4439c71c18f94116015d1b653a236942f7379805f7e79fd72d33d830d",
+  },
+  {
+    target: "google-cloud-storage/LICENSE",
+    url: "https://raw.githubusercontent.com/googleapis/nodejs-storage/189663a279d85451a65614b47a748d667d7eb3db/LICENSE",
+    sha256: "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  },
 ];
 
 function githubContentsFallback(url) {

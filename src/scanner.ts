@@ -304,7 +304,7 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile|move)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|seteuid|setgid|setegid|chmod|chown|run|call|Popen|check_call)$/,
     defense_evasion: /(?:^|\.)(?:remove|unlink|kill|rmtree|run|call|Popen)$/,
-    network_egress: /(?:^|\.)(?:get|post|put|patch|delete|head|options|request|ws_connect|urlopen|urlretrieve|socket|create_connection|open_connection|connect|upload_file)$/,
+    network_egress: /(?:^|\.)(?:get|post|put|patch|delete|head|options|request|ws_connect|urlopen|urlretrieve|socket|create_connection|open_connection|connect|upload_file|http_stream_backoff)$/,
     data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall|write)$/,
     destructive_behavior: /(?:^|\.)(?:rmtree|removedirs|open)$/,
     interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output|create_subprocess_shell)$/,
@@ -318,7 +318,7 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|setgid|chmod|chmodSync|chown|chownSync|exec|execSync)$/,
     defense_evasion: /(?:^|\.)(?:rm|rmSync|unlink|unlinkSync|rmdir|rmdirSync|kill|exec|execSync|spawn|spawnSync)$/,
-    network_egress: /^(?:(?:.*\.)?(?:fetch|get|request|stream|pipeline|connect|createConnection)|got\.stream|npm-registry-fetch)$/,
+    network_egress: /^(?:(?:.*\.)?(?:fetch|get|request|stream|pipeline|connect|createConnection)|got\.stream|node-fetch|npm-registry-fetch)$/,
     data_exfiltration: /(?:^|\.)(?:fetch|post|put|patch|send|write|upload|putObject|sendCommand)$/,
     destructive_behavior: /(?:^|\.)(?:rm|rmSync|rmdir|rmdirSync|unlink|unlinkSync|writeFile|writeFileSync|open|openSync)$/,
     interpreter_escape: /(?:^|\.)(?:exec|execSync|spawn|spawnSync)$/,
@@ -369,8 +369,11 @@ function collectAliases(source: string, language: "python" | "javascript"): Map<
     for (const match of source.matchAll(/^\s*import\s+([\w.]+)\s+as\s+(\w+)/gm)) {
       aliases.set(match[2]!, match[1]!);
     }
-    for (const match of source.matchAll(/^\s*from\s+([\w.]+)\s+import\s+([^\n#]+)/gm)) {
-      for (const binding of match[2]!.replace(/[()]/g, "").split(",")) {
+    for (const match of source.matchAll(
+      /^\s*from\s+([\w.]+)\s+import\s+(?:\(([\s\S]*?)^\s*\)|([^\n#]+))/gm,
+    )) {
+      const importedBindings = (match[2] ?? match[3] ?? "").replace(/#[^\n]*/g, "");
+      for (const binding of importedBindings.split(",")) {
         const parts = binding.trim().split(/\s+as\s+/);
         if (parts[0] && /^\w+$/.test(parts[0])) {
           aliases.set(parts[1] ?? parts[0], `${match[1]}.${parts[0]}`);
@@ -569,7 +572,11 @@ function environmentCredentialFinding(
   };
 }
 
-function collectJavaScriptShadows(root: SyntaxNode): Set<string> {
+function collectJavaScriptDerivedAliases(
+  root: SyntaxNode,
+  aliases: Map<string, string>,
+  uploads: Set<string>,
+): Set<string> {
   const shadows = new Set<string>();
   walk(root, (node) => {
     if (node.type === "function_declaration") {
@@ -587,19 +594,6 @@ function collectJavaScriptShadows(root: SyntaxNode): Set<string> {
     ) {
       shadows.add(name);
     }
-  });
-  return shadows;
-}
-
-function collectJavaScriptDerivedAliases(
-  root: SyntaxNode,
-  aliases: Map<string, string>,
-  uploads: Set<string>,
-): void {
-  walk(root, (node) => {
-    if (node.type !== "variable_declarator") return;
-    const name = node.childForFieldName("name")?.text;
-    const value = node.childForFieldName("value");
     if (
       name
       && /^[A-Za-z_$][\w$]*$/.test(name)
@@ -628,6 +622,7 @@ function collectJavaScriptDerivedAliases(
       aliases.set(name, wrapped);
     }
   });
+  return shadows;
 }
 
 function scanAstLanguage(
@@ -644,13 +639,15 @@ function scanAstLanguage(
   const interestingNodes: SyntaxNode[] = [];
   const aliases = collectAliases(source, language);
   const javascriptUploadObjects = new Set<string>();
+  let javascriptShadows = new Set<string>();
   if (language === "python") collectPythonSocketFactories(tree.rootNode, aliases);
   if (language === "javascript") {
-    collectJavaScriptDerivedAliases(tree.rootNode, aliases, javascriptUploadObjects);
+    javascriptShadows = collectJavaScriptDerivedAliases(
+      tree.rootNode,
+      aliases,
+      javascriptUploadObjects,
+    );
   }
-  const javascriptShadows = language === "javascript"
-    ? collectJavaScriptShadows(tree.rootNode)
-    : new Set<string>();
 
   walk(tree.rootNode, (node) => {
     if (language === "python") collectPythonObjectBindingNode(node, aliases);

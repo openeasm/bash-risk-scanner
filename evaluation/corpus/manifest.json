@@ -1200,6 +1200,13 @@
           "evidencePattern": "exec zsh"
         }
       ],
+      "forbiddenFindings": [
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.interpreter",
+          "evidencePattern": "command_exists zsh"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "ohmyzsh/ohmyzsh",
@@ -1211,12 +1218,19 @@
     },
     {
       "id": "holdout-huggingface-hub-download-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/huggingface-hub/file_download.py.txt",
       "sha256": "1a221b53b3fb9965b74c98cb7b183f61d276d91d7920ef4f8f0ca00725ca4b93",
       "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "http_stream_backoff"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "huggingface/huggingface_hub",
@@ -1228,7 +1242,7 @@
     },
     {
       "id": "holdout-node-pre-gyp-install-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/node-pre-gyp/install.js.txt",
@@ -1238,6 +1252,13 @@
         "network_egress",
         "second_stage_payload"
       ],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "fetch"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "mapbox/node-pre-gyp",
@@ -1245,6 +1266,40 @@
         "sourceUrl": "https://github.com/mapbox/node-pre-gyp/blob/14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5/lib/install.js",
         "license": "BSD-3-Clause",
         "licenseFile": "public/node-pre-gyp/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-ansible-get-url-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/ansible/get_url.py.txt",
+      "sha256": "691bd57e3cd32377c0fdf763481f715eebfb8e4740c618aef6723b7740be4833",
+      "expectedCategories": ["network_egress"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "ansible/ansible",
+        "commit": "67c6b7c5dd9a029d46c6a3792c14f9b61f66580e",
+        "sourceUrl": "https://github.com/ansible/ansible/blob/67c6b7c5dd9a029d46c6a3792c14f9b61f66580e/lib/ansible/modules/get_url.py",
+        "license": "GPL-3.0-or-later",
+        "licenseFile": "public/ansible/COPYING"
+      }
+    },
+    {
+      "id": "holdout-google-cloud-storage-upload-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/google-cloud-storage/uploadFile.js.txt",
+      "sha256": "883677c4439c71c18f94116015d1b653a236942f7379805f7e79fd72d33d830d",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "googleapis/nodejs-storage",
+        "commit": "189663a279d85451a65614b47a748d667d7eb3db",
+        "sourceUrl": "https://github.com/googleapis/nodejs-storage/blob/189663a279d85451a65614b47a748d667d7eb3db/samples/uploadFile.js",
+        "license": "Apache-2.0",
+        "licenseFile": "public/google-cloud-storage/LICENSE"
       }
     }
   ]

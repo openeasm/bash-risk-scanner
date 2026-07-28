@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 56 条离线语料：54 条完全匹配，precision 100%、recall 98.4%、
-F1 99.2%。前十三轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 58 条离线语料：56 条完全匹配，precision 100%、recall 97.6%、
+F1 98.8%。前十四轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -166,24 +166,35 @@ validation 回归：
   `$exe eval/run` 才识别动态执行与解释器逃逸。
 - Oh My Zsh：识别 shell rc 目标替换、`chsh -s` 和 `exec zsh`；`command -v "$@"`
   这类命令发现 wrapper 不再被摘要为实际解释器执行。
+- Hugging Face Hub：支持括号包裹的 Python 多行 import，并仅在
+  `.utils._http.http_stream_backoff` 来源成立时识别网络。
+- node-pre-gyp：`require("node-fetch")` 返回的模块本身作为 callable 使用时识别
+  网络；本地同名函数不命中。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Hugging Face Hub 的真实下载路径使用相对导入的 `http_stream_backoff()` context
-  manager，目前漏报网络外联。
-- node-pre-gyp 的 `require("node-fetch")` 默认函数导入下载二进制 tarball；凭据访问
-  与解压已命中，但模块本身作为 callable 的来源规范化尚未覆盖网络外联。
+- Ansible `get_url` 使用来自 `ansible.module_utils.urls` 的 `fetch_url()` wrapper，
+  当前漏报网络外联。
+- Google Cloud Storage 官方示例通过
+  `new Storage().bucket(bucketName).upload(filePath, options)` 上传本地文件，
+  当前漏报网络与数据外传。
 
-新 test 分层以实际 precision 100%、recall 50% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应修复两个网络 FN，并用相似安全 wrapper/
-本地 callable 约束来源后再提高 test 门槛。
+新 test 分层以实际 precision 100%、recall 0% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%，因此 test 的零召回不能被整体容易样本长期掩盖。
+下一轮应修复三个 FN，并用本地 `fetch_url`、本地 `Storage/bucket/upload` 链约束
+来源后立即提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-98 个单元测试或当前小规模公开语料外推生产环境准确率。
+100 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
-降至 91.74 ms；门槛仍保持 100 ms。
+降至 82–94 ms；门槛仍保持 100 ms。
+
+类别集合之外，manifest 现在可声明 `forbiddenFindings`，按 category、ruleId 和
+evidencePattern 禁止具体 finding。禁止 finding 数量进入 JSON/HTML 和全局 gate，
+避免同一类别的一条正确 finding 掩盖另一条错误 finding。Oh My Zsh 的
+`command_exists zsh` 已作为首个真实回归约束。
 
 ## 提升闭环
 

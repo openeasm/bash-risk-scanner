@@ -47,6 +47,13 @@ function emptyCounts() {
   return { tp: 0, fp: 0, fn: 0 };
 }
 
+function findingMatches(finding, specification) {
+  return (!specification.category || finding.category === specification.category)
+    && (!specification.ruleId || finding.ruleId === specification.ruleId)
+    && (!specification.evidencePattern
+      || new RegExp(specification.evidencePattern, "s").test(finding.evidence));
+}
+
 const sampleResults = [];
 for (const sample of manifest.samples) {
   const source = await readFile(safeSamplePath(sample.sourceFile), "utf8");
@@ -71,12 +78,14 @@ for (const sample of manifest.samples) {
   const truePositives = expected.filter((category) => actual.includes(category));
   const falseNegatives = expected.filter((category) => !actual.includes(category));
   const falsePositives = actual.filter((category) => !expected.includes(category));
-  const missingExpectedFindings = (sample.expectedFindings ?? []).filter((expectedFinding) =>
-    !actualFindings.some((finding) =>
-      finding.category === expectedFinding.category
-      && (!expectedFinding.ruleId || finding.ruleId === expectedFinding.ruleId)
-      && (!expectedFinding.evidencePattern
-        || new RegExp(expectedFinding.evidencePattern, "s").test(finding.evidence)),
+  const missingExpectedFindings = (sample.expectedFindings ?? []).filter(
+    (expectedFinding) => !actualFindings.some((finding) =>
+      findingMatches(finding, expectedFinding),
+    ),
+  );
+  const forbiddenFindings = actualFindings.filter((finding) =>
+    (sample.forbiddenFindings ?? []).some((forbiddenFinding) =>
+      findingMatches(finding, forbiddenFinding),
     ),
   );
 
@@ -95,12 +104,14 @@ for (const sample of manifest.samples) {
     falsePositives,
     falseNegatives,
     missingExpectedFindings,
+    forbiddenFindings,
     findingCount: result.findings.length,
     parseErrorCount: result.parseErrors.length,
     maximumParseErrors: sample.maximumParseErrors ?? 0,
     durationMilliseconds,
     passed: falsePositives.length === 0 && falseNegatives.length === 0
       && missingExpectedFindings.length === 0
+      && forbiddenFindings.length === 0
       && result.parseErrors.length <= (sample.maximumParseErrors ?? 0),
   });
 }
@@ -156,6 +167,10 @@ const summary = {
   sampleCount: sampleResults.length,
   passedSamples: sampleResults.filter((sample) => sample.passed).length,
   failedSamples: sampleResults.filter((sample) => !sample.passed).length,
+  forbiddenFindingCount: sampleResults.reduce(
+    (count, sample) => count + sample.forbiddenFindings.length,
+    0,
+  ),
   ...overall,
   parseErrorRate: ratio(parseErrorSamples, sampleResults.length),
   performance: {
@@ -170,6 +185,7 @@ const gates = {
   recall: summary.recall >= config.minimum.recall,
   parseErrorRate: summary.parseErrorRate <= config.maximum.parseErrorRate,
   p95Milliseconds: summary.performance.p95Milliseconds <= config.maximum.p95Milliseconds,
+  forbiddenFindings: summary.forbiddenFindingCount === 0,
 };
 for (const split of config.requiredPerfectSplits ?? []) {
   gates[`split:${split}:samples`] = sampleResults
@@ -256,10 +272,12 @@ ${metricRows(Object.entries(datasetSplits))}</tbody></table>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 ${metricRows(Object.entries(categories))}</tbody></table>
 <h2>失败样本</h2>
-${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>实际证据</th></tr></thead><tbody>
+${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>缺少指定 finding</th><th>禁止 finding</th><th>实际证据</th></tr></thead><tbody>
 ${failures.map((sample) => `<tr><td><code>${escapeHtml(sample.id)}</code><br>${escapeHtml(sample.provenance.repository ?? sample.provenance.type)}<br><span class="muted">${escapeHtml(sample.sourceFile)}</span></td>
 <td>${escapeHtml(sample.expectedCategories.join(", "))}</td><td>${escapeHtml(sample.actualCategories.join(", ") || "无")}</td>
 <td class="${sample.falseNegatives.length ? "fail" : "pass"}">${escapeHtml(sample.falseNegatives.join(", ") || "无")}</td>
+<td class="${sample.missingExpectedFindings.length ? "fail" : "pass"}">${escapeHtml(sample.missingExpectedFindings.map((finding) => finding.ruleId ?? finding.category).join(", ") || "无")}</td>
+<td class="${sample.forbiddenFindings.length ? "fail" : "pass"}">${escapeHtml(sample.forbiddenFindings.map((finding) => `${finding.ruleId}: ${finding.evidence}`).join(", ") || "无")}</td>
 <td>${sample.actualFindings.length === 0 ? "无" : sample.actualFindings.map((finding) => `<code>${escapeHtml(finding.ruleId)}</code>: ${escapeHtml(finding.evidence)}`).join("<br>")}</td></tr>`).join("\n")}</tbody></table>`}
 <p class="muted">生成时间：${escapeHtml(report.generatedAt)}。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>`;
