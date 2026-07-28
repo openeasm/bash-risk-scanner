@@ -13,6 +13,14 @@ const reportsRoot = resolve(repositoryRoot, "reports");
 
 const manifest = JSON.parse(await readFile(resolve(corpusRoot, "manifest.json"), "utf8"));
 const config = JSON.parse(await readFile(resolve(evaluationRoot, "config.json"), "utf8"));
+const performanceRuns = config.performanceRuns ?? 1;
+if (
+  !Number.isInteger(performanceRuns)
+  || performanceRuns < 1
+  || performanceRuns % 2 === 0
+) {
+  throw new Error("performanceRuns must be a positive odd integer");
+}
 
 function safeSamplePath(relativePath) {
   const absolutePath = resolve(corpusRoot, relativePath);
@@ -65,9 +73,15 @@ for (const sample of manifest.samples) {
   if (!provenance?.type || !provenance?.license) {
     throw new Error(`Missing provenance type or license for ${sample.id}`);
   }
-  const started = performance.now();
-  const result = scan(source, { language: sample.language });
-  const durationMilliseconds = performance.now() - started;
+  const runDurations = [];
+  let result;
+  for (let run = 0; run < performanceRuns; run += 1) {
+    const started = performance.now();
+    const current = scan(source, { language: sample.language });
+    runDurations.push(performance.now() - started);
+    result ??= current;
+  }
+  const durationMilliseconds = percentile(runDurations, 0.5);
   const actual = [...new Set(result.findings.map((finding) => finding.category))].sort();
   const actualFindings = result.findings.map((finding) => ({
     ruleId: finding.ruleId,

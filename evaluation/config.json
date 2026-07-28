@@ -1,4 +1,5 @@
 {
+  "performanceRuns": 3,
   "minimum": {
     "precision": 0.95,
     "recall": 0.9

@@ -319,7 +319,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "high",
     confidence: "medium",
     message: "Uses an upload or POST option that may transmit local data.",
-    pattern: /^\s*(?:curl\b[^;\n]*(?:(?:^|\s)(?:-F|-T)(?:\s|$)|--(?:form|upload-file)(?:=|\s)|--data(?:-binary)?\s+@|-X\s*POST\b)|aws\s+s3\s+cp\b|gsutil\s+cp\b|rclone\s+(?:copy|sync)\b|scp\s+)/,
+    pattern: /^\s*(?:curl\b[^;\n]*(?:(?:^|\s)(?:-F|-T)(?:\s|$)|--(?:form|upload-file)(?:=|\s)|--data(?:-binary)?\s+@|-X\s*POST\b)|aws\s+s3\s+cp\b|gsutil\s+cp\b|rclone\s+(?:copy|sync)\b)/,
   },
   {
     id: "exfil.python-http-server",
@@ -401,4 +401,4 @@ export const ARCHIVE_DOWNLOAD = /\b(?:curl|wget|fetch|aria2c)\b[^;\n]*(?:\.tar(?
 export const EXTRACT = /\b(?:tar|unzip|gunzip|7z)\b/i;
 export const INSTALL_OR_BINARY = /\b(?:\.\/)?(?:install(?:\.sh)?|setup(?:\.sh)?|run(?:\.sh)?)\b|\bchmod\s+\+x\b/i;
 export const FILE_READ = /\b(?:cat|head|tail|sed|awk|grep|tar|zip|find)\b/i;
-export const UPLOAD = /\b(?:curl\b[^;\n]*(?:(?:^|\s)(?:-F|-T)(?=\s|$)|--(?:form|upload-file)(?:=|\s)|--data(?:-binary)?\s+@)|scp\b|sftp\b|aws\s+s3\s+cp\b|gsutil\s+cp\b|rclone\s+(?:copy|sync)\b)/;
+export const UPLOAD = /\b(?:curl\b[^;\n]*(?:(?:^|\s)(?:-F|-T)(?=\s|$)|--(?:form|upload-file)(?:=|\s)|--data(?:-binary)?\s+@)|sftp\b|aws\s+s3\s+cp\b|gsutil\s+cp\b|rclone\s+(?:copy|sync)\b)/;
