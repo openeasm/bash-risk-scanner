@@ -199,6 +199,42 @@ await download(targetPath)
 `);
     expect(result.findings.some((finding) => finding.category === "network_egress")).toBe(false);
   });
+
+  it("tracks aiohttp ClientSession bindings without matching local sessions", () => {
+    const aiohttpResult = scanPython(`
+import aiohttp as ah
+async with ah.ClientSession() as session:
+    await session.request("GET", url)
+`);
+    expect(aiohttpResult.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "python.network", category: "network_egress" }),
+    ]));
+
+    const localResult = scanPython(`
+class ReportSession:
+    def request(self, method, path):
+        return path
+session = ReportSession()
+session.request("GET", "/local")
+`);
+    expect(localResult.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+  });
+
+  it("recognizes npm-registry-fetch imports without matching a local fetch function", () => {
+    const npmResult = scanJavaScript(`
+const fetch = require('npm-registry-fetch')
+fetch(this.resolved, opts)
+`);
+    expect(npmResult.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "javascript.network", category: "network_egress" }),
+    ]));
+
+    const localResult = scanJavaScript(`
+const fetch = value => cache.get(value)
+fetch("local-key")
+`);
+    expect(localResult.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+  });
 });
 
 describe("embedded interpreter payloads", () => {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T14:35:46.556Z",
+  "generatedAt": "2026-07-28T14:43:06.883Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -42,20 +42,20 @@
     "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 32,
-    "passedSamples": 30,
+    "sampleCount": 34,
+    "passedSamples": 32,
     "failedSamples": 2,
-    "tp": 51,
+    "tp": 53,
     "fp": 0,
-    "fn": 2,
+    "fn": 3,
     "precision": 1,
-    "recall": 0.9622641509433962,
-    "f1": 0.9807692307692307,
-    "parseErrorRate": 0.03125,
+    "recall": 0.9464285714285714,
+    "f1": 0.9724770642201834,
+    "parseErrorRate": 0.029411764705882353,
     "performance": {
-      "p50Milliseconds": 1.0800289999999961,
-      "p95Milliseconds": 65.238022,
-      "maximumMilliseconds": 95.54941300000002
+      "p50Milliseconds": 1.3905900000000315,
+      "p95Milliseconds": 77.547767,
+      "maximumMilliseconds": 111.397523
     }
   },
   "languages": {
@@ -68,20 +68,20 @@
       "f1": 1
     },
     "python": {
-      "tp": 15,
+      "tp": 16,
       "fp": 0,
-      "fn": 1,
+      "fn": 2,
       "precision": 1,
-      "recall": 0.9375,
-      "f1": 0.967741935483871
+      "recall": 0.8888888888888888,
+      "f1": 0.9411764705882353
     },
     "node": {
-      "tp": 17,
+      "tp": 18,
       "fp": 0,
       "fn": 1,
       "precision": 1,
-      "recall": 0.9444444444444444,
-      "f1": 0.9714285714285714
+      "recall": 0.9473684210526315,
+      "f1": 0.972972972972973
     }
   },
   "provenanceGroups": {
@@ -94,12 +94,12 @@
       "f1": 1
     },
     "public-snapshot": {
-      "tp": 20,
+      "tp": 22,
       "fp": 0,
-      "fn": 2,
+      "fn": 3,
       "precision": 1,
-      "recall": 0.9090909090909091,
-      "f1": 0.9523809523809523
+      "recall": 0.88,
+      "f1": 0.9361702127659575
     },
     "synthetic-realistic": {
       "tp": 25,
@@ -122,13 +122,13 @@
     "test": {
       "tp": 0,
       "fp": 0,
-      "fn": 2,
+      "fn": 3,
       "precision": 1,
       "recall": 0,
       "f1": 0
     },
     "validation": {
-      "tp": 26,
+      "tp": 28,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -148,10 +148,10 @@
     "data_exfiltration": {
       "tp": 5,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.8333333333333334,
+      "f1": 0.9090909090909091
     },
     "defense_evasion": {
       "tp": 1,
@@ -194,12 +194,12 @@
       "f1": 1
     },
     "network_egress": {
-      "tp": 16,
+      "tp": 18,
       "fp": 0,
       "fn": 2,
       "precision": 1,
-      "recall": 0.8888888888888888,
-      "f1": 0.9411764705882353
+      "recall": 0.9,
+      "f1": 0.9473684210526316
     },
     "persistence": {
       "tp": 3,
@@ -278,7 +278,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 12.391931,
+      "durationMilliseconds": 15.587256999999994,
       "passed": true
     },
     {
@@ -337,7 +337,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7860960000000006,
+      "durationMilliseconds": 0.9995559999999983,
       "passed": true
     },
     {
@@ -375,7 +375,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6651290000000074,
+      "durationMilliseconds": 0.7411809999999974,
       "passed": true
     },
     {
@@ -413,7 +413,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0257759999999934,
+      "durationMilliseconds": 1.2215829999999954,
       "passed": true
     },
     {
@@ -439,7 +439,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3598659999999967,
+      "durationMilliseconds": 0.4088069999999959,
       "passed": true
     },
     {
@@ -465,7 +465,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0800289999999961,
+      "durationMilliseconds": 1.2299089999999921,
       "passed": true
     },
     {
@@ -503,7 +503,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.324038000000002,
+      "durationMilliseconds": 6.688534000000004,
       "passed": true
     },
     {
@@ -549,7 +549,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.525825999999995,
+      "durationMilliseconds": 1.7821849999999984,
       "passed": true
     },
     {
@@ -587,7 +587,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.071792000000002,
+      "durationMilliseconds": 1.323644999999999,
       "passed": true
     },
     {
@@ -646,7 +646,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.0827620000000024,
+      "durationMilliseconds": 2.670703000000003,
       "passed": true
     },
     {
@@ -684,7 +684,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7284680000000066,
+      "durationMilliseconds": 1.06022999999999,
       "passed": true
     },
     {
@@ -710,7 +710,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0283110000000022,
+      "durationMilliseconds": 1.4167690000000164,
       "passed": true
     },
     {
@@ -736,7 +736,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.229842000000005,
+      "durationMilliseconds": 0.29845000000000255,
       "passed": true
     },
     {
@@ -782,7 +782,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.223348999999999,
+      "durationMilliseconds": 6.191761999999983,
       "passed": true
     },
     {
@@ -820,7 +820,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.3387439999999913,
+      "durationMilliseconds": 1.8511550000000057,
       "passed": true
     },
     {
@@ -874,7 +874,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.168294000000003,
+      "durationMilliseconds": 1.6149810000000002,
       "passed": true
     },
     {
@@ -928,7 +928,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0732260000000053,
+      "durationMilliseconds": 1.3144170000000202,
       "passed": true
     },
     {
@@ -966,7 +966,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3883790000000147,
+      "durationMilliseconds": 0.7645150000000172,
       "passed": true
     },
     {
@@ -992,7 +992,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.5730560000000082,
+      "durationMilliseconds": 0.8056919999999934,
       "passed": true
     },
     {
@@ -1018,7 +1018,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.17587999999997805,
+      "durationMilliseconds": 0.2941020000000094,
       "passed": true
     },
     {
@@ -1086,7 +1086,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 65.238022,
+      "durationMilliseconds": 77.547767,
       "passed": true
     },
     {
@@ -1290,7 +1290,7 @@
       "findingCount": 32,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 95.54941300000002,
+      "durationMilliseconds": 111.397523,
       "passed": true
     },
     {
@@ -1340,7 +1340,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.175436999999988,
+      "durationMilliseconds": 1.3905900000000315,
       "passed": true
     },
     {
@@ -1382,7 +1382,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.23693500000001677,
+      "durationMilliseconds": 0.2695160000000101,
       "passed": true
     },
     {
@@ -1424,7 +1424,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3288469999999961,
+      "durationMilliseconds": 0.4443949999999859,
       "passed": true
     },
     {
@@ -1474,7 +1474,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.41974799999997003,
+      "durationMilliseconds": 0.5695390000000202,
       "passed": true
     },
     {
@@ -1545,7 +1545,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 20.188713000000007,
+      "durationMilliseconds": 38.73059699999999,
       "passed": true
     },
     {
@@ -1609,7 +1609,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.8776450000000295,
+      "durationMilliseconds": 11.071551,
       "passed": true
     },
     {
@@ -1674,7 +1674,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.5496779999999717,
+      "durationMilliseconds": 4.077182999999991,
       "passed": true
     },
     {
@@ -1745,12 +1745,12 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 17.354059000000007,
+      "durationMilliseconds": 31.588952000000006,
       "passed": true
     },
     {
       "id": "holdout-aiohttp-curl-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/aiohttp/curl.py.txt",
@@ -1766,23 +1766,31 @@
       "expectedCategories": [
         "network_egress"
       ],
-      "actualCategories": [],
-      "actualFindings": [],
-      "truePositives": [],
-      "falsePositives": [],
-      "falseNegatives": [
+      "actualCategories": [
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "session.request(\"GET\", url)"
+        }
+      ],
+      "truePositives": [
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 0,
+      "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.4777730000000133,
-      "passed": false
+      "durationMilliseconds": 3.252504999999985,
+      "passed": true
     },
     {
       "id": "holdout-pacote-remote-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/pacote/remote.js.txt",
@@ -1798,6 +1806,80 @@
       "expectedCategories": [
         "network_egress"
       ],
+      "actualCategories": [
+        "network_egress"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "fetch(this.resolved, fetchOpts)"
+        }
+      ],
+      "truePositives": [
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 5.54696100000001,
+      "passed": true
+    },
+    {
+      "id": "holdout-memo-http-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/memo/_http.py.txt",
+      "sha256": "80e01e971a33306cbf7a02561170a2daa58b09f6fa9f5b63542d1c82563deecd",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "koaning/memo",
+        "commit": "6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1",
+        "sourceUrl": "https://github.com/koaning/memo/blob/6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1/memo/_http.py",
+        "license": "MIT",
+        "licenseFile": "public/memo/LICENSE"
+      },
+      "expectedCategories": [
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [],
+      "actualFindings": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.477292000000034,
+      "passed": false
+    },
+    {
+      "id": "holdout-mime-db-undici-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/mime-db/request.js.txt",
+      "sha256": "eaabfded0c974d00f7a9312a23505121de5af28f7a2840a9a8bad048e0829b9c",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "jshttp/mime-db",
+        "commit": "ba120a7f71bc8ab7d5299e88c0049063239029a7",
+        "sourceUrl": "https://github.com/jshttp/mime-db/blob/ba120a7f71bc8ab7d5299e88c0049063239029a7/scripts/lib/request.js",
+        "license": "MIT",
+        "licenseFile": "public/mime-db/LICENSE"
+      },
+      "expectedCategories": [
+        "network_egress"
+      ],
       "actualCategories": [],
       "actualFindings": [],
       "truePositives": [],
@@ -1809,7 +1891,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.5198299999999563,
+      "durationMilliseconds": 0.6032519999999977,
       "passed": false
     }
   ]

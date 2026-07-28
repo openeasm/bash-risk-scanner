@@ -443,12 +443,19 @@
     },
     {
       "id": "holdout-aiohttp-curl-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/aiohttp/curl.py.txt",
       "sha256": "9edea06311c326eddad6ff86d4ce077c95945fba17404d44dfde613844514202",
       "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "session[.]request"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "aio-libs/aiohttp",
@@ -460,12 +467,19 @@
     },
     {
       "id": "holdout-pacote-remote-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/pacote/remote.js.txt",
       "sha256": "d4843de4eec468b75632de2f431eb769a333dbd345b1b294f57a4a9eb077192c",
       "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "fetch[(]this[.]resolved"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "npm/pacote",
@@ -473,6 +487,40 @@
         "sourceUrl": "https://github.com/npm/pacote/blob/c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f/lib/remote.js",
         "license": "ISC",
         "licenseFile": "public/pacote/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-memo-http-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/memo/_http.py.txt",
+      "sha256": "80e01e971a33306cbf7a02561170a2daa58b09f6fa9f5b63542d1c82563deecd",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "koaning/memo",
+        "commit": "6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1",
+        "sourceUrl": "https://github.com/koaning/memo/blob/6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1/memo/_http.py",
+        "license": "MIT",
+        "licenseFile": "public/memo/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-mime-db-undici-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/mime-db/request.js.txt",
+      "sha256": "eaabfded0c974d00f7a9312a23505121de5af28f7a2840a9a8bad048e0829b9c",
+      "expectedCategories": ["network_egress"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "jshttp/mime-db",
+        "commit": "ba120a7f71bc8ab7d5299e88c0049063239029a7",
+        "sourceUrl": "https://github.com/jshttp/mime-db/blob/ba120a7f71bc8ab7d5299e88c0049063239029a7/scripts/lib/request.js",
+        "license": "MIT",
+        "licenseFile": "public/mime-db/LICENSE"
       }
     }
   ]

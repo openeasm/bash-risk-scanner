@@ -189,7 +189,7 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile|move)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|seteuid|setgid|setegid|chmod|chown|run|call|Popen|check_call)$/,
     defense_evasion: /(?:^|\.)(?:remove|unlink|kill|rmtree|run|call|Popen)$/,
-    network_egress: /(?:^|\.)(?:get|post|put|patch|request|urlopen|urlretrieve|socket|create_connection|open_connection|connect)$/,
+    network_egress: /(?:^|\.)(?:get|post|put|patch|delete|head|options|request|ws_connect|urlopen|urlretrieve|socket|create_connection|open_connection|connect)$/,
     data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall|write)$/,
     destructive_behavior: /(?:^|\.)(?:rmtree|remove|unlink|removedirs|open)$/,
     interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output|create_subprocess_shell)$/,
@@ -203,7 +203,7 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|setgid|chmod|chmodSync|chown|chownSync|exec|execSync)$/,
     defense_evasion: /(?:^|\.)(?:rm|rmSync|unlink|unlinkSync|rmdir|rmdirSync|kill|exec|execSync|spawn|spawnSync)$/,
-    network_egress: /^(?:(?:.*\.)?(?:fetch|get|request|connect|createConnection)|got\.stream)$/,
+    network_egress: /^(?:(?:.*\.)?(?:fetch|get|request|connect|createConnection)|got\.stream|npm-registry-fetch)$/,
     data_exfiltration: /(?:^|\.)(?:fetch|post|put|patch|send|write|upload|putObject|sendCommand)$/,
     destructive_behavior: /(?:^|\.)(?:rm|rmSync|rmdir|rmdirSync|unlink|unlinkSync|writeFile|writeFileSync|open|openSync)$/,
     interpreter_escape: /(?:^|\.)(?:exec|execSync|spawn|spawnSync)$/,
@@ -281,6 +281,54 @@ function canonicalizeCallee(callee: string, aliases: Map<string, string>): strin
   return replacement ? `${replacement}${callee.slice(identifier.length)}` : callee;
 }
 
+function collectPythonClientBindings(
+  root: SyntaxNode,
+  aliases: Map<string, string>,
+): void {
+  walk(root, (node) => {
+    let localName = "";
+    let value: SyntaxNode | null = null;
+    if (node.type === "assignment") {
+      localName = node.childForFieldName("left")?.text ?? "";
+      value = node.childForFieldName("right");
+    } else if (node.type === "as_pattern") {
+      localName = node.childForFieldName("alias")?.text
+        ?? node.namedChildren.find((child) => child.type === "as_pattern_target")?.text
+        ?? "";
+      value = node.childForFieldName("value")
+        ?? node.namedChildren.find((child) => child.type === "call")
+        ?? null;
+    }
+    if (!/^[A-Za-z_]\w*$/.test(localName) || value?.type !== "call") return;
+    const constructor = canonicalizeCallee(calleeOf(value), aliases);
+    if (constructor === "aiohttp.ClientSession") {
+      aliases.set(localName, constructor);
+    }
+  });
+}
+
+function collectJavaScriptShadows(root: SyntaxNode): Set<string> {
+  const shadows = new Set<string>();
+  walk(root, (node) => {
+    if (node.type === "function_declaration") {
+      const name = node.childForFieldName("name")?.text;
+      if (name) shadows.add(name);
+      return;
+    }
+    if (node.type !== "variable_declarator") return;
+    const name = node.childForFieldName("name")?.text;
+    const value = node.childForFieldName("value");
+    if (
+      name
+      && /^[A-Za-z_$][\w$]*$/.test(name)
+      && !value?.text.startsWith("require(")
+    ) {
+      shadows.add(name);
+    }
+  });
+  return shadows;
+}
+
 function scanAstLanguage(
   source: string,
   language: "python" | "javascript",
@@ -294,6 +342,10 @@ function scanAstLanguage(
   const parseErrors: SourceRange[] = [];
   const interestingNodes: SyntaxNode[] = [];
   const aliases = collectAliases(source, language);
+  if (language === "python") collectPythonClientBindings(tree.rootNode, aliases);
+  const javascriptShadows = language === "javascript"
+    ? collectJavaScriptShadows(tree.rootNode)
+    : new Set<string>();
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -331,6 +383,12 @@ function scanAstLanguage(
     }
     for (const rule of rules as LanguageRule[]) {
       if (!rule.nodeTypes.includes(node.type)) continue;
+      if (
+        language === "javascript"
+        && rule.category === "network_egress"
+        && originalCallee === "fetch"
+        && javascriptShadows.has("fetch")
+      ) continue;
       const calleePattern = CALLEE_BY_CATEGORY[language][rule.category];
       if (!calleePattern?.test(callee)) continue;
       rule.pattern.lastIndex = 0;

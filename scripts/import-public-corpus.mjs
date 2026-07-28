@@ -87,6 +87,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/npm/pacote/c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f/LICENSE",
     sha256: "36ec394cd0f976603cfec687c19175a703c1c0d9db717a76915391e756522c8e",
   },
+  {
+    target: "memo/_http.py.txt",
+    url: "https://raw.githubusercontent.com/koaning/memo/6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1/memo/_http.py",
+    sha256: "80e01e971a33306cbf7a02561170a2daa58b09f6fa9f5b63542d1c82563deecd",
+  },
+  {
+    target: "memo/LICENSE",
+    url: "https://raw.githubusercontent.com/koaning/memo/6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1/LICENSE",
+    sha256: "2f6c90ce801765bf074f3edfe23c7439b52866c184cb0e9cffde069a7293dbd4",
+  },
+  {
+    target: "mime-db/request.js.txt",
+    url: "https://raw.githubusercontent.com/jshttp/mime-db/ba120a7f71bc8ab7d5299e88c0049063239029a7/scripts/lib/request.js",
+    sha256: "eaabfded0c974d00f7a9312a23505121de5af28f7a2840a9a8bad048e0829b9c",
+  },
+  {
+    target: "mime-db/LICENSE",
+    url: "https://raw.githubusercontent.com/jshttp/mime-db/ba120a7f71bc8ab7d5299e88c0049063239029a7/LICENSE",
+    sha256: "cc1dfd4dafa27271e8212cd3b274eeb3f262e40a6fdab36ddc3f9696f706f58b",
+  },
 ];
 
 async function download(url) {
