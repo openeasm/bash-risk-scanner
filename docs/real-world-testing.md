@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 95 条离线语料：94 条完全匹配，precision 100%、recall 99.5%、
+当前基线为 96 条离线语料：95 条完全匹配，precision 100%、recall 99.5%、
 F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -306,21 +306,24 @@ validation 回归：
   identity 和阿里云 RAM credential metadata endpoint 现在识别凭据访问；实例 ID、
   区域、主机名、IMDSv2 握手 token、普通 link-local 请求、动态 URL、文本和函数
   遮蔽均不命中。
+- Atomic Red Team T1685 向精确 `/proc/sysrq-trigger` 写入静态 `b`、`c` 或 `o`
+  时分别识别立即重启、kernel crash 和断电破坏；仅启用/读取 SysRq、其他指令、
+  其他 `/proc/sys` 路径、动态值、文本和函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
 test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI token、ASLR、SCP
 方向、awk shell escape、密码哈希访问控制、信任存储修改、瞬态 systemd timer、
-全局 swap 禁用、nmap 扫描、at 作业和云 metadata 凭据访问，并新增 Atomic T1685
-向 `/proc/sysrq-trigger` 写入 `b` 以立即重启 Linux 主机的样本。当前完全漏掉该
-破坏行为。发布门禁继续要求整体
+全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
+并新增 Atomic T1685.004 的 `auditctl -D` 样本。当前完全漏掉删除全部 auditd
+规则的防御规避语义。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应只识别向精确
-`/proc/sysrq-trigger` 写入静态 reboot/crash 指令，排除读取、写其他 `/proc/sys`
-参数、恢复/启用 SysRq、动态值、普通 echo、帮助、注释和文本。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分 `auditctl -D` 全量删除和
+`-d` 单条规则删除、`-l/-s` 查询、`-e 1/2` 启用/锁定、添加规则、帮助、注释、
+文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-138 个单元测试或当前小规模公开语料外推生产环境准确率。
+139 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

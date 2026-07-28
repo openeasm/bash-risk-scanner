@@ -2456,7 +2456,7 @@
     },
     {
       "id": "holdout-atomic-sysrq-force-reboot-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/sysrq-force-reboot.sh.txt",
@@ -2480,6 +2480,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied and whitespace-normalized the two executor writes that enable SysRq and request an immediate reboot; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-delete-audit-rules-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/delete-audit-rules.sh.txt",
+      "sha256": "ccaf23df8e63442469441312324469dce624338bf3e4b685d20f538f3a288f98",
+      "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.audit-rules-delete",
+          "evidencePattern": "auditctl\\s+-D"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685.004/T1685.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.004.yaml.txt",
+        "upstreamSha256": "c3d31c8db49bd42520cbc7c23525c651ba98f6e28caa321da5367083595c1b92",
+        "upstreamId": "33a29ab1-cabb-407f-9448-269041bf2856",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command that deletes all auditd rules; the evaluation harness never executes it."
       }
     }
   ]

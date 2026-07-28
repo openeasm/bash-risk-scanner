@@ -1197,6 +1197,63 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects immediate SysRq reboot without matching ordinary proc configuration", () => {
+    const forcedReboots = [
+      "echo b > /proc/sysrq-trigger",
+      "echo -n 'b' >'/proc/sysrq-trigger'",
+      `printf 'b\\n' >/proc/sysrq-trigger`,
+      `printf '%s\\n' b > /proc/sysrq-trigger`,
+      `sudo sh -c 'echo b > /proc/sysrq-trigger'`,
+    ];
+    for (const source of forcedReboots) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "destructive.sysrq-reboot",
+          category: "destructive_behavior",
+          confidence: "high",
+        }),
+      ]));
+    }
+    expect(scan("echo c > /proc/sysrq-trigger").findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ ruleId: "destructive.sysrq-crash" }),
+      ]),
+    );
+    expect(scan("printf o >/proc/sysrq-trigger").findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ ruleId: "destructive.sysrq-poweroff" }),
+      ]),
+    );
+
+    const hardNegatives = [
+      "echo 1 > /proc/sys/kernel/sysrq",
+      "cat /proc/sysrq-trigger",
+      "echo h > /proc/sysrq-trigger",
+      "echo \"$action\" > /proc/sysrq-trigger",
+      "echo b > /tmp/sysrq-trigger",
+      "echo b",
+      "printf b > /proc/sys/kernel/sysrq",
+      "echo 'echo b > /proc/sysrq-trigger'",
+      "# echo b > /proc/sysrq-trigger",
+      `echo() { printf '%s\\n' "$*"; }
+       echo b > /proc/sysrq-trigger`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "destructive.sysrq-reboot"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      echo() { printf '%s\\n' "$*"; }
+      command echo b > /proc/sysrq-trigger
+      sudo sh -c 'echo b > /proc/sysrq-trigger'
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "destructive.sysrq-reboot"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",
