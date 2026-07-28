@@ -28,6 +28,19 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 命令参数歧义和文档字符串，但并非从生产流量随机抽样，因此不能用其分数宣称真实
 世界准确率。
 
+公开来源验证集还包括固定 commit 的完整 nvm、Homebrew 安装脚本，以及从 Atomic
+Red Team 测试定义实例化的四个 Bash 命令。每个样本记录来源 URL、commit、许可证、
+本地 SHA-256；派生样本额外记录上游 YAML 哈希、Atomic GUID 和占位符替换说明。
+公开快照可通过以下命令复核：
+
+```bash
+npm run evaluate:import-public
+```
+
+导入器在写入前验证 SHA-256。CI 只读取已提交的 `.txt` 快照，不访问网络、不执行
+样本。Homebrew 当前有一个 tree-sitter-bash 已知解析错误，manifest 明确允许该
+样本最多一个解析错误，同时总体解析错误样本率门禁仍为 5%。
+
 运行方式：
 
 ```bash

@@ -48,7 +48,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "high",
     confidence: "medium",
     message: "Changes a shell startup file and may establish persistence.",
-    pattern: /(?:>>?|tee(?:\s+-a)?)\s*(?:["']?\$HOME\/|~\/)?\.(?:bashrc|bash_profile|profile|zshrc|zprofile)\b/i,
+    pattern: /(?:>>?|tee(?:\s+-a)?)\s*(?:(?:["']?\$HOME\/|~\/)?\.(?:bashrc|bash_profile|profile|zshrc|zprofile)\b|["']?\$(?:\{)?(?:\w*_)?(?:PROFILE|BASHRC|ZSHRC)\b)/i,
   },
   {
     id: "credential.sensitive-path",
@@ -57,7 +57,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "high",
     confidence: "high",
     message: "Reads or enumerates a location commonly containing credentials.",
-    pattern: /^\s*(?:cat|head|tail|less|more|cp|tar|zip|find|ls|grep)\b[^;\n]*(?:\/?\.ssh\b|\/?\.aws\/credentials\b|\/?\.config\/gcloud\b|\/Library\/Keychains\b|Login Data\b|Cookies\b|keychain)/i,
+    pattern: /^\s*(?:cat|head|tail|less|more|cp|tar|zip|find|ls|grep)\b[^;\n]*(?:\/?\.ssh\b|\/?\.aws\/credentials\b|\/?\.config\/gcloud\b|\/Library\/Keychains\b|Login Data\b|Cookies\b|keychain|(?:^|\s)(?:id_rsa|id_ed25519|private[_-]?key)\b)/i,
   },
   {
     id: "credential.environment",
@@ -75,7 +75,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "critical",
     confidence: "high",
     message: "Writes sensitive OS, network, proxy, firewall, or trust configuration.",
-    pattern: /(?:>>?|tee|sed\s+-i|install|cp|mv)[^;\n]*(?:\/etc\/(?:sudoers|hosts|resolv\.conf|ssh|pam\.d)|\/etc\/|iptables|nftables|firewall|proxy|certificates?)/i,
+    pattern: /^\s*(?:(?:tee(?:\s+-a)?|sed\s+-i|install|cp|mv)\b[^;\n]*(?:\/etc\/(?:sudoers|hosts|resolv\.conf|ssh|pam\.d)|\/etc\/|iptables|nftables|firewall|proxy|certificates?)|[^;\n]*>>?\s*["']?(?:\/etc\/|[^;\n]*(?:sudoers|resolv\.conf|iptables|nftables|certificates?)))/i,
   },
   {
     id: "privilege.sudo",
@@ -84,7 +84,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "high",
     confidence: "high",
     message: "Invokes a command through sudo or su.",
-    pattern: new RegExp(`${cmd}(?:sudo|su)(?:\\s|$)`, "i"),
+    pattern: /^\s*(?:(?:\/usr\/bin\/)?sudo|su|execute_sudo)(?:\s|$)/i,
   },
   {
     id: "privilege.suid-capability",
@@ -102,7 +102,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "critical",
     confidence: "high",
     message: "Attempts to remove evidence from system or shell logs.",
-    pattern: /^\s*(?:(?:rm|shred|truncate)\b[^;\n]*(?:\/var\/log\b|\.bash_history\b|\.zsh_history\b|audit\.log\b)|history\s+-c\b)/i,
+    pattern: /^\s*(?:(?:rm|shred|truncate)\b[^;\n]*(?:\/var\/log\b|\.bash_history\b|\.zsh_history\b|audit\.log\b)|dd\b[^;\n]*\bof=\/var\/log\/|history\s+-c\b)/i,
   },
   {
     id: "defense.security-control",
@@ -120,7 +120,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "medium",
     confidence: "medium",
     message: "Creates an outbound network connection.",
-    pattern: new RegExp(`${cmd}(?:nc|ncat|netcat|socat|ssh|scp|sftp|curl|wget|dig|nslookup)${arg}`, "i"),
+    pattern: /^(?:\s*(?:nc|ncat|netcat|socat|ssh|scp|sftp|curl|wget|dig|nslookup)(?:\s|$)|\s*git\s+(?:clone|fetch|pull|ls-remote)(?:\s|$)|\s*(?:execute|retry)\b[^;\n]*(?:\$\{?(?:USABLE_)?(?:GIT|CURL)\}?)[^;\n]*(?:["'](?:clone|fetch|pull|ls-remote)["']))/i,
   },
   {
     id: "exfil.upload",
@@ -156,7 +156,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "critical",
     confidence: "high",
     message: "Direct disk writes can destroy data or filesystems.",
-    pattern: /^\s*(?:dd\b[^;\n]*\bof=\/dev\/|mkfs(?:\.\w+)?\s+\/dev\/|shred\b[^;\n]*\/dev\/)/i,
+    pattern: /^\s*(?:dd\b[^;\n]*\bof=(?:\/dev\/|\/var\/log\/)|mkfs(?:\.\w+)?\s+\/dev\/|shred\b[^;\n]*\/dev\/)/i,
   },
   {
     id: "destructive.bulk-encryption",

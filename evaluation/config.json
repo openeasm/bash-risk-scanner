@@ -4,7 +4,7 @@
     "recall": 0.9
   },
   "maximum": {
-    "parseErrorRate": 0,
+    "parseErrorRate": 0.05,
     "p95Milliseconds": 100
   }
 }

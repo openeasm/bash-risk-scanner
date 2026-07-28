@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
-  "description": "Non-executable seed corpus for category-level scanner evaluation",
+  "description": "Non-executable synthetic and pinned public corpus for category-level scanner evaluation",
   "provenance": {
     "type": "synthetic-realistic",
     "license": "repository-test-data",
     "containsLiveIndicators": false,
     "executableByHarness": false
   },
+  "defaultSplit": "regression",
   "samples": [
     {
       "id": "bash-download-execute-001",
@@ -147,6 +148,151 @@
       "kind": "hard-negative",
       "sourceFile": "node/documentation.js.txt",
       "expectedCategories": []
+    },
+    {
+      "id": "public-nvm-install-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/nvm/install.sh.txt",
+      "sha256": "b5f8ba6dcc759c1c58c027f07e439bb18afb0a8f16525470364d401a9471eb54",
+      "expectedCategories": ["network_egress", "persistence"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "command curl --fail"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.shell-rc",
+          "evidencePattern": "NVM_PROFILE"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "nvm-sh/nvm",
+        "commit": "65ded65d46c16481dbbe8e93f8ba9e6b35f20740",
+        "sourceUrl": "https://github.com/nvm-sh/nvm/blob/65ded65d46c16481dbbe8e93f8ba9e6b35f20740/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/nvm/LICENSE.md"
+      }
+    },
+    {
+      "id": "public-homebrew-install-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/homebrew-install/install.sh.txt",
+      "sha256": "8ff338091a5e10bb5fc040b38316648110f42feff057ecf9feaab51fd0a13ef9",
+      "maximumParseErrors": 1,
+      "expectedCategories": ["network_egress", "privilege_escalation", "system_modification", "interpreter_escape"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "USABLE_GIT.*fetch"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "execute_sudo"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "tee /etc/paths[.]d/homebrew"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.interpreter",
+          "evidencePattern": "ruby -e"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "Homebrew/install",
+        "commit": "ca0130bd52235f2fcb2bf23cfdda004bc5d250c1",
+        "sourceUrl": "https://github.com/Homebrew/install/blob/ca0130bd52235f2fcb2bf23cfdda004bc5d250c1/install.sh",
+        "license": "BSD-2-Clause",
+        "licenseFile": "public/homebrew-install/LICENSE.txt"
+      }
+    },
+    {
+      "id": "public-atomic-pipe-to-shell-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/pipe-to-shell.sh.txt",
+      "sha256": "20a129c11f003e8c1c0a264800d71c05996999e8c41a54ab855d271d191dfaa9",
+      "expectedCategories": ["download_execution", "network_egress"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.004/T1059.004.yaml",
+        "upstreamSha256": "27b52dd93ed8b71af08d45a1c06561dece3ad4463b457cea9ff071c0605a784e",
+        "upstreamId": "fca246a8-a585-4f28-a2df-6495973976a1",
+        "license": "MIT",
+        "transformation": "Replaced the remote_url placeholder with an inert .invalid URL."
+      }
+    },
+    {
+      "id": "public-atomic-bashrc-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/bashrc-persistence.sh.txt",
+      "sha256": "0dbdc220294c0042cbafa8cd601ab00c3cd4448a8d32c39cd15a4785e708457d",
+      "expectedCategories": ["persistence"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1546.004/T1546.004.yaml",
+        "upstreamSha256": "f709ed6ed473f2c368e3e949b0804d4ef06473938b68e029982d63bac57c0e45",
+        "upstreamId": "0a898315-4cfa-4007-bafe-33a4646d115f",
+        "license": "MIT",
+        "transformation": "Substituted the command_to_add placeholder with its inert default marker command."
+      }
+    },
+    {
+      "id": "public-atomic-private-key-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/discover-private-keys.sh.txt",
+      "sha256": "3f1ab94bb90d8397a496553a22b46a1bb524bac5607d2759c290a48e6a0b8976",
+      "expectedCategories": ["credential_access"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "46959285-906d-40fa-9437-5a439accd878",
+        "license": "MIT",
+        "transformation": "Substituted search_path and output_file placeholders with upstream defaults."
+      }
+    },
+    {
+      "id": "public-atomic-overwrite-log-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/overwrite-log.sh.txt",
+      "sha256": "e83013254f017a5ce5cb2bb37833e6a3c8328f7bf47a71ad2abbb3c39e43bb82",
+      "expectedCategories": ["defense_evasion", "destructive_behavior"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1485/T1485.yaml",
+        "upstreamSha256": "dec58f0061250f6573532a24b952809a5feb21494dc36fb8a22002a4020cd005",
+        "upstreamId": "38deee99-fd65-4031-bec8-bfa4f9f26146",
+        "license": "MIT",
+        "transformation": "Substituted overwrite_source and file_to_overwrite placeholders with upstream defaults."
+      }
     }
   ]
 }

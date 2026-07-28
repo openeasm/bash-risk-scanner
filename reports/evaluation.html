@@ -11,16 +11,16 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <h1>真实世界种子语料评测</h1>
 <p class="pass"><strong>门禁通过</strong></p>
 <div class="cards">
-<div class="card"><div class="big">20/20</div>样本通过</div>
+<div class="card"><div class="big">26/26</div>样本通过</div>
 <div class="card"><div class="big">100.0%</div>Precision</div>
 <div class="card"><div class="big">100.0%</div>Recall</div>
 <div class="card"><div class="big">100.0%</div>F1</div>
-<div class="card"><div class="big">4.78 ms</div>P95</div>
+<div class="card"><div class="big">68.18 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>7</td><td>0</td><td>0</td>
+    <td>bash</td><td>19</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -31,10 +31,34 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>node</td><td>10</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
+<h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
+<th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
+<tr>
+    <td>public-derived</td><td>6</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>public-snapshot</td><td>6</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>synthetic-realistic</td><td>25</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr></tbody></table>
+<h2>按数据集分层</h2><table><thead><tr><th>分层</th><th>TP</th><th>FP</th><th>FN</th>
+<th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
+<tr>
+    <td>regression</td><td>25</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>validation</td><td>12</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>credential_access</td><td>5</td><td>0</td><td>0</td>
+    <td>credential_access</td><td>6</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -42,11 +66,15 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>destructive_behavior</td><td>1</td><td>0</td><td>0</td>
+    <td>defense_evasion</td><td>1</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>download_execution</td><td>1</td><td>0</td><td>0</td>
+    <td>destructive_behavior</td><td>2</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>download_execution</td><td>2</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -54,18 +82,26 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>interpreter_escape</td><td>2</td><td>0</td><td>0</td>
+    <td>interpreter_escape</td><td>3</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>network_egress</td><td>9</td><td>0</td><td>0</td>
+    <td>network_egress</td><td>12</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>persistence</td><td>1</td><td>0</td><td>0</td>
+    <td>persistence</td><td>3</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>privilege_escalation</td><td>1</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>system_modification</td><td>1</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>失败样本</h2>
 <p class="pass">无</p>
-<p class="muted">生成时间：2026-07-28T13:58:04.424Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<p class="muted">生成时间：2026-07-28T14:10:31.139Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

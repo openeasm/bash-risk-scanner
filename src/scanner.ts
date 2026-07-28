@@ -64,6 +64,31 @@ function statements(root: SyntaxNode, source: string): Statement[] {
   return result.sort((a, b) => a.range.startIndex - b.range.startIndex);
 }
 
+function bashCommandVariants(text: string): string[] {
+  const variants = [text];
+  let current = text;
+  for (let depth = 0; depth < 4; depth++) {
+    let next = current;
+    next = next.replace(
+      /^\s*(?:command|builtin)\s+(?:(?:-p|--)\s+)*/i,
+      "",
+    );
+    next = next.replace(
+      /^\s*env\s+(?:(?:-[A-Za-z]+|--[\w-]+(?:=\S+)?|[A-Za-z_]\w*=\S+)\s+)*/i,
+      "",
+    );
+    next = next.replace(
+      /^\s*(?:nohup|sudo|\/usr\/bin\/sudo|execute_sudo|execute|retry)\s+/i,
+      "",
+    );
+    next = next.replace(/^\s*(["'])([^"']+)\1/, "$2");
+    if (next === current) break;
+    variants.push(next);
+    current = next;
+  }
+  return [...new Set(variants)];
+}
+
 function evidence(text: string, max: number): string {
   const compact = text.replace(/\s+/g, " ").trim();
   return compact.length <= max ? compact : `${compact.slice(0, max - 1)}…`;
@@ -367,8 +392,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
 
   for (const statement of commands) {
     for (const rule of COMMAND_RULES) {
-      rule.pattern.lastIndex = 0;
-      if (!rule.pattern.test(statement.text)) continue;
+      const matched = bashCommandVariants(statement.text).some((variant) => {
+        rule.pattern.lastIndex = 0;
+        return rule.pattern.test(variant);
+      });
+      if (!matched) continue;
       if (rule.confidence === "low" && options.includeLowConfidence === false) continue;
       findings.push({
         ruleId: rule.id,

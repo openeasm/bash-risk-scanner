@@ -1,4 +1,5 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import { dirname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -49,30 +50,58 @@ function emptyCounts() {
 const sampleResults = [];
 for (const sample of manifest.samples) {
   const source = await readFile(safeSamplePath(sample.sourceFile), "utf8");
+  const actualSha256 = createHash("sha256").update(source).digest("hex");
+  if (sample.sha256 && actualSha256 !== sample.sha256) {
+    throw new Error(`SHA-256 mismatch for ${sample.id}: ${actualSha256}`);
+  }
+  const provenance = sample.provenance ?? manifest.provenance;
+  if (!provenance?.type || !provenance?.license) {
+    throw new Error(`Missing provenance type or license for ${sample.id}`);
+  }
   const started = performance.now();
   const result = scan(source, { language: sample.language });
   const durationMilliseconds = performance.now() - started;
   const actual = [...new Set(result.findings.map((finding) => finding.category))].sort();
+  const actualFindings = result.findings.map((finding) => ({
+    ruleId: finding.ruleId,
+    category: finding.category,
+    evidence: finding.evidence,
+  }));
   const expected = [...new Set(sample.expectedCategories)].sort();
   const truePositives = expected.filter((category) => actual.includes(category));
   const falseNegatives = expected.filter((category) => !actual.includes(category));
   const falsePositives = actual.filter((category) => !expected.includes(category));
+  const missingExpectedFindings = (sample.expectedFindings ?? []).filter((expectedFinding) =>
+    !actualFindings.some((finding) =>
+      finding.category === expectedFinding.category
+      && (!expectedFinding.ruleId || finding.ruleId === expectedFinding.ruleId)
+      && (!expectedFinding.evidencePattern
+        || new RegExp(expectedFinding.evidencePattern, "s").test(finding.evidence)),
+    ),
+  );
 
   sampleResults.push({
     id: sample.id,
+    split: sample.split ?? manifest.defaultSplit ?? "unspecified",
     language: sample.language,
     kind: sample.kind,
     sourceFile: sample.sourceFile,
+    sha256: actualSha256,
+    provenance,
     expectedCategories: expected,
     actualCategories: actual,
+    actualFindings,
     truePositives,
     falsePositives,
     falseNegatives,
+    missingExpectedFindings,
     findingCount: result.findings.length,
     parseErrorCount: result.parseErrors.length,
+    maximumParseErrors: sample.maximumParseErrors ?? 0,
     durationMilliseconds,
     passed: falsePositives.length === 0 && falseNegatives.length === 0
-      && result.parseErrors.length === 0,
+      && missingExpectedFindings.length === 0
+      && result.parseErrors.length <= (sample.maximumParseErrors ?? 0),
   });
 }
 
@@ -89,6 +118,18 @@ function aggregate(results) {
 const languages = {};
 for (const language of ["bash", "python", "node"]) {
   languages[language] = aggregate(sampleResults.filter((sample) => sample.language === language));
+}
+
+const provenanceGroups = {};
+for (const provenanceType of [...new Set(sampleResults.map((sample) => sample.provenance.type))].sort()) {
+  provenanceGroups[provenanceType] = aggregate(
+    sampleResults.filter((sample) => sample.provenance.type === provenanceType),
+  );
+}
+
+const datasetSplits = {};
+for (const split of [...new Set(sampleResults.map((sample) => sample.split))].sort()) {
+  datasetSplits[split] = aggregate(sampleResults.filter((sample) => sample.split === split));
 }
 
 const allCategories = [...new Set(sampleResults.flatMap((sample) => [
@@ -146,6 +187,8 @@ const report = {
   gates,
   summary,
   languages,
+  provenanceGroups,
+  datasetSplits,
   categories,
   samples: sampleResults,
 };
@@ -192,13 +235,20 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 ${metricRows(Object.entries(languages))}</tbody></table>
+<h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
+<th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
+${metricRows(Object.entries(provenanceGroups))}</tbody></table>
+<h2>按数据集分层</h2><table><thead><tr><th>分层</th><th>TP</th><th>FP</th><th>FN</th>
+<th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
+${metricRows(Object.entries(datasetSplits))}</tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 ${metricRows(Object.entries(categories))}</tbody></table>
 <h2>失败样本</h2>
-${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID</th><th>FP</th><th>FN</th><th>解析错误</th></tr></thead><tbody>
+${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID</th><th>FP</th><th>FN</th><th>证据约束缺失</th><th>解析错误</th></tr></thead><tbody>
 ${failures.map((sample) => `<tr><td>${escapeHtml(sample.id)}</td><td>${escapeHtml(sample.falsePositives.join(", "))}</td>
-<td>${escapeHtml(sample.falseNegatives.join(", "))}</td><td>${sample.parseErrorCount}</td></tr>`).join("\n")}</tbody></table>`}
+<td>${escapeHtml(sample.falseNegatives.join(", "))}</td><td>${escapeHtml(sample.missingExpectedFindings.map((finding) => `${finding.ruleId ?? finding.category}:${finding.evidencePattern ?? "*"}`).join(", "))}</td>
+<td>${sample.parseErrorCount}</td></tr>`).join("\n")}</tbody></table>`}
 <p class="muted">生成时间：${escapeHtml(report.generatedAt)}。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>`;
 

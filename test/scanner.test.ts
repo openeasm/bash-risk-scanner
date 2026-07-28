@@ -98,4 +98,53 @@ describe("scan", () => {
       allowPrivateDownloadIps: true,
     }).findings.some((f) => f.category === "download_execution")).toBe(true);
   });
+
+  it("unwraps common command and privilege wrappers", () => {
+    const result = scan(`
+      command curl --fail https://example.test/metadata
+      execute_sudo tee /etc/paths.d/tool
+    `);
+    expect(result.findings.some((finding) => finding.category === "network_egress")).toBe(true);
+    expect(result.findings.some((finding) => finding.category === "privilege_escalation")).toBe(true);
+    expect(result.findings.some((finding) => finding.category === "system_modification")).toBe(true);
+  });
+
+  it("distinguishes command discovery from wrapped Git network execution", () => {
+    const discovery = scan("command -v curl >/dev/null");
+    expect(discovery.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+
+    const fetch = scan(`retry 5 "\${USABLE_GIT}" "fetch" "--force" "origin"`);
+    expect(fetch.findings.some((finding) => finding.category === "network_egress")).toBe(true);
+  });
+
+  it("distinguishes curl --fail from the case-sensitive -F upload option", () => {
+    const download = scan("curl --fail --location https://example.test/file -o /tmp/file");
+    expect(download.findings.some((finding) => finding.category === "data_exfiltration")).toBe(false);
+
+    const upload = scan("curl -F file=@/tmp/file https://example.test/upload");
+    expect(upload.findings.some((finding) => finding.category === "data_exfiltration")).toBe(true);
+  });
+
+  it("does not infer system writes from diagnostic text or set options", () => {
+    const result = scan(`
+      abort "Tool cannot be installed because /etc/tool/disabled exists"
+      set -euo pipefail
+    `);
+    expect(result.findings.some((finding) => finding.category === "system_modification")).toBe(false);
+    expect(result.findings.some((finding) => finding.category === "credential_access")).toBe(false);
+  });
+
+  it("detects public red-team private-key and log-overwrite patterns", () => {
+    const credentials = scan("find / -name id_rsa 2>/dev/null");
+    expect(credentials.findings.some((finding) => finding.category === "credential_access")).toBe(true);
+
+    const overwrite = scan("dd of=/var/log/syslog if=/dev/zero count=1024");
+    expect(overwrite.findings.some((finding) => finding.category === "defense_evasion")).toBe(true);
+    expect(overwrite.findings.some((finding) => finding.category === "destructive_behavior")).toBe(true);
+  });
+
+  it("detects writes through profile path variables", () => {
+    const result = scan(`command printf '%s' "$SOURCE" >> "$NVM_PROFILE"`);
+    expect(result.findings.some((finding) => finding.category === "persistence")).toBe(true);
+  });
 });

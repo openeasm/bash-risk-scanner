@@ -153,3 +153,7 @@ npm pack --dry-run
 及扫描耗时。门禁阈值位于 `evaluation/config.json`，结果写入
 `evaluation/results/`，同时生成 `reports/evaluation.html`。种子语料只用于建立
 评测机制和防止已知回归，其分数不能代表未经抽样的真实世界总体准确率。
+
+`npm run evaluate:import-public` 可按固定 commit 和 SHA-256 重新获取公开语料快照。
+当前公开验证集包括 MIT 许可的 nvm 与 Atomic Red Team，以及 BSD-2-Clause
+许可的 Homebrew 安装脚本；CI 使用仓库内快照，不联网下载，也不会执行样本。
