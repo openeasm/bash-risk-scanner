@@ -29,8 +29,8 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 世界准确率。
 
 公开来源语料还包括固定 commit 的完整 nvm、Homebrew、pipx、pnpm self-installer、
-node-gyp、aiohttp、pacote、memo 和 mime-db 代码，以及 Atomic Red Team 的 Bash
-命令和 Python telnet client。
+node-gyp、aiohttp、pacote、memo、mime-db、Twine 和 MQTT.js 代码，以及 Atomic
+Red Team 的 Bash 命令和 Python telnet client。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -108,8 +108,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 34 条离线语料：32 条完全匹配，precision 100%、recall 94.6%、
-F1 97.2%。前两轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 36 条离线语料：34 条完全匹配，precision 100%、recall 95.0%、
+F1 97.4%。前三轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -120,15 +120,17 @@ validation 回归：
   `session.request()`，不会把任意同名本地 session 当成网络客户端。
 - npm pacote：现在根据 `require("npm-registry-fetch")` 的导入来源识别别名，
   并处理本地变量遮蔽的 `fetch`。
+- memo：httpx `Client`/`AsyncClient` 构造绑定现在会传播到实例请求和 POST 外传。
+- mime-db：undici 的 `request`/`fetch` 解构导入现在按模块来源识别。
 
-本轮重新冻结的两个独立公开样本尚未用于调参，当前均为 FN：
+本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- memo 中 `httpx.Client()` 的 `client.post(url, data=...)`，缺少网络外联和
-  数据外传两个 finding。
-- mime-db 中从 undici 导入并重命名的 `request(url, options)`，缺少网络外联。
+- Twine 的 Keyring 凭据访问已检出；由跨文件 `make_requests_session()` 返回的
+  session 仍漏检网络外联和 POST 外传。
+- MQTT.js 构建脚本中从 `rimraf` 解构导入的递归清理仍漏检破坏行为。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-72 个单元测试或当前小规模公开语料外推生产环境准确率。
+75 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

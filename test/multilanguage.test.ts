@@ -235,6 +235,55 @@ fetch("local-key")
 `);
     expect(localResult.findings.some((finding) => finding.category === "network_egress")).toBe(false);
   });
+
+  it("tracks httpx client bindings for network requests and uploads", () => {
+    const result = scanPython(`
+import httpx as hx
+with hx.Client() as client:
+    client.post(url, data=payload)
+`);
+    for (const category of ["network_egress", "data_exfiltration"] as const) {
+      expect(result.findings.some((finding) => finding.category === category)).toBe(true);
+    }
+
+    const asyncResult = scanPython(`
+import httpx
+client = httpx.AsyncClient()
+await client.get(url)
+`);
+    expect(asyncResult.findings.some((finding) => finding.category === "network_egress")).toBe(true);
+  });
+
+  it("does not treat a local Python Client class as an HTTP client", () => {
+    const result = scanPython(`
+class Client:
+    def post(self, key, data):
+        return data
+with Client() as client:
+    client.post("cache-key", data=payload)
+`);
+    expect(result.findings.some((finding) =>
+      finding.category === "network_egress" || finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
+  it("recognizes undici request aliases without matching local request functions", () => {
+    const result = scanJavaScript(`
+const { request: sendRequest } = require('undici')
+sendRequest(url, options)
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "javascript.network", category: "network_egress" }),
+    ]));
+
+    const localResult = scanJavaScript(`
+function request(key, options) {
+  return cache.get(key, options)
+}
+request("local-key", {})
+`);
+    expect(localResult.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+  });
 });
 
 describe("embedded interpreter payloads", () => {

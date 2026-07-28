@@ -107,6 +107,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/jshttp/mime-db/ba120a7f71bc8ab7d5299e88c0049063239029a7/LICENSE",
     sha256: "cc1dfd4dafa27271e8212cd3b274eeb3f262e40a6fdab36ddc3f9696f706f58b",
   },
+  {
+    target: "twine/auth.py.txt",
+    url: "https://raw.githubusercontent.com/pypa/twine/e72703b10f5e97b0b87c436500527ba8369cfa52/twine/auth.py",
+    sha256: "638a8beb059a8e0328567d73dd2bd918b9da15a6ad77281b2f354a01fd0a7ccb",
+  },
+  {
+    target: "twine/LICENSE",
+    url: "https://raw.githubusercontent.com/pypa/twine/e72703b10f5e97b0b87c436500527ba8369cfa52/LICENSE",
+    sha256: "14ed54990120efea26042269885df36e1b53db858bf04b40c8cfc8c5e12f6fb1",
+  },
+  {
+    target: "mqtt/esbuild.js.txt",
+    url: "https://raw.githubusercontent.com/mqttjs/MQTT.js/6e3a676630a68e6355a94d99a82d1433b486c300/esbuild.js",
+    sha256: "9d3b836c96a89e1cdf983275f21889d7768f30fdcb27c3d10c98dfa9326cc4a1",
+  },
+  {
+    target: "mqtt/LICENSE.md",
+    url: "https://raw.githubusercontent.com/mqttjs/MQTT.js/6e3a676630a68e6355a94d99a82d1433b486c300/LICENSE.md",
+    sha256: "81b51ef8ac2a8ac8f111ed34ab1a32d63e7f4f7de586bd65f5510fb1ba3a89eb",
+  },
 ];
 
 async function download(url) {

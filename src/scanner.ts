@@ -203,7 +203,7 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|setgid|chmod|chmodSync|chown|chownSync|exec|execSync)$/,
     defense_evasion: /(?:^|\.)(?:rm|rmSync|unlink|unlinkSync|rmdir|rmdirSync|kill|exec|execSync|spawn|spawnSync)$/,
-    network_egress: /^(?:(?:.*\.)?(?:fetch|get|request|connect|createConnection)|got\.stream|npm-registry-fetch)$/,
+    network_egress: /^(?:(?:.*\.)?(?:fetch|get|request|stream|pipeline|connect|createConnection)|got\.stream|npm-registry-fetch)$/,
     data_exfiltration: /(?:^|\.)(?:fetch|post|put|patch|send|write|upload|putObject|sendCommand)$/,
     destructive_behavior: /(?:^|\.)(?:rm|rmSync|rmdir|rmdirSync|unlink|unlinkSync|writeFile|writeFileSync|open|openSync)$/,
     interpreter_escape: /(?:^|\.)(?:exec|execSync|spawn|spawnSync)$/,
@@ -301,7 +301,11 @@ function collectPythonClientBindings(
     }
     if (!/^[A-Za-z_]\w*$/.test(localName) || value?.type !== "call") return;
     const constructor = canonicalizeCallee(calleeOf(value), aliases);
-    if (constructor === "aiohttp.ClientSession") {
+    if (
+      constructor === "aiohttp.ClientSession"
+      || constructor === "httpx.Client"
+      || constructor === "httpx.AsyncClient"
+    ) {
       aliases.set(localName, constructor);
     }
   });

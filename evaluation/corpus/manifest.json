@@ -491,12 +491,24 @@
     },
     {
       "id": "holdout-memo-http-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/memo/_http.py.txt",
       "sha256": "80e01e971a33306cbf7a02561170a2daa58b09f6fa9f5b63542d1c82563deecd",
       "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "client[.]post"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "client[.]post"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "koaning/memo",
@@ -508,12 +520,19 @@
     },
     {
       "id": "holdout-mime-db-undici-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/mime-db/request.js.txt",
       "sha256": "eaabfded0c974d00f7a9312a23505121de5af28f7a2840a9a8bad048e0829b9c",
       "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "request[(]url"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "jshttp/mime-db",
@@ -521,6 +540,40 @@
         "sourceUrl": "https://github.com/jshttp/mime-db/blob/ba120a7f71bc8ab7d5299e88c0049063239029a7/scripts/lib/request.js",
         "license": "MIT",
         "licenseFile": "public/mime-db/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-twine-auth-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/twine/auth.py.txt",
+      "sha256": "638a8beb059a8e0328567d73dd2bd918b9da15a6ad77281b2f354a01fd0a7ccb",
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pypa/twine",
+        "commit": "e72703b10f5e97b0b87c436500527ba8369cfa52",
+        "sourceUrl": "https://github.com/pypa/twine/blob/e72703b10f5e97b0b87c436500527ba8369cfa52/twine/auth.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/twine/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-mqtt-rimraf-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/mqtt/esbuild.js.txt",
+      "sha256": "9d3b836c96a89e1cdf983275f21889d7768f30fdcb27c3d10c98dfa9326cc4a1",
+      "expectedCategories": ["destructive_behavior"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "mqttjs/MQTT.js",
+        "commit": "6e3a676630a68e6355a94d99a82d1433b486c300",
+        "sourceUrl": "https://github.com/mqttjs/MQTT.js/blob/6e3a676630a68e6355a94d99a82d1433b486c300/esbuild.js",
+        "license": "MIT",
+        "licenseFile": "public/mqtt/LICENSE.md"
       }
     }
   ]
