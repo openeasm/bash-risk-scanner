@@ -2273,7 +2273,7 @@
     },
     {
       "id": "holdout-atomic-add-trusted-root-cert-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/add-trusted-root-cert.sh.txt",
@@ -2302,6 +2302,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the macOS trust-root installation command and replaced the certificate placeholder with an inert /tmp path; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-systemd-transient-timer-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/systemd-transient-timer.sh.txt",
+      "sha256": "8094b31716cf74416025cbf0dc4d085ba65fcac4f6ae2a1fdcf3370c1d96bf90",
+      "expectedCategories": ["persistence"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.systemd-transient-timer",
+          "evidencePattern": "systemd-run\\s+--user.*--on-calendar"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1053.006/T1053.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1053.006.yaml.txt",
+        "upstreamSha256": "c0f8cf61604901717b2b2f6e2213d7d61b7c5e0bfb4e3fb26261e50425a389aa",
+        "upstreamId": "3de33f5b-62e5-4e63-a2a0-6fd8808c80ec",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the user-level transient timer executor and changed only the inert /tmp log filename; the evaluation harness never executes it."
       }
     }
   ]

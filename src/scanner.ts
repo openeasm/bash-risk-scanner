@@ -1712,6 +1712,12 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         && definedFunctions.has("tmutil")
         && /^\s*(?:tmutil\b|["']tmutil["'](?:\s|$))/.test(statement.text)
       ) continue;
+      if (rule.id === "system.trust-root-install") {
+        const directTrustCommand = statement.text.match(
+          /^\s*["']?(security|update-ca-certificates|update-ca-trust|trust)["']?(?:\s|$)/,
+        )?.[1];
+        if (directTrustCommand && definedFunctions.has(directTrustCommand)) continue;
+      }
       const matched = variants.some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);

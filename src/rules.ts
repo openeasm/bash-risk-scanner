@@ -142,6 +142,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:(?:tee(?:\s+-a)?|sed\s+-i|install|cp|mv)\b[^;\n]*\/etc\/|[^;\n]*>>?\s*["']?\/etc\/)/i,
   },
   {
+    id: "system.trust-root-install",
+    category: "system_modification",
+    title: "Modifies the system certificate trust store",
+    severity: "critical",
+    confidence: "high",
+    message: "Adds a trusted certificate or rebuilds/enables the operating system trust store.",
+    pattern: /^\s*(?:security\s+add-trusted-cert\b|update-ca-certificates\b(?![^;\n]*(?:^|\s)(?:--help|-h)(?:\s|$))|update-ca-trust\s+(?:extract|enable|disable)(?:\s|$)|trust\s+anchor(?:\s|$))/i,
+  },
+  {
     id: "system.firewall-flush",
     category: "system_modification",
     title: "Flushes Linux firewall rules",

@@ -875,6 +875,62 @@ describe("scan", () => {
     }
   });
 
+  it("detects system trust-store modification without flagging certificate inspection", () => {
+    const trustStoreChanges = [
+      `security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" root.crt`,
+      `sudo security add-trusted-cert -r trustAsRoot root.crt`,
+      "update-ca-certificates",
+      "sudo update-ca-certificates --fresh",
+      "update-ca-trust extract",
+      "update-ca-trust enable",
+      "update-ca-trust disable",
+      "trust anchor root.pem",
+      "trust anchor --remove root.pem",
+    ];
+    for (const source of trustStoreChanges) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "system.trust-root-install",
+          category: "system_modification",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "security find-certificate -a -p",
+      "security import root.pem -k login.keychain",
+      "security verify-cert -c root.pem",
+      "security help add-trusted-cert",
+      "update-ca-certificates --help",
+      "update-ca-certificates -h",
+      "update-ca-trust check",
+      "trust list",
+      "trust extract --format=pem-bundle",
+      "openssl verify root.pem",
+      "echo 'security add-trusted-cert root.pem'",
+      "# update-ca-certificates",
+      `security() { echo "project certificate helper"; }
+       security add-trusted-cert root.pem`,
+      `function update-ca-certificates { echo "project helper"; }
+       update-ca-certificates`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.trust-root-install"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      security() { echo "project helper"; }
+      command security add-trusted-cert root.pem
+      sudo security add-trusted-cert root.pem
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "system.trust-root-install"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",

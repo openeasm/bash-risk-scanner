@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 89 条离线语料：88 条完全匹配，precision 100%、recall 99.5%、
+当前基线为 90 条离线语料：89 条完全匹配，precision 100%、recall 99.5%、
 F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -285,20 +285,24 @@ validation 回归：
   `HISTIGNORE='*'`、`unset HISTFILE`、`set +o history` 和 `history -c` 现在识别
   防御规避；普通历史文件、非零大小、有限忽略列表、读取变量、动态值、命令局部
   环境变量、函数局部变量、帮助、注释和文本均不命中。
+- Atomic Red Team T1553.004 的 macOS `security add-trusted-cert`、Debian
+  `update-ca-certificates`、RHEL `update-ca-trust` 和 p11-kit `trust anchor`
+  现在识别系统信任存储修改；证书查询、验证、用户 Keychain 导入、帮助命令和
+  被同名 shell 函数遮蔽的调用均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
 test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI token、ASLR、SCP
-方向、awk shell escape 和密码哈希访问控制，并新增 Atomic T1553.004 使用
-`security add-trusted-cert` 安装系统信任根的样本。当前能识别 `sudo` 权限提升，
-但漏掉系统信任配置修改。发布门禁继续要求整体
+方向、awk shell escape、密码哈希访问控制和信任存储修改，并新增 Atomic
+T1053.006 使用 `systemd-run --on-calendar` 创建用户级瞬态定时任务的样本。
+当前完全漏掉该持久化语义。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应覆盖 macOS
-`security add-trusted-cert` 与 Linux `update-ca-certificates`/trust-store 更新；
-证书查询、用户 Keychain 导入、验证和帮助命令应作为 hard-negative。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分带 `--on-calendar` 或
+`--on-active` 等定时参数的 `systemd-run` 与普通瞬态命令执行、状态查询、帮助、
+注释和文本。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-132 个单元测试或当前小规模公开语料外推生产环境准确率。
+133 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

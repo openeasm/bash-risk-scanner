@@ -138,6 +138,11 @@ const snapshots = [
     sha256: "fa18467775f261af1338727bd3f5d749bc710df362a98680cc3ae36f9435d6da",
   },
   {
+    target: "atomic-red-team/T1053.006.yaml.txt",
+    url: "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1053.006/T1053.006.yaml",
+    sha256: "c0f8cf61604901717b2b2f6e2213d7d61b7c5e0bfb4e3fb26261e50425a389aa",
+  },
+  {
     target: "atomic-red-team/T1555.001.yaml.txt",
     url: "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1555.001/T1555.001.yaml",
     sha256: "4e968f55659da084ec56c668fff5258c0b268eee89d456a8424b11de23988cac",

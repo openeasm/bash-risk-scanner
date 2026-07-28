@@ -167,8 +167,8 @@ Atomic Red Team DNS 外传、timestomp、`.netrc`、crontab、SUID、UFW、GCS �
 GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传输和 T1690
 历史抑制已转为 validation 回归；UFW 日志关闭也已转为 validation。冻结 test
 分层保留跨语言控制、iptables 规则删除、OCI session token、Linux ASLR、SCP
-方向、awk shell escape 和密码哈希访问控制，并新增 T1553.004“安装受信任根
-证书”盲测。
+方向、awk shell escape、密码哈希访问控制和 T1553.004 信任存储修改，并新增
+T1053.006“瞬态 systemd 定时任务”盲测。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

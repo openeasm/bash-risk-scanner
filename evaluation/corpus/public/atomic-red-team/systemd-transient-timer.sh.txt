@@ -1,0 +1,1 @@
+systemd-run --user --unit=Atomic-Red-Team --on-calendar '*:0/1' /bin/sh -c 'echo "$(date) $(whoami)" >>/tmp/atomic-systemd-timer.log'
