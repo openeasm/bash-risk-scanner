@@ -1139,13 +1139,18 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     });
   });
 
-  for (const statement of commands) {
+  const commandVariants = commands.map((statement) => ({
+    statement,
+    scopeId: bashExecutionScopeId(statement.node),
+    variants: bashCommandVariants(
+      statement.text,
+      commandWrappers,
+      functionSummaries.transparent,
+    ),
+  }));
+  for (const { statement, variants } of commandVariants) {
     for (const rule of COMMAND_RULES) {
-      const matched = bashCommandVariants(
-        statement.text,
-        commandWrappers,
-        functionSummaries.transparent,
-      ).some((variant) => {
+      const matched = variants.some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);
       });
@@ -1165,15 +1170,6 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     }
   }
 
-  const commandVariants = commands.map((statement) => ({
-    statement,
-    scopeId: bashExecutionScopeId(statement.node),
-    variants: bashCommandVariants(
-      statement.text,
-      commandWrappers,
-      functionSummaries.transparent,
-    ),
-  }));
   walk(tree.rootNode, (node) => {
     if (node.type !== "for_statement") return;
     const loopVariable = node.childForFieldName("variable")?.text;

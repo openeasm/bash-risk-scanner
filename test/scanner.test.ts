@@ -540,6 +540,47 @@ describe("scan", () => {
     }
   });
 
+  it("distinguishes cloud storage deletion from non-destructive remote operations", () => {
+    const deletion = scan("gcloud storage buckets delete gs://example-bucket");
+    expect(deletion.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "network.cloud-storage-cli",
+        category: "network_egress",
+      }),
+      expect.objectContaining({
+        ruleId: "destructive.cloud-storage-delete",
+        category: "destructive_behavior",
+      }),
+    ]));
+
+    const remoteButNonDestructive = [
+      "gcloud storage buckets list",
+      "gcloud storage buckets describe gs://example-bucket",
+      "gcloud storage buckets create gs://example-bucket",
+      "gcloud storage cp ./artifact gs://example-bucket/artifact",
+    ];
+    for (const source of remoteButNonDestructive) {
+      const result = scan(source);
+      expect(result.findings.some((finding) =>
+        finding.ruleId === "network.cloud-storage-cli"
+      )).toBe(true);
+      expect(result.findings.some((finding) =>
+        finding.ruleId === "destructive.cloud-storage-delete"
+      )).toBe(false);
+    }
+
+    const localOnly = [
+      "gcloud storage --help",
+      "echo 'gcloud storage buckets delete gs://example-bucket'",
+    ];
+    for (const source of localOnly) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "network.cloud-storage-cli"
+        || finding.ruleId === "destructive.cloud-storage-delete"
+      )).toBe(false);
+    }
+  });
+
   it("detects writes through profile path variables", () => {
     const result = scan(`command printf '%s' "$SOURCE" >> "$NVM_PROFILE"`);
     expect(result.findings.some((finding) => finding.category === "persistence")).toBe(true);

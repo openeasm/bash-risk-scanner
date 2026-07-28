@@ -1503,12 +1503,24 @@
     },
     {
       "id": "holdout-atomic-delete-gcs-bucket-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/delete-gcs-bucket.sh.txt",
       "sha256": "1e38288fc12f9a7f669a9a870bdf67b4f3fec96d5039f2d9cabbb2dce91da786",
       "expectedCategories": ["destructive_behavior", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.cloud-storage-delete",
+          "evidencePattern": "gcloud\\s+storage\\s+buckets\\s+delete"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.cloud-storage-cli",
+          "evidencePattern": "gcloud\\s+storage\\s+buckets\\s+delete"
+        }
+      ],
       "provenance": {
         "type": "public-derived",
         "repository": "redcanaryco/atomic-red-team",
@@ -1520,6 +1532,27 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Kept the GCS bucket deletion command and replaced bucket_name with atomic-evaluation-bucket."
+      }
+    },
+    {
+      "id": "holdout-atomic-python-pty-spawn-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/python-pty-spawn.sh.txt",
+      "sha256": "93d268d97be3ecc50c62f9bcad736ad32b002975e2cddfe4d508361f4409d2dd",
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.006/T1059.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.006.yaml.txt",
+        "upstreamSha256": "d00ae4d0e180f8508092ada1a271b56a7ed094673278bc0dc64491621ee04d85",
+        "upstreamId": "161d694c-b543-4434-85c3-c3a433e33792",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Kept interpreter discovery and the first Python pty.spawn command; omitted exit and the duplicate bash spawn."
       }
     }
   ]

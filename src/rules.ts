@@ -168,6 +168,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^(?:\s*(?:nc|ncat|netcat|socat|ssh|scp|sftp|curl|wget|dig|nslookup)(?:\s|$)|\s*git\s+(?:clone|fetch|pull|ls-remote)(?:\s|$)|\s*(?:execute|retry)\b[^;\n]*(?:\$\{?(?:USABLE_)?(?:GIT|CURL)\}?)[^;\n]*(?:["'](?:clone|fetch|pull|ls-remote)["']))/i,
   },
   {
+    id: "network.cloud-storage-cli",
+    category: "network_egress",
+    title: "Uses a cloud storage CLI",
+    severity: "medium",
+    confidence: "high",
+    message: "Performs an operation against remote cloud storage.",
+    pattern: /^\s*gcloud\s+storage\s+(?:(?:buckets|objects)\s+(?:list|describe|create|update|delete)\b|(?:cp|mv|rsync|ls|rm)\b)/i,
+  },
+  {
     id: "exfil.upload",
     category: "data_exfiltration",
     title: "Uploads local data",
@@ -211,6 +220,15 @@ export const COMMAND_RULES: Rule[] = [
     confidence: "medium",
     message: "Combines file enumeration with encryption tooling.",
     pattern: /^\s*find\b[^;\n]*(?:-exec|xargs)[^;\n]*(?:openssl\s+enc|gpg\s+(?:-c|--symmetric)|age\s+-r)/i,
+  },
+  {
+    id: "destructive.cloud-storage-delete",
+    category: "destructive_behavior",
+    title: "Deletes cloud storage data",
+    severity: "critical",
+    confidence: "high",
+    message: "Deletes a cloud storage bucket, object, or remote path.",
+    pattern: /^\s*gcloud\s+storage\s+(?:(?:buckets|objects)\s+delete\b|rm\b)/i,
   },
   {
     id: "escape.interpreter",
