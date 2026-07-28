@@ -1142,6 +1142,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const parseErrors: SourceRange[] = [];
   const commandWrappers = staticBashCommandWrappers(source);
   const functionSummaries = bashFunctionSummaries(source);
+  const definedFunctions = new Set(
+    tree.rootNode.descendantsOfType("function_definition")
+      .map((node) => node.childForFieldName("name")?.text)
+      .filter((name): name is string => name !== undefined),
+  );
   const shellStartupVariables = bashShellStartupVariables(source);
   const discoveredPythonVariables = bashDiscoveredCommandVariables(
     tree.rootNode,
@@ -1184,6 +1189,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   }));
   for (const { statement, variants } of commandVariants) {
     for (const rule of COMMAND_RULES) {
+      if (
+        (rule.id === "system.backup-disable" || rule.id === "destructive.backup-disable")
+        && definedFunctions.has("tmutil")
+        && /^\s*(?:tmutil\b|["']tmutil["'](?:\s|$))/.test(statement.text)
+      ) continue;
       const matched = variants.some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);

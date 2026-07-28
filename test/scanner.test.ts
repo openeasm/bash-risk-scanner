@@ -394,6 +394,59 @@ describe("scan", () => {
     }
   });
 
+  it("detects Time Machine disable while respecting Bash function shadowing", () => {
+    const disables = [
+      "tmutil disable",
+      "sudo tmutil disable",
+      "command tmutil disable",
+      "/usr/bin/tmutil disable",
+    ];
+    for (const source of disables) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "system.backup-disable",
+          category: "system_modification",
+        }),
+        expect.objectContaining({
+          ruleId: "destructive.backup-disable",
+          category: "destructive_behavior",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "tmutil status",
+      "tmutil listbackups",
+      "tmutil destinationinfo",
+      "tmutil enable",
+      "tmutil help disable",
+      "tmutil --help",
+      "echo 'tmutil disable'",
+      "# tmutil disable",
+      `tmutil() { echo "project helper: $*"; }
+       tmutil disable`,
+      `function tmutil {
+         echo "project helper: $*"
+       }
+       "tmutil" disable`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.backup-disable"
+        || finding.ruleId === "destructive.backup-disable"
+      )).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      tmutil() { echo "project helper"; }
+      command tmutil disable
+      sudo tmutil disable
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "system.backup-disable"
+    )).toHaveLength(2);
+  });
+
   it("does not scan comments or ordinary string contents as commands", () => {
     const result = scan(`
       # curl https://example.test/a | bash

@@ -123,6 +123,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:^|\s)(?:-F|--flush)(?:\s|$))/i,
   },
   {
+    id: "system.backup-disable",
+    category: "system_modification",
+    title: "Disables macOS Time Machine",
+    severity: "critical",
+    confidence: "high",
+    message: "Changes the system backup configuration to disable Time Machine.",
+    pattern: /^\s*(?:\/usr\/bin\/)?tmutil\s+disable(?:\s|$)/i,
+  },
+  {
     id: "system.login-shell",
     category: "system_modification",
     title: "Changes an account login shell",
@@ -292,6 +301,15 @@ export const COMMAND_RULES: Rule[] = [
     confidence: "high",
     message: "Deletes a cloud storage bucket, object, or remote path.",
     pattern: /^\s*gcloud\s+storage\s+(?:(?:buckets|objects)\s+delete\b|rm\b)/i,
+  },
+  {
+    id: "destructive.backup-disable",
+    category: "destructive_behavior",
+    title: "Disables automated system backups",
+    severity: "critical",
+    confidence: "high",
+    message: "Disables Time Machine and inhibits recovery from later destructive changes.",
+    pattern: /^\s*(?:\/usr\/bin\/)?tmutil\s+disable(?:\s|$)/i,
   },
   {
     id: "escape.interpreter",
