@@ -13,17 +13,17 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">79/80</div>样本通过</div>
+<div class="card"><div class="big">80/81</div>样本通过</div>
 <div class="card"><div class="big">100.0%</div>Precision</div>
-<div class="card"><div class="big">97.7%</div>Recall</div>
-<div class="card"><div class="big">98.8%</div>F1</div>
-<div class="card"><div class="big">70.99 ms</div>P95</div>
+<div class="card"><div class="big">98.9%</div>Recall</div>
+<div class="card"><div class="big">99.4%</div>F1</div>
+<div class="card"><div class="big">93.17 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>88</td><td>0</td><td>4</td>
-    <td>100.0%</td><td>95.7%</td><td>97.8%</td>
+    <td>bash</td><td>94</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>97.9%</td><td>98.9%</td>
   </tr>
 <tr>
     <td>python</td><td>38</td><td>0</td><td>0</td>
@@ -36,8 +36,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>public-derived</td><td>47</td><td>0</td><td>4</td>
-    <td>100.0%</td><td>92.2%</td><td>95.9%</td>
+    <td>public-derived</td><td>53</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>96.4%</td><td>98.1%</td>
   </tr>
 <tr>
     <td>public-snapshot</td><td>95</td><td>0</td><td>0</td>
@@ -54,8 +54,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>test</td><td>4</td><td>0</td><td>4</td>
-    <td>100.0%</td><td>50.0%</td><td>66.7%</td>
+    <td>test</td><td>10</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>83.3%</td><td>90.9%</td>
   </tr>
 <tr>
     <td>validation</td><td>138</td><td>0</td><td>0</td>
@@ -80,19 +80,19 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>download_execution</td><td>8</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>88.9%</td><td>94.1%</td>
+    <td>download_execution</td><td>9</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>90.0%</td><td>94.7%</td>
   </tr>
 <tr>
-    <td>dynamic_execution</td><td>14</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>93.3%</td><td>96.6%</td>
+    <td>dynamic_execution</td><td>16</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>interpreter_escape</td><td>12</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>92.3%</td><td>96.0%</td>
+    <td>interpreter_escape</td><td>14</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>network_egress</td><td>46</td><td>0</td><td>1</td>
+    <td>network_egress</td><td>47</td><td>0</td><td>1</td>
     <td>100.0%</td><td>97.9%</td><td>98.9%</td>
   </tr>
 <tr>
@@ -113,11 +113,11 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>缺少指定 finding</th><th>禁止 finding</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-atomic-generated-python-download-execute-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/generated-python-download-execute.sh.txt</span></td>
-<td>download_execution, dynamic_execution, interpreter_escape, network_egress</td><td>无</td>
-<td class="fail">download_execution, dynamic_execution, interpreter_escape, network_egress</td>
-<td class="fail">escape.discovered-python-script, chain.generated-python-download-execute</td>
+<tr><td><code>holdout-atomic-generated-compiled-python-download-execute-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/generated-compiled-python-download-execute.sh.txt</span></td>
+<td>download_execution, dynamic_execution, interpreter_escape, network_egress</td><td>dynamic_execution, interpreter_escape</td>
+<td class="fail">download_execution, network_egress</td>
+<td class="fail">chain.generated-compiled-python-download-execute</td>
 <td class="pass">无</td>
-<td>无</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T18:37:20.812Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<td><code>escape.discovered-python</code>: $runtime -c 'import py_compile; py_compile.compile(&quot;/tmp/atomic-stage.py&quot;, &quot;/tmp/atomic-stage.pyc&quot;)'<br><code>dynamic.discovered-python-command</code>: $runtime -c 'import py_compile; py_compile.compile(&quot;/tmp/atomic-stage.py&quot;, &quot;/tmp/atomic-stage.pyc&quot;)'</td></tr></tbody></table>
+<p class="muted">生成时间：2026-07-28T18:44:15.950Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

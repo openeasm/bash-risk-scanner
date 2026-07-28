@@ -1431,32 +1431,52 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     }
     for (const variable of discoveredPythonVariables) {
       const escapedVariable = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      if (!variants.some((variant) =>
+      const invokesInlineCode = variants.some((variant) =>
         new RegExp(
           `^\\s*["']?\\$(?:\\{)?${escapedVariable}\\}?["']?\\s+-c(?:\\s|$)`,
         ).test(variant),
-      )) continue;
-      findings.push({
-        ruleId: "escape.discovered-python",
-        category: "interpreter_escape",
-        title: "Invokes a discovered Python interpreter",
-        severity: "medium",
-        confidence: "high",
-        message: "Invokes a variable proven to select from Python interpreter executables.",
-        evidence: evidence(statement.text, maxEvidence),
-        range: statement.range,
-        language: "bash",
-      }, {
-        ruleId: "dynamic.discovered-python-command",
-        category: "dynamic_execution",
-        title: "Executes inline Python code",
-        severity: "high",
-        confidence: "high",
-        message: "Passes inline code to a variable proven to reference a Python interpreter.",
-        evidence: evidence(statement.text, maxEvidence),
-        range: statement.range,
-        language: "bash",
-      });
+      );
+      const invokesStaticScript = variants.some((variant) =>
+        new RegExp(
+          `^\\s*["']?\\$(?:\\{)?${escapedVariable}\\}?["']?\\s+["']?[^"'$\\s;|&<>]+[.]py["']?(?:\\s|$)`,
+        ).test(variant),
+      );
+      if (invokesInlineCode) {
+        findings.push({
+          ruleId: "escape.discovered-python",
+          category: "interpreter_escape",
+          title: "Invokes a discovered Python interpreter",
+          severity: "medium",
+          confidence: "high",
+          message: "Invokes a variable proven to select from Python interpreter executables.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        }, {
+          ruleId: "dynamic.discovered-python-command",
+          category: "dynamic_execution",
+          title: "Executes inline Python code",
+          severity: "high",
+          confidence: "high",
+          message: "Passes inline code to a variable proven to reference a Python interpreter.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+      if (invokesStaticScript) {
+        findings.push({
+          ruleId: "escape.discovered-python-script",
+          category: "interpreter_escape",
+          title: "Runs a Python script through a discovered interpreter",
+          severity: "medium",
+          confidence: "high",
+          message: "Invokes a static Python script with a variable proven to reference Python.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
     }
     for (const variable of discoveredGpgVariables) {
       const escapedVariable = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

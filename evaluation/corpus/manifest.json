@@ -1995,7 +1995,7 @@
         },
         {
           "category": "download_execution",
-          "ruleId": "chain.generated-python-download-execute",
+          "ruleId": "python.chain.download-write-execute",
           "evidencePattern": "requests[.]get[\\s\\S]*os[.]system"
         }
       ],
@@ -2010,6 +2010,44 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Reduced interpreter discovery to command -v python3, replaced the URL, generated script, and payload paths with inert example.invalid and /tmp/atomic-* values, and retained the echo-built Python download/write/execute chain."
+      }
+    },
+    {
+      "id": "holdout-atomic-generated-compiled-python-download-execute-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/generated-compiled-python-download-execute.sh.txt",
+      "sha256": "601ca342949d0762887319fbee612609b75031ddd5b84c3005e9897fa0c1e4b4",
+      "expectedCategories": ["download_execution", "dynamic_execution", "interpreter_escape", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.discovered-python-command",
+          "evidencePattern": "[$]runtime\\s+-c[\\s\\S]*py_compile"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.discovered-python",
+          "evidencePattern": "[$]runtime\\s+-c[\\s\\S]*py_compile"
+        },
+        {
+          "category": "download_execution",
+          "ruleId": "chain.generated-compiled-python-download-execute",
+          "evidencePattern": "atomic-stage[.]py[\\s\\S]*atomic-stage[.]pyc"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.006/T1059.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.006.yaml.txt",
+        "upstreamSha256": "d00ae4d0e180f8508092ada1a271b56a7ed094673278bc0dc64491621ee04d85",
+        "upstreamId": "0b44d79b-570a-4b27-a31f-3bf2156e5eaa",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Reduced interpreter discovery to command -v python3, replaced the URL, source, bytecode, and payload paths with inert example.invalid and /tmp/atomic-* values, and retained the echo-built source, py_compile step, and bytecode execution."
       }
     }
   ]

