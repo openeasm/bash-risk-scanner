@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 105 条离线语料：104 条完全匹配，类别级 precision、recall 和
+当前基线为 106 条离线语料：105 条完全匹配，类别级 precision、recall 和
 F1 均为 100%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -340,6 +340,9 @@ validation 回归：
 - Atomic Red Team T1552.004 的静态私有 SSH 密钥名称与 `find -exec cp` 组合现在
   识别为发现后暂存行为；只查找、动态名称、其他文件、非复制动作、动态目标、
   帮助、文本、注释和函数遮蔽均不命中。
+- Atomic Red Team T1555.003 的 Safari Cookie 目录切换与二进制 Cookie 文件搜索
+  现在按同一执行区域关联；普通目录或文件、动态路径或搜索词、中途切换目录、
+  不同函数、不同条件分支、文本和函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
@@ -348,16 +351,16 @@ test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI to
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
 已修复的 Atomic T1685.004、T1543.002、T1136.001 和 T1556.003 已转入
 validation；Atomic T1548.003 的 `timestamp_timeout=-1` 也已转入 validation。
-`Defaults !tty_tickets`、`sudo vim /etc/sudoers`、`.gnupg` 目录发现和私钥暂存
-也已转入 validation。当前冻结样本改为 Atomic T1555.003 先进入
-`~/Library/Cookies`，再用 grep 定向搜索 `Cookies.binarycookies`；扫描器能识别
-凭据类别，但尚未识别跨语句语义 `credential.browser-cookie-search`。发布门禁继续要求整体
+`Defaults !tty_tickets`、`sudo vim /etc/sudoers`、`.gnupg` 目录发现、私钥暂存
+和 Safari Cookie 搜索也已转入 validation。当前冻结样本改为 Atomic T1555.001
+读取 `~/Library/Keychains/login.keychain-db` 并重定向到 `/tmp/keychain`；扫描器
+能识别凭据类别，但尚未识别暂存语义 `credential.keychain-file-stage`。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分浏览器 Cookie 内容搜索与
-普通目录切换、普通 grep、动态路径、帮助、注释、文本和函数遮蔽。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分钥匙串文件读取后暂存与
+只读查看、普通重定向、动态源或目标、帮助、注释、文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-148 个单元测试或当前小规模公开语料外推生产环境准确率。
+149 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

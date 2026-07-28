@@ -2766,7 +2766,7 @@
     },
     {
       "id": "holdout-atomic-search-safari-cookies-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/search-safari-cookies.sh.txt",
@@ -2790,6 +2790,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic search_string placeholder with its inert default and copied only the two Safari cookie-search commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-stage-keychain-file-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/stage-keychain-file.sh.txt",
+      "sha256": "d65b65987fd3afee0c9aaeec4b1041f1febce798f736e5771e93ae7350601626",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.keychain-file-stage",
+          "evidencePattern": "cat\\s+~/Library/Keychains/login[.]keychain-db\\s+>\\s+/tmp/keychain"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1555.001/T1555.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1555.001.yaml.txt",
+        "upstreamSha256": "4e968f55659da084ec56c668fff5258c0b268eee89d456a8424b11de23988cac",
+        "upstreamId": "5c32102a-c508-49d3-978f-288f8a9f6617",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic keychain_export placeholder with its inert /tmp default and copied only the keychain-file staging command; the evaluation harness never executes it."
       }
     }
   ]

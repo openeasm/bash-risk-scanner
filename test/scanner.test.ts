@@ -1355,6 +1355,63 @@ describe("scan", () => {
     }
   });
 
+  it("detects Safari cookie searches without joining unrelated commands or scopes", () => {
+    const searches = [
+      `cd ~/Library/Cookies
+       grep -q "coinbase" "Cookies.binarycookies"`,
+      `cd -- /Users/alice/Library/Cookies/
+       command grep session ./Cookies.binarycookies`,
+      `inspect() {
+         cd ~/Library/Cookies
+         grep -e token Cookies.binarycookies
+       }`,
+    ];
+    for (const source of searches) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.browser-cookie-search",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `cd ~/Library/Cookies`,
+      `grep -q coinbase Cookies.binarycookies`,
+      `cd ~/Library/Downloads
+       grep -q coinbase Cookies.binarycookies`,
+      `cd "$cookie_dir"
+       grep -q coinbase Cookies.binarycookies`,
+      `cd ~/Library/Cookies
+       grep -q "$search_term" Cookies.binarycookies`,
+      `cd ~/Library/Cookies
+       grep -q coinbase "$cookie_file"`,
+      `cd ~/Library/Cookies
+       cd /tmp
+       grep -q coinbase Cookies.binarycookies`,
+      `left() { cd ~/Library/Cookies; }
+       right() { grep -q coinbase Cookies.binarycookies; }`,
+      `if ready; then
+         cd ~/Library/Cookies
+       else
+         grep -q coinbase Cookies.binarycookies
+       fi`,
+      `echo "cd ~/Library/Cookies; grep coinbase Cookies.binarycookies"`,
+      `cd() { echo "project helper"; }
+       cd ~/Library/Cookies
+       grep coinbase Cookies.binarycookies`,
+      `grep() { echo "project helper"; }
+       cd ~/Library/Cookies
+       grep coinbase Cookies.binarycookies`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.browser-cookie-search"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

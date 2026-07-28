@@ -171,8 +171,8 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
 近期修复的 T1685.004、T1543.002、T1136.001、T1556.003，以及 T1548.003 的
 无限 sudo 缓存、`!tty_tickets`、sudoers 编辑器和 T1552.004 的 `.gnupg`
-凭据目录发现、私有 SSH 密钥发现后暂存均已进入 validation；当前冻结 test 为
-在 Safari Cookie 存储中定向搜索内容。
+凭据目录发现、私有 SSH 密钥发现后暂存和 Safari Cookie 搜索均已进入
+validation；当前冻结 test 为暂存 macOS login.keychain 文件。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

@@ -595,6 +595,48 @@ function bashStagesPrivateSshKeys(text: string): boolean {
   return findsPrivateKey && stagesWithCp;
 }
 
+function bashChangesToSafariCookieDirectory(text: string): boolean {
+  if (!/^\s*cd(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  const operands = words.slice(1).filter((word) => word !== "--");
+  return operands.length === 1
+    && !/[$`;&|<>]/.test(operands[0]!)
+    && /^(?:~|\/Users\/[^/]+)\/Library\/Cookies\/?$/.test(operands[0]!);
+}
+
+function bashSearchesSafariCookieFile(text: string): boolean {
+  if (!/^\s*grep(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words[0] !== "grep" || words.some((word) =>
+    /^(?:--help|--version)$/.test(word)
+  )) return false;
+
+  const operands: string[] = [];
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (word === "--") {
+      operands.push(...words.slice(index + 1));
+      break;
+    }
+    if (/^(?:-e|--regexp|-f|--file)$/.test(word)) {
+      const value = words[index + 1];
+      if (!value || /[$`;&|<>]/.test(value)) return false;
+      operands.push(value);
+      index += 1;
+      continue;
+    }
+    if (word.startsWith("-")) continue;
+    operands.push(word);
+  }
+  if (operands.length < 2) return false;
+  const search = operands[0]!;
+  const file = operands.at(-1)!;
+  return !/[$`;&|<>]/.test(search)
+    && search.length > 0
+    && !/[$`;&|<>]/.test(file)
+    && /^(?:[.]\/)?Cookies[.]binarycookies$/.test(file);
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -2458,6 +2500,41 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         range: statement.range,
         language: "bash",
       });
+    }
+  }
+
+  if (
+    source.includes("Library/Cookies")
+    && source.includes("Cookies.binarycookies")
+    && !definedFunctions.has("cd")
+    && !definedFunctions.has("grep")
+  ) {
+    for (const directoryChange of commandVariants) {
+      if (!directoryChange.variants.some(bashChangesToSafariCookieDirectory)) continue;
+      const search = commandVariants.find((candidate) =>
+        candidate.scopeId === directoryChange.scopeId
+        && candidate.statement.node.parent?.id === directoryChange.statement.node.parent?.id
+        && candidate.statement.range.startIndex > directoryChange.statement.range.startIndex
+        && candidate.statement.range.startIndex - directoryChange.statement.range.startIndex <= 1_000
+        && candidate.variants.some(bashSearchesSafariCookieFile)
+        && !commandVariants.some((intermediate) =>
+          intermediate.scopeId === directoryChange.scopeId
+          && intermediate.statement.node.parent?.id === directoryChange.statement.node.parent?.id
+          && intermediate.statement.range.startIndex > directoryChange.statement.range.startIndex
+          && intermediate.statement.range.startIndex < candidate.statement.range.startIndex
+          && intermediate.variants.some((variant) => /^\s*cd(?:\s|$)/.test(variant))
+        )
+      );
+      if (!search) continue;
+      addChainFinding(findings, directoryChange.statement, search.statement, {
+        ruleId: "credential.browser-cookie-search",
+        category: "credential_access",
+        title: "Searches a Safari browser cookie store",
+        severity: "high",
+        confidence: "high",
+        message: "Changes into Safari's cookie directory and searches its binary cookie store in the same execution scope.",
+        language: "bash",
+      }, maxEvidence);
     }
   }
 
