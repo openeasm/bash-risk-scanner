@@ -174,8 +174,9 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 凭据目录发现、私有 SSH 密钥发现后暂存、Safari Cookie 搜索、macOS
 login.keychain 文件暂存、LaunchAgent plist 安装加载、广泛文件树密码模式搜索、
 AWS credentials、Azure token cache 和 GCP 凭据数据库发现均已进入
-validation；rsync、FreeBSD `gcp` 私钥暂存和私钥位置清单生成也已修复，当前
-冻结 test 为 `auditctl -e 0` 禁用 Linux 审计系统的具体语义。
+validation；rsync、FreeBSD `gcp` 私钥暂存、私钥位置清单生成和
+`auditctl -e 0` 审计禁用也已修复，当前冻结 test 为 SCP 远端到本地拉取的
+方向性语义。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

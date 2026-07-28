@@ -2837,7 +2837,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         if (directMetadataClient && definedFunctions.has(directMetadataClient)) continue;
       }
       if (
-        rule.id === "defense.audit-rules-delete"
+        (rule.id === "defense.audit-rules-delete" || rule.id === "defense.audit-disable")
         && definedFunctions.has("auditctl")
         && /^\s*["']?auditctl["']?(?:\s|$)/.test(statement.text)
       ) continue;

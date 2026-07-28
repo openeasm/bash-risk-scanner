@@ -286,6 +286,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*auditctl\s+(?:(?:-[A-Za-z]*D[A-Za-z]*|--delete-all))(?:\s|$)/,
   },
   {
+    id: "defense.audit-disable",
+    category: "defense_evasion",
+    title: "Disables the Linux audit system",
+    severity: "critical",
+    confidence: "high",
+    message: "Sets the Linux kernel audit enabled flag to zero, stopping audit event generation.",
+    pattern: /^\s*(?:\/(?:usr\/)?sbin\/)?auditctl\s+-e(?:\s+|=)?0(?:\s|$)/,
+  },
+  {
     id: "defense.firewall-flush",
     category: "defense_evasion",
     title: "Flushes Linux firewall protections",

@@ -2083,6 +2083,53 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects Linux audit disable without matching enable, lock, or status operations", () => {
+    const disables = [
+      "auditctl -e 0",
+      "sudo auditctl -e0",
+      "command /sbin/auditctl -e=0",
+      "/usr/sbin/auditctl -e 0",
+    ];
+    for (const source of disables) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "defense.audit-disable",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "auditctl -e 1",
+      "auditctl -e 2",
+      "auditctl -e",
+      "auditctl -s",
+      "auditctl -l",
+      "auditctl -D",
+      "auditctl -e 00",
+      "auditctl --help",
+      "echo 'auditctl -e 0'",
+      "# auditctl -e 0",
+      `auditctl() { echo "project helper"; }
+       auditctl -e 0`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "defense.audit-disable"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      auditctl() { echo "project helper"; }
+      command auditctl -e 0
+      sudo auditctl -e0
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "defense.audit-disable"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",
