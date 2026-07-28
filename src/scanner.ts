@@ -793,6 +793,44 @@ function bashDiscoversAzureTokenCache(text: string): boolean {
   return tokenCachePath || (azureRoot && tokenCacheName);
 }
 
+function bashDiscoversGcpCredentialDatabase(text: string): boolean {
+  if (!/^\s*find(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words[0] !== "find" || words.some((word) =>
+    /^(?:-h|--help|--version)$/.test(word)
+  )) return false;
+
+  const roots: string[] = [];
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (word.startsWith("-") || word === "(" || word === "\\(") break;
+    roots.push(word);
+  }
+  const gcloudRoot = roots.some((root) =>
+    !/[$`;&|<>*?[\]]/.test(root)
+    && /(?:^|\/)[.]config\/gcloud\/?$/.test(root)
+  );
+
+  let databaseName = false;
+  let databasePath = false;
+  for (let index = 1; index < words.length - 1; index += 1) {
+    const predicate = words[index]!;
+    const value = words[index + 1]!;
+    const isCredentialDatabase =
+      /^(?:credentials[.]db|access_tokens[.]db)$/.test(value);
+    if (/^-(?:i?name)$/.test(predicate)) {
+      databaseName ||= !/[$`;&|<>*?[\]]/.test(value)
+        && isCredentialDatabase;
+    }
+    if (/^-(?:i?path|wholename)$/.test(predicate)) {
+      databasePath ||= !/[$`;&|<>?[\]]/.test(value)
+        && /(?:^|\/)(?:[*]\/)?[.]config\/gcloud\/(?:credentials[.]db|access_tokens[.]db)$/
+          .test(value);
+    }
+  }
+  return databasePath || (gcloudRoot && databaseName);
+}
+
 function isStaticLaunchAgentPath(value: string): boolean {
   return !/[$`;&|<>]/.test(value)
     && /^(?:(?:~|\/Users\/[^/]+)\/Library\/LaunchAgents|\/Library\/LaunchAgents)\/[^/]+[.]plist$/
@@ -2133,6 +2171,14 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     )
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*find(?:\s|$)/m
       .test(source);
+  const hasGcpCredentialDatabaseDiscoveryCandidate =
+    source.includes(".config/gcloud")
+    && (
+      source.includes("credentials.db")
+      || source.includes("access_tokens.db")
+    )
+    && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*find(?:\s|$)/m
+      .test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2640,6 +2686,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Finds a statically named Azure token cache beneath a static .azure directory.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasGcpCredentialDatabaseDiscoveryCandidate) {
+      const directFind = /^\s*["']?find["']?(?:\s|$)/.test(statement.text);
+      if (
+        !(directFind && definedFunctions.has("find"))
+        && variants.some((variant) => bashDiscoversGcpCredentialDatabase(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.gcp-credential-db-discovery",
+          category: "credential_access",
+          title: "Discovers a gcloud credential database",
+          severity: "high",
+          confidence: "high",
+          message: "Finds a statically named gcloud credential database beneath a static configuration directory.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

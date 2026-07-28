@@ -2939,7 +2939,7 @@
     },
     {
       "id": "holdout-atomic-find-gcp-credential-databases-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/find-gcp-credential-databases.sh.txt",
@@ -2963,6 +2963,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic file_path placeholder with its inert static root default, normalized the resulting double slash, and copied only the find command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-stage-private-ssh-keys-rsync-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/stage-private-ssh-keys-rsync.sh.txt",
+      "sha256": "81235680577bc84fbb90e05b138667e8e01347428cc1492d6daf397fda9178c1",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.private-key-rsync-stage",
+          "evidencePattern": "find\\s+/\\s+-name\\s+id_rsa.*-exec\\s+rsync\\s+-R\\s+\\{\\}\\s+/tmp/art-staging"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "864bb0b2-6bb5-489a-b43b-a77b3a16d68a",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic search and output inputs with inert static defaults and copied only the executor commands; the evaluation harness never executes them."
       }
     }
   ]

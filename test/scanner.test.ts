@@ -1621,6 +1621,43 @@ describe("scan", () => {
     }
   });
 
+  it("detects gcloud credential database discovery without matching ordinary SQLite files", () => {
+    const discoveries = [
+      `find /.config/gcloud -name "credentials.db" -o -name "access_tokens.db" -type f`,
+      "find ~/.config/gcloud -type f -iname credentials.db",
+      `find /home -path '*/.config/gcloud/access_tokens.db' -type f`,
+      `sudo find /Users -ipath '*/.config/gcloud/credentials.db'`,
+    ];
+    for (const source of discoveries) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.gcp-credential-db-discovery",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find /.config/gcloud -name settings.db -type f",
+      "find /tmp -name credentials.db",
+      `find "$gcloud_dir" -name credentials.db`,
+      `find /.config/gcloud -name "$database_name"`,
+      `find /home -path "$database_path"`,
+      `find /home -path '*/.config/example/credentials.db'`,
+      "find --help /.config/gcloud credentials.db",
+      `echo "find /.config/gcloud -name credentials.db"`,
+      "# find /.config/gcloud -name credentials.db",
+      `find() { echo "project helper"; }
+       find /.config/gcloud -name credentials.db`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.gcp-credential-db-discovery"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",
