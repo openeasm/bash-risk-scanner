@@ -290,6 +290,53 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects journald service disable without matching ordinary service administration", () => {
+    const disables = [
+      "systemctl stop systemd-journald",
+      "sudo systemctl disable --now systemd-journald.service",
+      "command /bin/systemctl --system mask systemd-journald.service",
+      "/usr/bin/systemctl stop --no-block systemd-journald",
+    ];
+    for (const source of disables) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "defense.journald-disable",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "systemctl start systemd-journald",
+      "systemctl restart systemd-journald",
+      "systemctl enable systemd-journald",
+      "systemctl unmask systemd-journald",
+      "systemctl status systemd-journald",
+      "systemctl is-active systemd-journald",
+      "systemctl stop systemd-timesyncd",
+      "systemctl --help systemd-journald",
+      "echo 'systemctl stop systemd-journald'",
+      "# systemctl disable systemd-journald",
+      `systemctl() { echo "project helper"; }
+       systemctl stop systemd-journald`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "defense.journald-disable"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      systemctl() { echo "project helper"; }
+      command systemctl stop systemd-journald
+      sudo systemctl mask systemd-journald
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "defense.journald-disable"
+    )).toHaveLength(2);
+  });
+
   it("tracks Python interpreters selected only from trusted discovery candidates", () => {
     const result = scan(`
       which_python=$(which python || which python3 || command -v python3.12)

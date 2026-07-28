@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 119 条离线语料：118 条完全匹配，类别级 precision 为 100%、
+当前基线为 120 条离线语料：119 条完全匹配，类别级 precision 为 100%、
 recall 为 99.6%、F1 为 99.8%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -382,6 +382,9 @@ validation 回归：
 - Atomic Red Team T1105 的 SFTP 上传现在关联静态远端会话与 here-string 中
   明确的 `put`/`mput` 静态本地源；`get`、查询、动态命令或路径、batch 文件、
   普通连接、文本和函数遮蔽均不命中。
+- Atomic Red Team T1685 的 journald 服务停止现在解析 systemctl 动作和精确
+  单元名；启动、重启、启用、解除 mask、状态查询、其他单元、帮助、文本和
+  函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
@@ -393,16 +396,17 @@ validation；Atomic T1548.003 的 `timestamp_timeout=-1` 也已转入 validation
 `Defaults !tty_tickets`、`sudo vim /etc/sudoers`、`.gnupg` 目录发现、私钥暂存、
 Safari Cookie 搜索、Keychain 文件暂存、LaunchAgent 安装加载、广泛密码搜索、
 AWS credentials、Azure token cache、GCP 凭据数据库发现、rsync 和 gcp 私钥
-暂存、私钥位置清单、`auditctl -e 0`、SCP/SFTP 远端拉取和 SFTP 上传也已转入
-validation。当前冻结样本改为 Atomic T1685 使用
-`sudo systemctl stop systemd-journald`；扫描器能识别 sudo 权限提升，但尚未识别
-`defense_evasion` 类别及 `defense.journald-disable`。发布门禁继续要求整体
+暂存、私钥位置清单、`auditctl -e 0`、SCP/SFTP 传输和 journald 服务停止也已
+转入 validation。当前冻结样本改为 Atomic T1685 使用 sed 把
+`/etc/systemd/journald.conf` 的 `Storage=auto` 改为 `Storage=none`；扫描器能
+识别系统修改和 sudo 权限提升，但尚未识别 `defense_evasion` 类别及
+`defense.journald-storage-disable`。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分停止/禁用 journald 与
-启动、重启、状态查询、其他 systemd 单元、帮助、文本和函数遮蔽。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分将 Storage 设置为 none 与
+恢复 auto/persistent、只读取配置、其他键、非原地 sed、帮助、文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-162 个单元测试或当前小规模公开语料外推生产环境准确率。
+163 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

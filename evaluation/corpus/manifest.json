@@ -3163,7 +3163,7 @@
     },
     {
       "id": "holdout-atomic-disable-journald-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/disable-journald.sh.txt",
@@ -3189,6 +3189,44 @@
         "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
         "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
         "upstreamId": "c3a377f9-1203-4454-aa35-9d391d34768f",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without modification; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-journald-storage-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-journald-storage.sh.txt",
+      "sha256": "2d71192237d80fd8d1ea04550f3c351be437ecd854aaf55c0c9829b528b7c661",
+      "expectedCategories": ["defense_evasion", "system_modification", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.journald-storage-disable",
+          "evidencePattern": "sed\\s+-i\\s+['\"]s/Storage=auto/Storage=none/"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "/etc/systemd/journald[.]conf"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+sed"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "12e5551c-8d5c-408e-b3e4-63f53b03379f",
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single executor command without modification; the evaluation harness never executes it."

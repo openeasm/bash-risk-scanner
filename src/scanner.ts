@@ -403,6 +403,40 @@ function bashSystemdRunSchedulesTimer(text: string): boolean {
   return false;
 }
 
+function bashDisablesJournald(text: string): boolean {
+  const words = staticBashWords(text);
+  if (!/^(?:\/(?:usr\/)?bin\/)?systemctl$/.test(words[0] ?? "")) return false;
+
+  const optionsWithValue = new Set([
+    "-H", "-M", "-p", "-t", "--host", "--machine", "--property", "--root",
+    "--type",
+  ]);
+  let action: string | undefined;
+  const units: string[] = [];
+  let optionsEnded = false;
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (!optionsEnded && word === "--") {
+      optionsEnded = true;
+      continue;
+    }
+    if (!optionsEnded && word.startsWith("-")) {
+      const option = word.split("=", 1)[0]!;
+      if (!word.includes("=") && optionsWithValue.has(option)) index += 1;
+      continue;
+    }
+    if (!action) {
+      action = word;
+      continue;
+    }
+    if (word.startsWith("-")) continue;
+    units.push(word);
+  }
+
+  return /^(?:stop|disable|mask)$/.test(action ?? "")
+    && units.some((unit) => /^systemd-journald(?:[.]service)?$/.test(unit));
+}
+
 function bashNmapScansNetwork(text: string): boolean {
   if (!/^\s*nmap(?:\s|$)/i.test(text)) return false;
   const words = staticBashWords(text);
@@ -2282,6 +2316,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const hasGnuPgDirectoryCandidate = source.toLowerCase().includes(".gnupg");
   const hasScpCandidate = source.includes("scp");
   const hasSftpCandidate = source.includes("sftp");
+  const hasJournaldCandidate = source.includes("systemd-journald");
   const hasPrivateSshKeyCandidate =
     /(?:id_rsa|id_ed25519|id_ecdsa|id_dsa)/.test(source)
     && (source.includes("-exec") || source.includes(">"));
@@ -2573,6 +2608,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "high",
         confidence: "high",
         message: "Sends a static local path to a static remote SFTP session with put or mput.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    const directSystemctl = hasJournaldCandidate
+      && /^\s*["']?systemctl["']?(?:\s|$)/.test(statement.text);
+    if (
+      hasJournaldCandidate
+      && !(directSystemctl && definedFunctions.has("systemctl"))
+      && variants.some((variant) => bashDisablesJournald(variant))
+    ) {
+      findings.push({
+        ruleId: "defense.journald-disable",
+        category: "defense_evasion",
+        title: "Stops or disables the system journal service",
+        severity: "high",
+        confidence: "high",
+        message: "Stops, disables, or masks systemd-journald, reducing system logging visibility.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",
