@@ -1251,6 +1251,10 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     tree.rootNode,
     /^(?:which|command\s+-v)\s+gpg2?\s*$/,
   );
+  const discoveredOpenSslVariables = bashDiscoveredCommandVariables(
+    tree.rootNode,
+    /^(?:which|command\s+-v)\s+openssl\s*$/,
+  );
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -1364,6 +1368,38 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "critical",
         confidence: "high",
         message: "Invokes a variable proven to reference GPG with symmetric encryption and an explicit output file.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    for (const variable of discoveredOpenSslVariables) {
+      const escapedVariable = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const invokesFileEncryption = variants.some((variant) => {
+        const prefix = `^\\s*["']?\\$(?:\\{)?${escapedVariable}\\}?["']?\\s+`;
+        const hasInputAndOutput =
+          "(?=[^;\\n]*(?:^|\\s)-in(?:\\s|$))(?=[^;\\n]*(?:^|\\s)-out(?:\\s|$))";
+        const asymmetric = new RegExp(
+          `${prefix}(?:rsautl|pkeyutl)\\b(?=[^;\\n]*(?:^|\\s)-encrypt(?:\\s|$))`
+          + `(?=[^;\\n]*(?:^|\\s)-inkey(?:\\s|$))${hasInputAndOutput}`,
+        );
+        if (asymmetric.test(variant)) return true;
+        const symmetric = new RegExp(
+          `${prefix}enc\\b(?![^;\\n]*(?:^|\\s)(?:-d|--decrypt)(?:\\s|$))`
+          + `(?=[^;\\n]*(?:^|\\s)-(?:aes|aria|camellia|chacha|des|sm4)[\\w-]*(?:\\s|$))`
+          + hasInputAndOutput,
+          "i",
+        );
+        return symmetric.test(variant);
+      });
+      if (!invokesFileEncryption) continue;
+      findings.push({
+        ruleId: "destructive.discovered-openssl-encryption",
+        category: "destructive_behavior",
+        title: "Encrypts a file with a discovered OpenSSL executable",
+        severity: "critical",
+        confidence: "high",
+        message: "Invokes a variable proven to reference OpenSSL with explicit encryption, input, and output arguments.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",

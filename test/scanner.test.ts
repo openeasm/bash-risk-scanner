@@ -168,6 +168,48 @@ describe("scan", () => {
     }
   });
 
+  it("detects file encryption only through a proven OpenSSL executable variable", () => {
+    const encryptionCommands = [
+      `which_openssl=$(command -v openssl)
+       $which_openssl rsautl -encrypt -inkey /tmp/public.pem -pubin -in /tmp/plain -out /tmp/cipher`,
+      `openssl_bin=$(which openssl)
+       "$openssl_bin" pkeyutl -encrypt -inkey /tmp/public.pem -in /tmp/plain -out /tmp/cipher`,
+      `ssl=$(command -v openssl)
+       $ssl enc -aes-256-cbc -salt -in /tmp/plain -out /tmp/cipher`,
+    ];
+    for (const source of encryptionCommands) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "destructive.discovered-openssl-encryption",
+          category: "destructive_behavior",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `tool=$(command -v gpg); $tool rsautl -encrypt -inkey /tmp/key -in /tmp/a -out /tmp/b`,
+      `tool=openssl; $tool rsautl -encrypt -inkey /tmp/key -in /tmp/a -out /tmp/b`,
+      `$unknown_openssl rsautl -encrypt -inkey /tmp/key -in /tmp/a -out /tmp/b`,
+      `tool=$(command -v openssl); tool=/tmp/custom; $tool rsautl -encrypt -inkey /tmp/key -in /tmp/a -out /tmp/b`,
+      `tool=$(command -v openssl); $tool rsautl -decrypt -inkey /tmp/key -in /tmp/a -out /tmp/b`,
+      `tool=$(command -v openssl); $tool rsautl -encrypt -in /tmp/a -out /tmp/b`,
+      `tool=$(command -v openssl); $tool rsautl -encrypt -inkey /tmp/key -in /tmp/a`,
+      `tool=$(command -v openssl); $tool genrsa -out /tmp/private.pem 2048`,
+      `tool=$(command -v openssl); $tool req -new -key /tmp/private.pem -out /tmp/request.csr`,
+      `tool=$(command -v openssl); $tool dgst -sha256 /tmp/plain`,
+      `tool=$(command -v openssl); $tool enc -d -aes-256-cbc -in /tmp/a -out /tmp/b`,
+      `tool=$(command -v openssl); $tool enc -in /tmp/a -out /tmp/b`,
+      `tool=$(command -v openssl); $tool --help`,
+      `tool=$(command -v openssl); echo '$tool rsautl -encrypt -inkey /tmp/key -in /tmp/a -out /tmp/b'`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "destructive.discovered-openssl-encryption"
+      )).toBe(false);
+    }
+  });
+
   it("classifies static interpreter inline-code switches as dynamic execution", () => {
     const commands = [
       "python3 -c 'print(1)'",

@@ -112,7 +112,7 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 77 条离线语料：76 条完全匹配，precision 100%、recall 99.4%、
+当前基线为 78 条离线语料：77 条完全匹配，precision 100%、recall 99.4%、
 F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -236,19 +236,23 @@ validation 回归：
 - Atomic Red Team T1105 rsync 推送只有在最后一个非选项操作数是远程目标，
   且前面至少有一个静态本地源时才报告数据外传；远程拉取、远端到远端、
   纯本地同步、变量源、`--dry-run`/`-n` 和文本均不命中。
+- Atomic Red Team T1486 只有在变量的全部赋值都来自 `which/command -v
+  openssl`，且同一调用包含明确加密动作、输入、输出和所需密钥参数时才报告
+  破坏行为；解密、密钥生成、证书请求、摘要、帮助、缺参数、未知或被覆盖变量
+  和文本均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-新冻结的 Atomic Red Team T1486 test 样本通过 `command -v` 定位 OpenSSL，
-生成 RSA 密钥并调用 `rsautl -encrypt` 加密本地文件。当前没有命中
-`destructive_behavior`，所以 test recall 基线为 0%；test 是非阻断探索分层，
-但 precision 仍要求 100%。发布门禁继续要求整体 precision 95%、recall 90%、
-regression 完全匹配，且 `maximum.forbiddenFindingCount` 为 0。下一轮应传播
-可信发现的 OpenSSL 可执行文件来源，并要求同一调用同时具备加密动作、输入和
-输出参数；解密、密钥生成、证书操作、摘要、帮助和未知变量应作为 hard-negative。
+新冻结的 Atomic Red Team T1686 test 样本执行 `ufw logging off`。当前已识别
+防御规避，但未识别其对防火墙日志配置的系统修改，所以 test recall 基线为 50%；
+test precision 仍要求 100%，recall 门槛恢复为 50%。发布门禁继续要求整体
+precision 95%、recall 90%、regression 完全匹配，且
+`maximum.forbiddenFindingCount` 为 0。下一轮应只对关闭 UFW 日志报告系统修改，
+并以日志级别调整、状态查询、规则管理、启停防火墙、其他 `logging` 子命令、
+帮助和文本作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-121 个单元测试或当前小规模公开语料外推生产环境准确率。
+122 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

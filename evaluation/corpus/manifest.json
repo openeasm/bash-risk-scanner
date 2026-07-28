@@ -1882,7 +1882,7 @@
     },
     {
       "id": "holdout-atomic-openssl-rsautl-encryption-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/openssl-rsautl-encrypt.sh.txt",
@@ -1906,6 +1906,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Used command -v for inert OpenSSL discovery and replaced key, input, and output paths with /tmp/atomic-* values; retained the RSA key generation and rsautl encryption structure."
+      }
+    },
+    {
+      "id": "holdout-atomic-ufw-logging-off-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/ufw-logging-off.sh.txt",
+      "sha256": "04f5c30016987d0484a105047f12520e336530be4d1668326466a9546f68d3b4",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.security-control",
+          "evidencePattern": "ufw\\s+logging\\s+off"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.firewall-logging-disable",
+          "evidencePattern": "ufw\\s+logging\\s+off"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1686/T1686.yaml",
+        "upstreamFile": "public/atomic-red-team/T1686.yaml.txt",
+        "upstreamSha256": "64c9ef50a35974d2523484e7577890da241ffe7fabcde4f3e64c28c7da88ffd3",
+        "upstreamId": "8a95b832-2c2a-494d-9cb0-dc9dd97c8bad",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without its prerequisite and cleanup commands."
       }
     }
   ]
