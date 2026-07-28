@@ -544,12 +544,29 @@
     },
     {
       "id": "holdout-twine-auth-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/twine/auth.py.txt",
       "sha256": "638a8beb059a8e0328567d73dd2bd918b9da15a6ad77281b2f354a01fd0a7ccb",
       "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "python.credential-access",
+          "evidencePattern": "keyring[.]get_password"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "session[.]get"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "session[.]post"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "pypa/twine",
@@ -561,12 +578,19 @@
     },
     {
       "id": "holdout-mqtt-rimraf-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/mqtt/esbuild.js.txt",
       "sha256": "9d3b836c96a89e1cdf983275f21889d7768f30fdcb27c3d10c98dfa9326cc4a1",
       "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "javascript.destructive.rimraf",
+          "evidencePattern": "rimraf[(]outdir"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "mqttjs/MQTT.js",
@@ -574,6 +598,46 @@
         "sourceUrl": "https://github.com/mqttjs/MQTT.js/blob/6e3a676630a68e6355a94d99a82d1433b486c300/esbuild.js",
         "license": "MIT",
         "licenseFile": "public/mqtt/LICENSE.md"
+      }
+    },
+    {
+      "id": "holdout-adafruit-retrogame-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/adafruit-retrogame/retrogame.py.txt",
+      "sha256": "dad3a969b9df0eab2b3f401f8eb6b00c77d929749f32ee29c333e15f64377925",
+      "expectedCategories": [
+        "download_execution",
+        "network_egress",
+        "persistence",
+        "system_modification",
+        "destructive_behavior"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "adafruit/Raspberry-Pi-Installer-Scripts",
+        "commit": "85c3e7697fc970275215a8a27953b36c16f9b074",
+        "sourceUrl": "https://github.com/adafruit/Raspberry-Pi-Installer-Scripts/blob/85c3e7697fc970275215a8a27953b36c16f9b074/retrogame.py",
+        "license": "MIT",
+        "licenseFile": "public/adafruit-retrogame/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-anaconda-audit-disable-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/anaconda/anaconda.py.txt",
+      "sha256": "d726cca651d791df8a33c6f2b739f954b20ced42e814e1df4d8a6ab8f631caec",
+      "expectedCategories": ["defense_evasion"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "rhinstaller/anaconda",
+        "commit": "43a7fc4c561566fa16003752ed79db96ba3cee4e",
+        "sourceUrl": "https://github.com/rhinstaller/anaconda/blob/43a7fc4c561566fa16003752ed79db96ba3cee4e/anaconda.py",
+        "license": "GPL-2.0-only",
+        "licenseFile": "public/anaconda/COPYING"
       }
     }
   ]

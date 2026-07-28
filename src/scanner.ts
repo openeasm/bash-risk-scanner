@@ -305,8 +305,16 @@ function collectPythonClientBindings(
       constructor === "aiohttp.ClientSession"
       || constructor === "httpx.Client"
       || constructor === "httpx.AsyncClient"
+      || constructor === "requests.Session"
+      || constructor === "requests.session"
+      || constructor === "twine.utils.make_requests_session"
     ) {
-      aliases.set(localName, constructor);
+      aliases.set(
+        localName,
+        constructor === "twine.utils.make_requests_session"
+          ? "requests.Session"
+          : constructor,
+      );
     }
   });
 }
@@ -366,6 +374,33 @@ function scanAstLanguage(
     const analysisText = text.startsWith(originalCallee)
       ? `${callee}${text.slice(originalCallee.length)}`
       : text;
+    const javascriptRoot = originalCallee.match(/^[A-Za-z_$][\w$]*/)?.[0];
+    const importedJavaScriptModule = javascriptRoot
+      ? aliases.get(javascriptRoot)
+      : undefined;
+    if (
+      language === "javascript"
+      && (
+        callee === "rimraf.rimraf"
+        || callee === "rimraf.rimrafSync"
+        || (
+          importedJavaScriptModule === "rimraf"
+          && /^(?:rimraf|rimraf\.sync)$/.test(originalCallee)
+        )
+      )
+    ) {
+      findings.push({
+        ruleId: "javascript.destructive.rimraf",
+        category: "destructive_behavior",
+        title: "Recursively removes files with rimraf",
+        severity: "high",
+        confidence: "high",
+        message: "A function imported from the rimraf package recursively removes a path.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
     if (
       language === "javascript"
       && /(?:^|\/)download\.download$/.test(callee)

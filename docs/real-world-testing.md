@@ -29,8 +29,8 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 世界准确率。
 
 公开来源语料还包括固定 commit 的完整 nvm、Homebrew、pipx、pnpm self-installer、
-node-gyp、aiohttp、pacote、memo、mime-db、Twine 和 MQTT.js 代码，以及 Atomic
-Red Team 的 Bash 命令和 Python telnet client。
+node-gyp、aiohttp、pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer
+和 Anaconda 代码，以及 Atomic Red Team 的 Bash 命令和 Python telnet client。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -108,8 +108,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 36 条离线语料：34 条完全匹配，precision 100%、recall 95.0%、
-F1 97.4%。前三轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 38 条离线语料：36 条完全匹配，precision 100%、recall 90.9%、
+F1 95.2%。前四轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -122,15 +122,19 @@ validation 回归：
   并处理本地变量遮蔽的 `fetch`。
 - memo：httpx `Client`/`AsyncClient` 构造绑定现在会传播到实例请求和 POST 外传。
 - mime-db：undici 的 `request`/`fetch` 解构导入现在按模块来源识别。
+- Twine：`twine.utils.make_requests_session()` 被有限摘要为 requests-compatible
+  session；普通同名本地工厂不会命中。
+- MQTT.js：rimraf 只在模块导入来源成立时识别为递归删除。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Twine 的 Keyring 凭据访问已检出；由跨文件 `make_requests_session()` 返回的
-  session 仍漏检网络外联和 POST 外传。
-- MQTT.js 构建脚本中从 `rimraf` 解构导入的递归清理仍漏检破坏行为。
+- Adafruit Retrogame installer：自定义 `Shell` wrapper 内的下载执行、网络外联、
+  systemd 持久化、系统路径修改和删除行为均未传播。
+- Anaconda installer：`util.execWithRedirect("auditctl", ["-e", "0"])` 关闭审计
+  尚未识别为防御规避。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-75 个单元测试或当前小规模公开语料外推生产环境准确率。
+77 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

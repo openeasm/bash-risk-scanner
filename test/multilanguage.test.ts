@@ -284,6 +284,52 @@ request("local-key", {})
 `);
     expect(localResult.findings.some((finding) => finding.category === "network_egress")).toBe(false);
   });
+
+  it("summarizes a source-bound requests session factory", () => {
+    const result = scanPython(`
+from twine import utils
+session = utils.make_requests_session()
+session.get(audience_url)
+session.post(token_url, json={"token": oidc_token})
+`);
+    for (const category of ["network_egress", "data_exfiltration"] as const) {
+      expect(result.findings.some((finding) => finding.category === category)).toBe(true);
+    }
+
+    const localResult = scanPython(`
+class CacheSession:
+    def post(self, key, json):
+        return json
+def make_requests_session():
+    return CacheSession()
+session = make_requests_session()
+session.post("local-key", json=payload)
+`);
+    expect(localResult.findings.some((finding) =>
+      finding.category === "network_egress" || finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
+  it("detects imported rimraf without matching a local function", () => {
+    const result = scanJavaScript(`
+const { rimraf: clean } = require('rimraf')
+await clean(outdir)
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.destructive.rimraf",
+        category: "destructive_behavior",
+      }),
+    ]));
+
+    const localResult = scanJavaScript(`
+function rimraf(value) {
+  return value.trim()
+}
+rimraf(label)
+`);
+    expect(localResult.findings.some((finding) => finding.category === "destructive_behavior")).toBe(false);
+  });
 });
 
 describe("embedded interpreter payloads", () => {

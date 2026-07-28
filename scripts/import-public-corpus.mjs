@@ -127,6 +127,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/mqttjs/MQTT.js/6e3a676630a68e6355a94d99a82d1433b486c300/LICENSE.md",
     sha256: "81b51ef8ac2a8ac8f111ed34ab1a32d63e7f4f7de586bd65f5510fb1ba3a89eb",
   },
+  {
+    target: "adafruit-retrogame/retrogame.py.txt",
+    url: "https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/85c3e7697fc970275215a8a27953b36c16f9b074/retrogame.py",
+    sha256: "dad3a969b9df0eab2b3f401f8eb6b00c77d929749f32ee29c333e15f64377925",
+  },
+  {
+    target: "adafruit-retrogame/LICENSE.txt",
+    url: "https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/85c3e7697fc970275215a8a27953b36c16f9b074/LICENSES/MIT.txt",
+    sha256: "e710bb4810f36a853ff7cb28de520e23fd7991720f6b1770cc936f6c8135ff0a",
+  },
+  {
+    target: "anaconda/anaconda.py.txt",
+    url: "https://raw.githubusercontent.com/rhinstaller/anaconda/43a7fc4c561566fa16003752ed79db96ba3cee4e/anaconda.py",
+    sha256: "d726cca651d791df8a33c6f2b739f954b20ced42e814e1df4d8a6ab8f631caec",
+  },
+  {
+    target: "anaconda/COPYING",
+    url: "https://raw.githubusercontent.com/rhinstaller/anaconda/43a7fc4c561566fa16003752ed79db96ba3cee4e/COPYING",
+    sha256: "4e5c6316d44ccbdc1260ab522076aecf51b8b4acd8bc073f60039e23b1852b72",
+  },
 ];
 
 async function download(url) {
