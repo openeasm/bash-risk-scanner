@@ -756,6 +756,43 @@ function bashDiscoversAwsCredentials(text: string): boolean {
   return credentialsPath || (awsRoot && credentialsName);
 }
 
+function bashDiscoversAzureTokenCache(text: string): boolean {
+  if (!/^\s*find(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words[0] !== "find" || words.some((word) =>
+    /^(?:-h|--help|--version)$/.test(word)
+  )) return false;
+
+  const roots: string[] = [];
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (word.startsWith("-") || word === "(" || word === "\\(") break;
+    roots.push(word);
+  }
+  const azureRoot = roots.some((root) =>
+    !/[$`;&|<>*?[\]]/.test(root)
+    && /(?:^|\/)[.]azure\/?$/.test(root)
+  );
+
+  let tokenCacheName = false;
+  let tokenCachePath = false;
+  for (let index = 1; index < words.length - 1; index += 1) {
+    const predicate = words[index]!;
+    const value = words[index + 1]!;
+    const isTokenCache =
+      /^(?:msal_token_cache[.]json|accessTokens[.]json)$/.test(value);
+    if (/^-(?:i?name)$/.test(predicate)) {
+      tokenCacheName ||= !/[$`;&|<>*?[\]]/.test(value) && isTokenCache;
+    }
+    if (/^-(?:i?path|wholename)$/.test(predicate)) {
+      tokenCachePath ||= !/[$`;&|<>?[\]]/.test(value)
+        && /(?:^|\/)(?:[*]\/)?[.]azure\/(?:msal_token_cache[.]json|accessTokens[.]json)$/
+          .test(value);
+    }
+  }
+  return tokenCachePath || (azureRoot && tokenCacheName);
+}
+
 function isStaticLaunchAgentPath(value: string): boolean {
   return !/[$`;&|<>]/.test(value)
     && /^(?:(?:~|\/Users\/[^/]+)\/Library\/LaunchAgents|\/Library\/LaunchAgents)\/[^/]+[.]plist$/
@@ -2088,6 +2125,14 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     && source.includes("credentials")
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*find(?:\s|$)/m
       .test(source);
+  const hasAzureTokenCacheDiscoveryCandidate =
+    source.includes(".azure")
+    && (
+      source.includes("msal_token_cache.json")
+      || source.includes("accessTokens.json")
+    )
+    && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*find(?:\s|$)/m
+      .test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2576,6 +2621,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Finds a statically named credentials file beneath a static .aws directory.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasAzureTokenCacheDiscoveryCandidate) {
+      const directFind = /^\s*["']?find["']?(?:\s|$)/.test(statement.text);
+      if (
+        !(directFind && definedFunctions.has("find"))
+        && variants.some((variant) => bashDiscoversAzureTokenCache(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.azure-token-cache-discovery",
+          category: "credential_access",
+          title: "Discovers an Azure CLI token cache",
+          severity: "high",
+          confidence: "high",
+          message: "Finds a statically named Azure token cache beneath a static .azure directory.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

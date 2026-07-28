@@ -1584,6 +1584,43 @@ describe("scan", () => {
     }
   });
 
+  it("detects Azure token cache discovery across multiple find predicates", () => {
+    const discoveries = [
+      `find /.azure -name "msal_token_cache.json" -o -name "accessTokens.json" -type f`,
+      "find ~/.azure -type f -iname msal_token_cache.json",
+      `find /home -path '*/.azure/accessTokens.json' -type f`,
+      `sudo find /Users -ipath '*/.azure/msal_token_cache.json'`,
+    ];
+    for (const source of discoveries) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.azure-token-cache-discovery",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find /.azure -name profile.json -type f",
+      "find /tmp -name msal_token_cache.json",
+      `find "$azure_dir" -name msal_token_cache.json`,
+      `find /.azure -name "$cache_name"`,
+      `find /home -path "$cache_path"`,
+      `find /home -path '*/.config/msal_token_cache.json'`,
+      "find --help /.azure msal_token_cache.json",
+      `echo "find /.azure -name msal_token_cache.json"`,
+      "# find /.azure -name msal_token_cache.json",
+      `find() { echo "project helper"; }
+       find /.azure -name msal_token_cache.json`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.azure-token-cache-discovery"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

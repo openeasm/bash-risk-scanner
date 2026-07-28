@@ -2911,7 +2911,7 @@
     },
     {
       "id": "holdout-atomic-find-azure-token-cache-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/find-azure-token-cache.sh.txt",
@@ -2932,6 +2932,34 @@
         "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
         "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
         "upstreamId": "a8f6148d-478a-4f43-bc62-5efee9f931a4",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic file_path placeholder with its inert static root default, normalized the resulting double slash, and copied only the find command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-find-gcp-credential-databases-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-gcp-credential-databases.sh.txt",
+      "sha256": "fb9b935d2437380024a5d0bbeb15a8f247df9d65e6345e12d53996178ff76ddc",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.gcp-credential-db-discovery",
+          "evidencePattern": "find\\s+/[.]config/gcloud\\s+-name\\s+[\"']?credentials[.]db.*-o\\s+-name\\s+[\"']?access_tokens[.]db"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "aa12eb29-2dbb-414e-8b20-33d34af93543",
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic file_path placeholder with its inert static root default, normalized the resulting double slash, and copied only the find command; the evaluation harness never executes it."

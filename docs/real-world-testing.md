@@ -116,8 +116,8 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 110 条离线语料：109 条完全匹配，precision 100%、recall 99.5%、
-F1 99.8%。前面的冻结集缺口均已转为带具体
+当前基线为 111 条离线语料：110 条完全匹配，类别级 precision、recall 和
+F1 均为 100%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -355,6 +355,9 @@ validation 回归：
 - Atomic Red Team T1552.001 的 find 现在关联静态 `.aws` 搜索根与
   `credentials` 文件名，也支持静态 `*/.aws/credentials` 路径谓词；普通同名
   文件、其他配置目录、动态根或谓词、帮助、文本和函数遮蔽均不命中。
+- Atomic Red Team T1552.001 的 find 现在识别静态 `.azure` 根下 MSAL 或旧版
+  token cache 文件，也支持静态路径谓词和多个 `-name -o`；普通 JSON、其他目录、
+  动态根或名称、帮助、文本和函数遮蔽均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
@@ -364,17 +367,17 @@ test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI to
 已修复的 Atomic T1685.004、T1543.002、T1136.001 和 T1556.003 已转入
 validation；Atomic T1548.003 的 `timestamp_timeout=-1` 也已转入 validation。
 `Defaults !tty_tickets`、`sudo vim /etc/sudoers`、`.gnupg` 目录发现、私钥暂存、
-Safari Cookie 搜索、Keychain 文件暂存、LaunchAgent 安装加载、广泛密码搜索和
-AWS credentials 发现也已转入 validation。当前冻结样本改为 Atomic T1552.001
-在 `.azure` 下通过两个 `-name` 与 `-o` 定位 `msal_token_cache.json` 和
-`accessTokens.json`；扫描器尚未识别
-`credential.azure-token-cache-discovery`。发布门禁继续要求整体
+Safari Cookie 搜索、Keychain 文件暂存、LaunchAgent 安装加载、广泛密码搜索、
+AWS credentials 和 Azure token cache 发现也已转入 validation。当前冻结样本
+改为 Atomic T1552.001 在 `.config/gcloud` 下通过两个 `-name -o` 定位
+`credentials.db` 和 `access_tokens.db`；扫描器能识别凭据类别，但尚未识别
+`credential.gcp-credential-db-discovery`。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分静态 `.azure` token cache
-发现与普通 JSON、单个无关名称、动态目录或名称、错误布尔组合、帮助、文本和函数遮蔽。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分静态 gcloud 凭据数据库发现
+与普通 SQLite 文件、其他配置目录、动态目录或名称、帮助、文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-153 个单元测试或当前小规模公开语料外推生产环境准确率。
+154 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
