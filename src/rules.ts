@@ -313,6 +313,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^(?:\s*(?:nc|ncat|netcat|socat|ssh|scp|sftp|curl|wget|dig|nslookup)(?:\s|$)|\s*git\s+(?:clone|fetch|pull|ls-remote)(?:\s|$)|\s*(?:execute|retry)\b[^;\n]*(?:\$\{?(?:USABLE_)?(?:GIT|CURL)\}?)[^;\n]*(?:["'](?:clone|fetch|pull|ls-remote)["']))/i,
   },
   {
+    id: "network.dev-socket",
+    category: "network_egress",
+    title: "Opens a Bash network socket",
+    severity: "medium",
+    confidence: "high",
+    message: "Uses Bash's /dev/tcp or /dev/udp redirection to contact a network endpoint.",
+    pattern: /\/dev\/(?:tcp|udp)\/[^/\s"'$`;&|<>]+\/[^/\s"'`;&|<>]+/i,
+  },
+  {
     id: "network.rsync-remote",
     category: "network_egress",
     title: "Transfers files with a remote rsync endpoint",
@@ -364,7 +373,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "critical",
     confidence: "high",
     message: "Connects a shell or file descriptor to a remote endpoint.",
-    pattern: /\/dev\/tcp\/|^\s*(?:(?:nc|ncat|socat)\b[^;\n]*(?:-e\s*(?:\/bin\/)?(?:ba)?sh|EXEC:(?:ba)?sh)|(?:ba)?sh\s+-i\s+.*(?:>&|0<&))/i,
+    pattern: /^\s*(?:(?:nc|ncat|socat)\b[^;\n]*(?:-e\s*(?:\/bin\/)?(?:ba)?sh|EXEC:(?:ba)?sh)|(?:ba)?sh\s+-i\b[^;\n]*(?:(?:>&|0<&)|\/dev\/tcp\/)|exec\s+\d*<>\/dev\/tcp\/[^;\n]+[;\n][^;\n]*(?:ba)?sh\b)/i,
   },
   {
     id: "destructive.rm-root",

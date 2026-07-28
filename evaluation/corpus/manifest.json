@@ -2362,7 +2362,7 @@
     },
     {
       "id": "holdout-atomic-nmap-port-scan-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/nmap-port-scan.sh.txt",
@@ -2391,6 +2391,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the sudo nmap executor command and replaced its host range and port placeholders with documentation-only 192.0.2.0/24 and port 80; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-at-scheduled-job-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/at-scheduled-job.sh.txt",
+      "sha256": "eaa1d97efc656e05c1ab00df3a7158bb26561f23246a3337fcc911d312bf5075",
+      "expectedCategories": ["persistence"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler-at",
+          "evidencePattern": "echo.*\\|\\s*at\\s+23:59"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1053.002/T1053.002.yaml",
+        "upstreamFile": "public/atomic-red-team/T1053.002.yaml.txt",
+        "upstreamSha256": "b473e0b730f636d5119d00d570a0f5a024ad9100f9e3ab0c2257dd90583379c1",
+        "upstreamId": "7266d898-ac82-4ec0-97c7-436075d0d08e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the command and time placeholders with an inert /tmp write and a static future time while preserving the pipe-to-at structure; the evaluation harness never executes it."
       }
     }
   ]

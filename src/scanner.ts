@@ -318,6 +318,42 @@ function bashSystemdRunSchedulesTimer(text: string): boolean {
   return false;
 }
 
+function bashNmapScansNetwork(text: string): boolean {
+  if (!/^\s*nmap(?:\s|$)/i.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words.some((word) =>
+    /^(?:-h|--help|-V|--version|--iflist|--script-help)$/.test(word)
+  )) return false;
+
+  const optionsWithValue = new Set([
+    "-D", "-e", "-g", "-iL", "-oA", "-oG", "-oN", "-oS", "-oX", "-p",
+    "-S", "--data-length", "--dns-servers", "--exclude", "--excludefile",
+    "--host-timeout", "--max-rate", "--max-retries", "--min-rate", "--proxies",
+    "--scan-delay", "--script", "--script-args", "--source-port", "--spoof-mac",
+    "--ttl",
+  ]);
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (word === "--") continue;
+    if (word.startsWith("--")) {
+      const option = word.split("=", 1)[0]!;
+      if (!word.includes("=") && optionsWithValue.has(option)) index += 1;
+      continue;
+    }
+    if (/^-(?:[DegpS]|iL|o[AGNSX])$/.test(word)) {
+      index += 1;
+      continue;
+    }
+    if (/^-(?:[DegpS].+|iL.+|o[AGNSX].+)$/.test(word)) continue;
+    if (word.startsWith("-")) continue;
+    if (/[$`;&|<>]/.test(word)) continue;
+    if (
+      /^(?:\d{1,3}(?:\.\d{1,3}){3}(?:[-/]\d{1,3})?|[0-9A-Fa-f:]{2,}(?:\/\d{1,3})?|[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,})$/.test(word)
+    ) return true;
+  }
+  return false;
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1741,6 +1777,23 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "high",
         confidence: "high",
         message: "Schedules a command through a transient systemd timer unit.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    const directNmap = /^\s*["']?nmap["']?(?:\s|$)/.test(statement.text);
+    if (
+      !(directNmap && definedFunctions.has("nmap"))
+      && variants.some((variant) => bashNmapScansNetwork(variant))
+    ) {
+      findings.push({
+        ruleId: "network.port-scan",
+        category: "network_egress",
+        title: "Scans a network target with nmap",
+        severity: "medium",
+        confidence: "high",
+        message: "Invokes nmap with a static IP address, network range, or domain target.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",
