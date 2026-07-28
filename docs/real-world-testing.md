@@ -28,8 +28,9 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 命令参数歧义和文档字符串，但并非从生产流量随机抽样，因此不能用其分数宣称真实
 世界准确率。
 
-公开来源语料还包括固定 commit 的完整 nvm、Homebrew、pipx、pnpm self-installer
-和 node-gyp 代码，以及 Atomic Red Team 的 Bash 命令和 Python telnet client。
+公开来源语料还包括固定 commit 的完整 nvm、Homebrew、pipx、pnpm self-installer、
+node-gyp、aiohttp 和 pacote 代码，以及 Atomic Red Team 的 Bash 命令和 Python
+telnet client。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -107,16 +108,22 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 30 条离线语料：28 条完全匹配，precision 100%、recall 90.2%、
-F1 94.8%。其中冻结 `test` 分层故意不针对失败样本调参，暴露 5 个 FN：
+当前基线为 32 条离线语料：30 条完全匹配，precision 100%、recall 96.2%、
+F1 98.1%。上一轮冻结集暴露的 5 个 FN 已转为带具体 rule/evidence 约束的
+validation 回归：
 
-- Atomic Python telnet client：未识别 `telnetlib3.open_connection`、
-  `asyncio.create_subprocess_shell` 以及写入远端 stream 的外传链。
-- node-gyp installer：可识别解压和递归清理，但跨文件导入的 `download()`
-  包装函数尚未关联为网络外联。
+- Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
+  `asyncio.create_subprocess_shell` 以及命名远端 writer 的写入。
+- node-gyp installer：现在识别解压、递归清理和带 URL 参数的相对
+  `download()` 包装函数。
+
+本轮重新冻结的两个独立公开样本尚未用于调参，当前均为 FN：
+
+- aiohttp 官方 `curl.py` 示例中的 `session.request("GET", url)`。
+- npm pacote 中作为 `fetch` 导入的 `npm-registry-fetch` 调用。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-66 个单元测试或当前小规模公开语料外推生产环境准确率。
+70 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

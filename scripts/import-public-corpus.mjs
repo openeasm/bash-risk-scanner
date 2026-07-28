@@ -67,6 +67,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/nodejs/node-gyp/42367da5a2683115ff538b92caed5c32c322005f/LICENSE",
     sha256: "662a1b0115251cfb29c6aed0f221f8847bc49c6365d1c53a62c9f4bccc2489c3",
   },
+  {
+    target: "aiohttp/curl.py.txt",
+    url: "https://raw.githubusercontent.com/aio-libs/aiohttp/c3f07fcf858bc1ac328345d717c2fa7e22b31801/examples/curl.py",
+    sha256: "9edea06311c326eddad6ff86d4ce077c95945fba17404d44dfde613844514202",
+  },
+  {
+    target: "aiohttp/LICENSE.txt",
+    url: "https://raw.githubusercontent.com/aio-libs/aiohttp/c3f07fcf858bc1ac328345d717c2fa7e22b31801/LICENSE.txt",
+    sha256: "2e4be5fc6c4c72a466fcb665d726e049a6891981fe536c4f04b6366749461d23",
+  },
+  {
+    target: "pacote/remote.js.txt",
+    url: "https://raw.githubusercontent.com/npm/pacote/c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f/lib/remote.js",
+    sha256: "d4843de4eec468b75632de2f431eb769a333dbd345b1b294f57a4a9eb077192c",
+  },
+  {
+    target: "pacote/LICENSE",
+    url: "https://raw.githubusercontent.com/npm/pacote/c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f/LICENSE",
+    sha256: "36ec394cd0f976603cfec687c19175a703c1c0d9db717a76915391e756522c8e",
+  },
 ];
 
 async function download(url) {

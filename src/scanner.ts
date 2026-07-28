@@ -183,16 +183,16 @@ const CALLEE_BY_CATEGORY: Record<
 > = {
   python: {
     download_execution: /^(?:exec|eval|os\.system|os\.popen|subprocess\.\w+)$/,
-    dynamic_execution: /^(?:eval|exec|compile|os\.(?:system|popen)|subprocess\.\w+)$/,
+    dynamic_execution: /^(?:eval|exec|compile|os\.(?:system|popen)|subprocess\.\w+|asyncio\.create_subprocess_(?:shell|exec))$/,
     persistence: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile)$/,
     credential_access: /(?:^|\.)(?:open|Path|read_text|read_bytes|getenv|items|copy|keys|values|\w*password\w*|\w*credential\w*)$/i,
     system_modification: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile|move)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|seteuid|setgid|setegid|chmod|chown|run|call|Popen|check_call)$/,
     defense_evasion: /(?:^|\.)(?:remove|unlink|kill|rmtree|run|call|Popen)$/,
-    network_egress: /(?:^|\.)(?:get|post|put|patch|request|urlopen|urlretrieve|socket|create_connection|connect)$/,
-    data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall)$/,
+    network_egress: /(?:^|\.)(?:get|post|put|patch|request|urlopen|urlretrieve|socket|create_connection|open_connection|connect)$/,
+    data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall|write)$/,
     destructive_behavior: /(?:^|\.)(?:rmtree|remove|unlink|removedirs|open)$/,
-    interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output)$/,
+    interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output|create_subprocess_shell)$/,
     second_stage_payload: /(?:^|\.)(?:get|urlretrieve|unpack_archive|open|ZipFile)$/,
   },
   javascript: {
@@ -310,6 +310,25 @@ function scanAstLanguage(
     const analysisText = text.startsWith(originalCallee)
       ? `${callee}${text.slice(originalCallee.length)}`
       : text;
+    if (
+      language === "javascript"
+      && /(?:^|\/)download\.download$/.test(callee)
+      && /(?:url|uri|href)/i.test(
+        node.childForFieldName("arguments")?.text ?? "",
+      )
+    ) {
+      findings.push({
+        ruleId: "javascript.network.download-wrapper",
+        category: "network_egress",
+        title: "Calls an imported URL download wrapper",
+        severity: "medium",
+        confidence: "medium",
+        message: "A relative module named download is called with a URL-like argument.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
     for (const rule of rules as LanguageRule[]) {
       if (!rule.nodeTypes.includes(node.type)) continue;
       const calleePattern = CALLEE_BY_CATEGORY[language][rule.category];

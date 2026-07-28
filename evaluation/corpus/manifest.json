@@ -369,12 +369,34 @@
     },
     {
       "id": "holdout-atomic-telnet-client-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/client.py.txt",
       "sha256": "432f729fe9111b2f2ac195332b7e77f76a0216948952c6deb459a0ff8d1d9c11",
       "expectedCategories": ["network_egress", "dynamic_execution", "interpreter_escape", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "telnetlib3[.]open_connection"
+        },
+        {
+          "category": "dynamic_execution",
+          "ruleId": "python.dynamic-code",
+          "evidencePattern": "asyncio[.]create_subprocess_shell"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "python.interpreter-escape",
+          "evidencePattern": "asyncio[.]create_subprocess_shell"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "writer[.]write"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "redcanaryco/atomic-red-team",
@@ -387,12 +409,29 @@
     },
     {
       "id": "holdout-node-gyp-install-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/node-gyp/install.js.txt",
       "sha256": "f0a0017fec48692a8eb8922b6eaff8d12f4a4eb1af4e42f23efa3e8797dff2c3",
       "expectedCategories": ["network_egress", "second_stage_payload", "destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.download-wrapper",
+          "evidencePattern": "release[.]tarballUrl"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "javascript.second-stage",
+          "evidencePattern": "tar[.]extract"
+        },
+        {
+          "category": "destructive_behavior",
+          "ruleId": "javascript.destructive",
+          "evidencePattern": "fs[.]rm"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "nodejs/node-gyp",
@@ -400,6 +439,40 @@
         "sourceUrl": "https://github.com/nodejs/node-gyp/blob/42367da5a2683115ff538b92caed5c32c322005f/lib/install.js",
         "license": "MIT",
         "licenseFile": "public/node-gyp/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-aiohttp-curl-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/aiohttp/curl.py.txt",
+      "sha256": "9edea06311c326eddad6ff86d4ce077c95945fba17404d44dfde613844514202",
+      "expectedCategories": ["network_egress"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "aio-libs/aiohttp",
+        "commit": "c3f07fcf858bc1ac328345d717c2fa7e22b31801",
+        "sourceUrl": "https://github.com/aio-libs/aiohttp/blob/c3f07fcf858bc1ac328345d717c2fa7e22b31801/examples/curl.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/aiohttp/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-pacote-remote-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/pacote/remote.js.txt",
+      "sha256": "d4843de4eec468b75632de2f431eb769a333dbd345b1b294f57a4a9eb077192c",
+      "expectedCategories": ["network_egress"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "npm/pacote",
+        "commit": "c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f",
+        "sourceUrl": "https://github.com/npm/pacote/blob/c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f/lib/remote.js",
+        "license": "ISC",
+        "licenseFile": "public/pacote/LICENSE"
       }
     }
   ]

