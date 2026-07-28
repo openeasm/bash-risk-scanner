@@ -88,6 +88,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^(?:\s*(?:env|printenv)(?:\s|$)|\s*set\s*$)/i,
   },
   {
+    id: "credential.cloud-metadata",
+    category: "credential_access",
+    title: "Requests credentials from a cloud metadata service",
+    severity: "critical",
+    confidence: "high",
+    message: "Requests temporary role, service-account, or managed-identity credentials from a link-local metadata endpoint.",
+    pattern: /^\s*(?:curl|wget)\b(?=[^;\n]*(?:(?:169\.254\.169\.254|metadata\.google\.internal)(?::\d+)?\/latest\/meta-data\/iam\/security-credentials(?:\/|["']?(?:\s|$|\?))|(?:169\.254\.170\.(?:2|23))(?::\d+)?\/v2\/credentials\/|(?:169\.254\.169\.254|metadata\.google\.internal)(?::\d+)?\/computeMetadata\/v1\/instance\/service-accounts\/[^/"'\s;]+\/(?:token|identity)(?:["'?\s]|$)|169\.254\.169\.254(?::\d+)?\/metadata\/identity\/oauth2\/token(?:["'?\s]|$)|169\.254\.169\.254(?::\d+)?\/latest\/meta-data\/ram\/security-credentials(?:\/|["']?(?:\s|$|\?))))/i,
+  },
+  {
     id: "credential.netrc-read",
     category: "credential_access",
     title: "Reads a netrc credential file",

@@ -1863,6 +1863,12 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         && definedFunctions.has("swapoff")
         && /^\s*["']?swapoff["']?(?:\s|$)/.test(statement.text)
       ) continue;
+      if (rule.id === "credential.cloud-metadata") {
+        const directMetadataClient = statement.text.match(
+          /^\s*["']?(curl|wget)["']?(?:\s|$)/,
+        )?.[1];
+        if (directMetadataClient && definedFunctions.has(directMetadataClient)) continue;
+      }
       const matched = variants.some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);

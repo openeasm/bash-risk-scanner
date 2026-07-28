@@ -1148,6 +1148,55 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects cloud metadata credential endpoints without matching ordinary metadata", () => {
+    const credentialRequests = [
+      "curl http://169.254.169.254/latest/meta-data/iam/security-credentials/role",
+      "wget -qO- http://169.254.170.2/v2/credentials/task-id",
+      "curl -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
+      "curl 'http://169.254.169.254/computeMetadata/v1/instance/service-accounts/build@project.iam.gserviceaccount.com/identity?audience=test'",
+      "curl -H Metadata:true 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=x'",
+      "wget -qO- http://169.254.169.254/latest/meta-data/ram/security-credentials/example-role",
+    ];
+    for (const source of credentialRequests) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.cloud-metadata",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "curl http://169.254.169.254/latest/api/token",
+      "curl http://169.254.169.254/latest/meta-data/instance-id",
+      "curl http://169.254.169.254/latest/meta-data/placement/region",
+      "curl http://metadata.google.internal/computeMetadata/v1/instance/hostname",
+      "curl -H Metadata:true 'http://169.254.169.254/metadata/instance?api-version=2021-02-01'",
+      "curl http://169.254.169.254/",
+      "curl \"$metadata_url\"",
+      "curl --help",
+      "echo 'curl http://169.254.169.254/latest/meta-data/iam/security-credentials/role'",
+      "# curl http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
+      `curl() { echo "project helper"; }
+       curl http://169.254.169.254/latest/meta-data/iam/security-credentials/role`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.cloud-metadata"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      curl() { echo "project helper"; }
+      command curl http://169.254.169.254/latest/meta-data/iam/security-credentials/role
+      sudo curl http://169.254.169.254/latest/meta-data/iam/security-credentials/role
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "credential.cloud-metadata"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",

@@ -2423,7 +2423,7 @@
     },
     {
       "id": "holdout-atomic-aws-imds-role-credentials-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/aws-imds-role-credentials.sh.txt",
@@ -2452,6 +2452,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the final IMDSv2 credential request and replaced placeholders with an inert token, example role, and /tmp output path; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-sysrq-force-reboot-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/sysrq-force-reboot.sh.txt",
+      "sha256": "4828fccedcce9e92e2eb540c341d657b409ada998078510a60b758ea39db355a",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.sysrq-reboot",
+          "evidencePattern": "echo\\s+b\\s*>\\s*/proc/sysrq-trigger"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "6d6d3154-1a52-4d1a-9d51-92ab8148b32e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied and whitespace-normalized the two executor writes that enable SysRq and request an immediate reboot; the evaluation harness never executes them."
       }
     }
   ]
