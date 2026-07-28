@@ -557,7 +557,7 @@ function bashAccessesGnuPgDirectory(text: string): boolean {
 
 function bashStagesPrivateSshKeys(
   text: string,
-  stagingCommand: "cp" | "rsync" = "cp",
+  stagingCommand: "cp" | "rsync" | "gcp" = "cp",
 ): boolean {
   if (!/^\s*find(?:\s|$)/.test(text) || !/\s-exec(?:dir)?\s/.test(text)) {
     return false;
@@ -583,7 +583,9 @@ function bashStagesPrivateSshKeys(
     const command = words[index + 1]!;
     const commandPattern = stagingCommand === "cp"
       ? /^(?:\/(?:usr\/)?bin\/)?cp$/
-      : /^(?:\/(?:usr\/)?bin\/)?rsync$/;
+      : stagingCommand === "gcp"
+        ? /^(?:\/(?:usr\/local\/)?bin\/)?gcp$/
+        : /^(?:\/(?:usr\/)?bin\/)?rsync$/;
     if (!commandPattern.test(command)) continue;
     const execWords: string[] = [];
     for (let cursor = index + 2; cursor < words.length; cursor += 1) {
@@ -2637,6 +2639,22 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Finds a statically named private SSH key and copies matches to a static local rsync destination.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+      if (
+        !(directFind && definedFunctions.has("find"))
+        && variants.some((variant) => bashStagesPrivateSshKeys(variant, "gcp"))
+      ) {
+        findings.push({
+          ruleId: "credential.private-key-gcp-stage",
+          category: "credential_access",
+          title: "Discovers and stages private SSH keys with GNU cp",
+          severity: "high",
+          confidence: "high",
+          message: "Finds a statically named private SSH key and copies matches with the FreeBSD GNU cp command.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

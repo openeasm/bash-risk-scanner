@@ -2995,7 +2995,7 @@
     },
     {
       "id": "holdout-atomic-stage-private-ssh-keys-gcp-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/stage-private-ssh-keys-gcp.sh.txt",
@@ -3016,6 +3016,34 @@
         "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
         "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
         "upstreamId": "12e4a260-a7fd-4ed8-bf18-1a28c1395775",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic search and output inputs with inert static defaults and copied only the executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-manifest-private-ssh-key-locations-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/manifest-private-ssh-key-locations.sh.txt",
+      "sha256": "3f1ab94bb90d8397a496553a22b46a1bb524bac5607d2759c290a48e6a0b8976",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.private-key-location-manifest",
+          "evidencePattern": "find\\s+/\\s+-name\\s+id_rsa.*>>\\s+/tmp/keyfile_locations[.]txt"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "46959285-906d-40fa-9437-5a439accd878",
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic search and output inputs with inert static defaults and copied only the executor commands; the evaluation harness never executes them."

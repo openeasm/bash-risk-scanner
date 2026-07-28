@@ -174,8 +174,8 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 凭据目录发现、私有 SSH 密钥发现后暂存、Safari Cookie 搜索、macOS
 login.keychain 文件暂存、LaunchAgent plist 安装加载、广泛文件树密码模式搜索、
 AWS credentials、Azure token cache 和 GCP 凭据数据库发现均已进入
-validation；rsync 私钥暂存也已修复，当前冻结 test 为 FreeBSD `gcp`
-私钥暂存链。
+validation；rsync 和 FreeBSD `gcp` 私钥暂存也已修复，当前冻结 test 为私钥
+位置清单生成。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

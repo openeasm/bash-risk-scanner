@@ -1391,6 +1391,41 @@ describe("scan", () => {
     }
   });
 
+  it("detects private SSH key staging through FreeBSD GNU cp without matching ordinary gcp", () => {
+    const stagingChains = [
+      `find / -name id_rsa 2>/dev/null -exec gcp --parents {} /tmp/art-staging \\;`,
+      `find /home -iname id_ed25519 -exec /usr/local/bin/gcp -p {} ./keys +`,
+      `sudo find /Users -name id_ecdsa -execdir gcp {} ~/staged-keys \\;`,
+    ];
+    for (const source of stagingChains) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.private-key-gcp-stage",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find / -name id_rsa",
+      `find / -name "$key_name" -exec gcp {} /tmp/stage \\;`,
+      `find / -name '*.pem' -exec gcp {} /tmp/stage \\;`,
+      `find / -name id_rsa -exec gcp {} "$stage_dir" \\;`,
+      `find / -name id_rsa -exec gcp /tmp/source {} \\;`,
+      `find / -name id_rsa -exec cp {} /tmp/stage \\;`,
+      `gcp --parents ~/.ssh/id_rsa /tmp/stage`,
+      `echo "find / -name id_rsa -exec gcp {} /tmp/stage"`,
+      `find() { echo "project helper"; }
+       find / -name id_rsa -exec gcp {} /tmp/stage \\;`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.private-key-gcp-stage"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects Safari cookie searches without joining unrelated commands or scopes", () => {
     const searches = [
       `cd ~/Library/Cookies
