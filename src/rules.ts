@@ -412,6 +412,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:\/usr\/bin\/)?tmutil\s+disable(?:\s|$)/i,
   },
   {
+    id: "destructive.swap-disable",
+    category: "destructive_behavior",
+    title: "Disables all memory swap",
+    severity: "high",
+    confidence: "high",
+    message: "Disables every configured swap area and can impair host availability or recovery.",
+    pattern: /^\s*swapoff\b(?=[^;\n]*(?:^|\s)(?:--all|-[A-Za-z]*a[A-Za-z]*)(?:\s|$))/i,
+  },
+  {
     id: "escape.interpreter",
     category: "interpreter_escape",
     title: "Invokes another interpreter",

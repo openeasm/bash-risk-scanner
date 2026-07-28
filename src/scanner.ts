@@ -1758,6 +1758,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         )?.[1];
         if (directTrustCommand && definedFunctions.has(directTrustCommand)) continue;
       }
+      if (
+        rule.id === "destructive.swap-disable"
+        && definedFunctions.has("swapoff")
+        && /^\s*["']?swapoff["']?(?:\s|$)/.test(statement.text)
+      ) continue;
       const matched = variants.some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);

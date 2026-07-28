@@ -982,6 +982,52 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects disabling all swap without matching scoped swap administration", () => {
+    const globalDisables = [
+      "swapoff -a",
+      "sudo swapoff --all",
+      "swapoff -av",
+      "swapoff -va",
+    ];
+    for (const source of globalDisables) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "destructive.swap-disable",
+          category: "destructive_behavior",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "swapoff /dev/sda2",
+      "swapoff -v /swapfile",
+      "swapon -a",
+      "swapon --show",
+      "cat /proc/swaps",
+      "free -h",
+      "swapoff --help",
+      "echo 'swapoff -a'",
+      "# swapoff --all",
+      `swapoff() { echo "project helper"; }
+       swapoff -a`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "destructive.swap-disable"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      swapoff() { echo "project helper"; }
+      command swapoff -a
+      sudo swapoff --all
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "destructive.swap-disable"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",
