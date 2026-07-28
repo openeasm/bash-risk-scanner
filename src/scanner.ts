@@ -304,7 +304,7 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile|move)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|seteuid|setgid|setegid|chmod|chown|run|call|Popen|check_call)$/,
     defense_evasion: /(?:^|\.)(?:remove|unlink|kill|rmtree|run|call|Popen)$/,
-    network_egress: /(?:^|\.)(?:get|post|put|patch|delete|head|options|request|ws_connect|urlopen|urlretrieve|socket|create_connection|open_connection|connect|upload_file|http_stream_backoff)$/,
+    network_egress: /(?:^|\.)(?:get|post|put|patch|delete|head|options|request|ws_connect|urlopen|urlretrieve|socket|create_connection|open_connection|connect|upload_file|http_stream_backoff|fetch_url)$/,
     data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall|write)$/,
     destructive_behavior: /(?:^|\.)(?:rmtree|removedirs|open)$/,
     interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output|create_subprocess_shell)$/,
@@ -384,17 +384,17 @@ function collectAliases(source: string, language: "python" | "javascript"): Map<
   }
 
   for (const match of source.matchAll(
-    /(?:const|let|var)\s+(\w+)\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)/g,
+    /(?:const|let|var)\s+(\w+)\s*=\s*require\s*\(\s*(["'](?:node:)?[@\w./-]+["'])\s*\)/g,
   )) {
     aliases.set(match[1]!, moduleName(match[2]!));
   }
   for (const match of source.matchAll(
-    /(?:const|let|var)\s+(\w+)\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)\.(\w+)/g,
+    /(?:const|let|var)\s+(\w+)\s*=\s*require\s*\(\s*(["'](?:node:)?[@\w./-]+["'])\s*\)\.(\w+)/g,
   )) {
     aliases.set(match[1]!, `${moduleName(match[2]!)}.${match[3]}`);
   }
   for (const match of source.matchAll(
-    /(?:const|let|var)\s*\{([^}]+)\}\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)/g,
+    /(?:const|let|var)\s*\{([^}]+)\}\s*=\s*require\s*\(\s*(["'](?:node:)?[@\w./-]+["'])\s*\)/g,
   )) {
     const module = moduleName(match[2]!);
     for (const binding of match[1]!.split(",")) {
@@ -403,17 +403,17 @@ function collectAliases(source: string, language: "python" | "javascript"): Map<
     }
   }
   for (const match of source.matchAll(
-    /import\s+\*\s+as\s+(\w+)\s+from\s+(["'](?:node:)?[\w./-]+["'])/g,
+    /import\s+\*\s+as\s+(\w+)\s+from\s+(["'](?:node:)?[@\w./-]+["'])/g,
   )) {
     aliases.set(match[1]!, moduleName(match[2]!));
   }
   for (const match of source.matchAll(
-    /import\s+(\w+)\s+from\s+(["'](?:node:)?[\w./-]+["'])/g,
+    /import\s+(\w+)\s+from\s+(["'](?:node:)?[@\w./-]+["'])/g,
   )) {
     aliases.set(match[1]!, moduleName(match[2]!));
   }
   for (const match of source.matchAll(
-    /import\s*\{([^}]+)\}\s*from\s*(["'](?:node:)?[\w./-]+["'])/g,
+    /import\s*\{([^}]+)\}\s*from\s*(["'](?:node:)?[@\w./-]+["'])/g,
   )) {
     const module = moduleName(match[2]!);
     for (const binding of match[1]!.split(",")) {
@@ -607,10 +607,16 @@ function collectJavaScriptDerivedAliases(
       name
       && /^[A-Za-z_$][\w$]*$/.test(name)
       && value?.type === "new_expression"
-      && calleeOf(value) === "Octokit"
     ) {
-      aliases.set(name, "octokit.Client");
-      return;
+      const constructor = canonicalizeCallee(calleeOf(value), aliases);
+      if (constructor === "Octokit") {
+        aliases.set(name, "octokit.Client");
+        return;
+      }
+      if (constructor === "@google-cloud/storage.Storage") {
+        aliases.set(name, constructor);
+        return;
+      }
     }
     if (!name || value?.type !== "call_expression") return;
     const wrapper = canonicalizeCallee(calleeOf(value), aliases);
@@ -855,6 +861,33 @@ function scanAstLanguage(
           language,
         });
       }
+    }
+    if (
+      language === "javascript"
+      && /^@google-cloud\/storage\.Storage\.bucket\([^)]*\)\.upload$/.test(callee)
+    ) {
+      findings.push({
+        ruleId: "javascript.network.google-cloud-storage-upload",
+        category: "network_egress",
+        title: "Uploads to Google Cloud Storage",
+        severity: "medium",
+        confidence: "high",
+        message: "A source-bound Google Cloud Storage client uploads an object.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+      findings.push({
+        ruleId: "javascript.exfiltration.google-cloud-storage-upload",
+        category: "data_exfiltration",
+        title: "Uploads a local file to Google Cloud Storage",
+        severity: "high",
+        confidence: "high",
+        message: "A source-bound Google Cloud Storage client uploads a local file path.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
     }
     if (
       language === "javascript"

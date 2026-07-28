@@ -547,6 +547,50 @@ fetchBinary(path)
     expect(local.findings.some((finding) => finding.category === "network_egress")).toBe(false);
   });
 
+  it("recognizes Ansible fetch_url only from its networking module", () => {
+    const result = scanPython(`
+from ansible.module_utils.urls import fetch_url
+response, info = fetch_url(module, url, method="GET")
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "python.network", category: "network_egress" }),
+    ]));
+
+    const local = scanPython(`
+def fetch_url(module, path):
+    return cache.open(path)
+fetch_url(module, local_path)
+`);
+    expect(local.findings.some((finding) => finding.category === "network_egress")).toBe(false);
+  });
+
+  it("tracks Google Cloud Storage instances through bucket upload chains", () => {
+    const result = scanJavaScript(`
+const { Storage } = require("@google-cloud/storage")
+const storage = new Storage()
+await storage.bucket(bucketName).upload(filePath, options)
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.network.google-cloud-storage-upload",
+        category: "network_egress",
+      }),
+      expect.objectContaining({
+        ruleId: "javascript.exfiltration.google-cloud-storage-upload",
+        category: "data_exfiltration",
+      }),
+    ]));
+
+    const local = scanJavaScript(`
+class Storage { bucket(name) { return localBucket(name) } }
+const storage = new Storage()
+storage.bucket("cache").upload(localKey)
+`);
+    expect(local.findings.some((finding) =>
+      finding.category === "network_egress" || finding.category === "data_exfiltration"
+    )).toBe(false);
+  });
+
   it("does not treat a local Python Client class as an HTTP client", () => {
     const result = scanPython(`
 class Client:

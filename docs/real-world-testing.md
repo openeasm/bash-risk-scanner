@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 58 条离线语料：56 条完全匹配，precision 100%、recall 97.6%、
-F1 98.8%。前十四轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 59 条离线语料：58 条完全匹配，precision 100%、recall 99.2%、
+F1 99.6%。前十五轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -170,22 +170,24 @@ validation 回归：
   `.utils._http.http_stream_backoff` 来源成立时识别网络。
 - node-pre-gyp：`require("node-fetch")` 返回的模块本身作为 callable 使用时识别
   网络；本地同名函数不命中。
+- Ansible：只有来源为 `ansible.module_utils.urls.fetch_url` 的 wrapper 才识别网络。
+- Google Cloud Storage：支持以 `@` 开头的 scoped npm package 导入；只有确认来自
+  `@google-cloud/storage` 的 `Storage` 实例，其 `bucket().upload()` 才识别网络
+  和本地文件外传。
 
-本轮重新冻结的两个独立公开样本尚未用于调参：
+本轮重新冻结的公开恶意样本尚未用于调参：
 
-- Ansible `get_url` 使用来自 `ansible.module_utils.urls` 的 `fetch_url()` wrapper，
-  当前漏报网络外联。
-- Google Cloud Storage 官方示例通过
-  `new Storage().bucket(bucketName).upload(filePath, options)` 上传本地文件，
-  当前漏报网络与数据外传。
+- Atomic Red Team T1048.003 的 Linux DNS 外传步骤先用 `xxd` 编码文件，再循环读取
+  编码结果并放入 `dig` 查询名。网络外联已命中，跨命令/循环的数据外传尚未覆盖。
+- 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把输入替换为 `/tmp` 文本，
+  域名替换为保留的 `example.invalid`，评测器不会执行命令。
 
-新 test 分层以实际 precision 100%、recall 0% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%，因此 test 的零召回不能被整体容易样本长期掩盖。
-下一轮应修复三个 FN，并用本地 `fetch_url`、本地 `Storage/bucket/upload` 链约束
-来源后立即提高 test 门槛。
+新 test 分层以实际 precision 100%、recall 50% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应修复 DNS 外传 FN，并用普通 `xxd` 转换、
+普通 `dig` 健康检查和不相关循环作为 hard-negative 后立即提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-100 个单元测试或当前小规模公开语料外推生产环境准确率。
+102 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
