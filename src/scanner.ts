@@ -721,6 +721,41 @@ function bashSearchesBroadTreeForCredentials(text: string): boolean {
   return recursive && credentialPattern && broadTarget;
 }
 
+function bashDiscoversAwsCredentials(text: string): boolean {
+  if (!/^\s*find(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words[0] !== "find" || words.some((word) =>
+    /^(?:-h|--help|--version)$/.test(word)
+  )) return false;
+
+  const roots: string[] = [];
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (word.startsWith("-") || word === "(" || word === "\\(") break;
+    roots.push(word);
+  }
+  const awsRoot = roots.some((root) =>
+    !/[$`;&|<>*?[\]]/.test(root)
+    && /(?:^|\/)[.]aws\/?$/.test(root)
+  );
+
+  let credentialsName = false;
+  let credentialsPath = false;
+  for (let index = 1; index < words.length - 1; index += 1) {
+    const predicate = words[index]!;
+    const value = words[index + 1]!;
+    if (/^-(?:i?name)$/.test(predicate)) {
+      credentialsName ||= !/[$`;&|<>*?[\]]/.test(value)
+        && value === "credentials";
+    }
+    if (/^-(?:i?path|wholename)$/.test(predicate)) {
+      credentialsPath ||= !/[$`;&|<>?[\]]/.test(value)
+        && /(?:^|\/)(?:[*]\/)?[.]aws\/credentials$/.test(value);
+    }
+  }
+  return credentialsPath || (awsRoot && credentialsName);
+}
+
 function isStaticLaunchAgentPath(value: string): boolean {
   return !/[$`;&|<>]/.test(value)
     && /^(?:(?:~|\/Users\/[^/]+)\/Library\/LaunchAgents|\/Library\/LaunchAgents)\/[^/]+[.]plist$/
@@ -2048,6 +2083,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     /\b(?:password|passwd|secret|token|api[_-]?key)\b/i.test(source)
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*grep(?:\s|$)/m
       .test(source);
+  const hasAwsCredentialDiscoveryCandidate =
+    source.includes(".aws")
+    && source.includes("credentials")
+    && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*find(?:\s|$)/m
+      .test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2517,6 +2557,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Recursively searches a broad user or system root for a static credential-related term.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasAwsCredentialDiscoveryCandidate) {
+      const directFind = /^\s*["']?find["']?(?:\s|$)/.test(statement.text);
+      if (
+        !(directFind && definedFunctions.has("find"))
+        && variants.some((variant) => bashDiscoversAwsCredentials(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.aws-credentials-discovery",
+          category: "credential_access",
+          title: "Discovers an AWS shared credentials file",
+          severity: "high",
+          confidence: "high",
+          message: "Finds a statically named credentials file beneath a static .aws directory.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

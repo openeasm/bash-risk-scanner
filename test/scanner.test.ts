@@ -1547,6 +1547,43 @@ describe("scan", () => {
     }
   });
 
+  it("detects AWS credentials discovery when find separates the directory and filename", () => {
+    const discoveries = [
+      `find /.aws -name "credentials" -type f 2>/dev/null`,
+      "find ~/.aws -type f -iname credentials",
+      `find /home -path '*/.aws/credentials' -type f`,
+      `sudo find /Users -ipath '*/.aws/credentials'`,
+    ];
+    for (const source of discoveries) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.aws-credentials-discovery",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find / -name credentials -type f",
+      "find /.aws -name config -type f",
+      `find "$aws_dir" -name credentials`,
+      `find /.aws -name "$credential_file"`,
+      `find /home -path "$pattern"`,
+      `find /home -path '*/.config/credentials'`,
+      "find --help /.aws credentials",
+      `echo "find /.aws -name credentials"`,
+      "# find /.aws -name credentials",
+      `find() { echo "project helper"; }
+       find /.aws -name credentials`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.aws-credentials-discovery"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",
