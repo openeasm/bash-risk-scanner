@@ -1450,6 +1450,63 @@ describe("scan", () => {
     }
   });
 
+  it("detects installing and loading the same LaunchAgent without joining unrelated commands", () => {
+    const installs = [
+      `sudo cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist
+       sudo launchctl load -w ~/Library/LaunchAgents/com.example.agent.plist`,
+      `install -m 600 /tmp/agent.plist /Users/alice/Library/LaunchAgents/com.example.agent.plist
+       launchctl bootstrap gui/501 /Users/alice/Library/LaunchAgents/com.example.agent.plist`,
+      `setup() {
+         mv /tmp/agent.plist /Library/LaunchAgents/com.example.agent.plist
+         launchctl load /Library/LaunchAgents/com.example.agent.plist
+       }`,
+    ];
+    for (const source of installs) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "persistence.launchagent-install-load",
+          category: "persistence",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist",
+      "launchctl load -w ~/Library/LaunchAgents/com.example.agent.plist",
+      `cp /tmp/one.plist ~/Library/LaunchAgents/com.example.one.plist
+       launchctl load ~/Library/LaunchAgents/com.example.two.plist`,
+      `cp /tmp/agent.plist "$launch_agent"
+       launchctl load "$launch_agent"`,
+      `cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist
+       launchctl unload ~/Library/LaunchAgents/com.example.agent.plist`,
+      `launchctl load ~/Library/LaunchAgents/com.example.agent.plist
+       cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist`,
+      `cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist
+       rm ~/Library/LaunchAgents/com.example.agent.plist
+       launchctl load ~/Library/LaunchAgents/com.example.agent.plist`,
+      `left() { cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist; }
+       right() { launchctl load ~/Library/LaunchAgents/com.example.agent.plist; }`,
+      `if ready; then
+         cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist
+       else
+         launchctl load ~/Library/LaunchAgents/com.example.agent.plist
+       fi`,
+      `echo "cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist; launchctl load ~/Library/LaunchAgents/com.example.agent.plist"`,
+      `cp() { echo "project helper"; }
+       cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist
+       launchctl load ~/Library/LaunchAgents/com.example.agent.plist`,
+      `launchctl() { echo "project helper"; }
+       cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist
+       launchctl load ~/Library/LaunchAgents/com.example.agent.plist`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.launchagent-install-load"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",

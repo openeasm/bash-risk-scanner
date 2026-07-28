@@ -2822,7 +2822,7 @@
     },
     {
       "id": "holdout-atomic-install-launchagent-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/install-launchagent.sh.txt",
@@ -2851,6 +2851,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic plist inputs with inert static /tmp and user LaunchAgents paths and copied only the executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-search-password-pattern-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/search-password-pattern.sh.txt",
+      "sha256": "336ec8f785dfebb90646d2eeb62841898249473638c9e339a935f57f41ec8831",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.password-pattern-search",
+          "evidencePattern": "grep\\s+-ri\\s+password\\s+/"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "bd4cf0d1-7646-474e-8610-78ccf5a097c4",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic file_path placeholder with its inert static default and copied only the executor commands; the evaluation harness never executes them."
       }
     }
   ]

@@ -651,6 +651,51 @@ function bashStagesKeychainFile(text: string): boolean {
     && destination !== "/dev/null";
 }
 
+function isStaticLaunchAgentPath(value: string): boolean {
+  return !/[$`;&|<>]/.test(value)
+    && /^(?:(?:~|\/Users\/[^/]+)\/Library\/LaunchAgents|\/Library\/LaunchAgents)\/[^/]+[.]plist$/
+      .test(value);
+}
+
+function bashLaunchAgentInstallPath(text: string): string | undefined {
+  if (!/^\s*(?:cp|mv|install)(?:\s|$)/.test(text)) return undefined;
+  const words = staticBashWords(text);
+  const command = words[0];
+  if (!command || words.some((word) =>
+    /^(?:-h|--help|--version|-t|--target-directory)$/.test(word)
+  )) return undefined;
+
+  const optionsWithValue = command === "install"
+    ? new Set(["-m", "--mode", "-o", "--owner", "-g", "--group", "-S", "--suffix"])
+    : new Set(["-S", "--suffix"]);
+  const operands: string[] = [];
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (optionsWithValue.has(word)) {
+      index += 1;
+      continue;
+    }
+    if (word.startsWith("-")) continue;
+    operands.push(word);
+  }
+  if (operands.length < 2 || operands.some((word) => /[$`;&|<>]/.test(word))) {
+    return undefined;
+  }
+  const destination = operands.at(-1)!;
+  return isStaticLaunchAgentPath(destination) ? destination : undefined;
+}
+
+function bashLaunchAgentLoadPath(text: string): string | undefined {
+  if (!/^\s*launchctl(?:\s|$)/.test(text)) return undefined;
+  const words = staticBashWords(text);
+  const action = words[1];
+  if (action !== "load" && action !== "bootstrap") return undefined;
+  const operands = words.slice(2).filter((word) => !word.startsWith("-"));
+  if (action === "bootstrap" && operands.length < 2) return undefined;
+  const path = operands.at(-1);
+  return path && isStaticLaunchAgentPath(path) ? path : undefined;
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -2570,6 +2615,59 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "high",
         confidence: "high",
         message: "Changes into Safari's cookie directory and searches its binary cookie store in the same execution scope.",
+        language: "bash",
+      }, maxEvidence);
+    }
+  }
+
+  if (
+    source.includes("Library/LaunchAgents")
+    && source.includes("launchctl")
+  ) {
+    for (const install of commandVariants) {
+      const directInstaller = install.statement.text.match(
+        /^\s*["']?(cp|mv|install)["']?(?:\s|$)/,
+      )?.[1];
+      if (directInstaller && definedFunctions.has(directInstaller)) continue;
+      const installedPath = install.variants
+        .map(bashLaunchAgentInstallPath)
+        .find((path) => path !== undefined);
+      if (!installedPath) continue;
+      const load = commandVariants.find((candidate) => {
+        const directLaunchctl = /^\s*["']?launchctl["']?(?:\s|$)/
+          .test(candidate.statement.text);
+        if (directLaunchctl && definedFunctions.has("launchctl")) return false;
+        if (
+          candidate.scopeId !== install.scopeId
+          || candidate.statement.node.parent?.id !== install.statement.node.parent?.id
+          || candidate.statement.range.startIndex <= install.statement.range.startIndex
+          || candidate.statement.range.startIndex - install.statement.range.startIndex > 2_000
+          || !candidate.variants.some((variant) =>
+            bashLaunchAgentLoadPath(variant) === installedPath
+          )
+        ) return false;
+        return !commandVariants.some((intermediate) =>
+          intermediate.scopeId === install.scopeId
+          && intermediate.statement.node.parent?.id === install.statement.node.parent?.id
+          && intermediate.statement.range.startIndex > install.statement.range.startIndex
+          && intermediate.statement.range.startIndex < candidate.statement.range.startIndex
+          && intermediate.variants.some((variant) =>
+            (
+              /^\s*(?:rm|unlink|mv)(?:\s|$)/.test(variant)
+              || /^\s*launchctl\s+(?:unload|bootout)(?:\s|$)/.test(variant)
+            )
+            && bashCommandReferencesPath(variant, installedPath)
+          )
+        );
+      });
+      if (!load) continue;
+      addChainFinding(findings, install.statement, load.statement, {
+        ruleId: "persistence.launchagent-install-load",
+        category: "persistence",
+        title: "Installs and loads a macOS LaunchAgent",
+        severity: "high",
+        confidence: "high",
+        message: "Copies a plist into LaunchAgents and loads the same static path in the same execution region.",
         language: "bash",
       }, maxEvidence);
     }
