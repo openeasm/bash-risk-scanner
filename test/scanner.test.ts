@@ -379,6 +379,35 @@ describe("scan", () => {
     expect(overwrite.findings.some((finding) => finding.category === "destructive_behavior")).toBe(true);
   });
 
+  it("detects explicit timestomping without flagging ordinary touch updates", () => {
+    const explicit = scan("touch -a -t 197001010000.00 /tmp/payload");
+    expect(explicit.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "defense.timestomp",
+        category: "defense_evasion",
+      }),
+    ]));
+
+    const reference = scan("touch -acmr /bin/sh /tmp/payload");
+    expect(reference.findings.some((finding) =>
+      finding.ruleId === "defense.timestomp"
+    )).toBe(true);
+
+    const hardNegatives = [
+      "touch /tmp/new-file",
+      "touch -a /tmp/accessed-now",
+      "touch -m /tmp/modified-now",
+      "touch -c /tmp/existing-only",
+      "touch -a -d now /tmp/accessed-now",
+      "echo 'touch -t 197001010000.00 /tmp/example'",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "defense.timestomp"
+      )).toBe(false);
+    }
+  });
+
   it("detects writes through profile path variables", () => {
     const result = scan(`command printf '%s' "$SOURCE" >> "$NVM_PROFILE"`);
     expect(result.findings.some((finding) => finding.category === "persistence")).toBe(true);

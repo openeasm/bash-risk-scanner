@@ -132,6 +132,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:systemctl\s+(?:stop|disable)|pkill|killall|service\s+\S+\s+stop|auditctl\s+-e\s+0)\b[^;\n]*(?:audit|edr|defender|falcon|sentinel|security|antivirus)?/i,
   },
   {
+    id: "defense.timestomp",
+    category: "defense_evasion",
+    title: "Sets a file timestamp to an explicit or referenced value",
+    severity: "high",
+    confidence: "medium",
+    message: "Explicitly replacing file timestamps can conceal when a file was created or modified.",
+    pattern: /^\s*touch\b(?=[^;\n]*(?:(?:^|\s)-(?:[A-Za-z]*t[A-Za-z]*)\s+\d{8,12}(?:\.\d{2})?(?:\s|$)|(?:^|\s)-(?:[A-Za-z]*r[A-Za-z]*)\s+\S+|(?:^|\s)--reference(?:=|\s)\S+))[^;\n]*$/i,
+  },
+  {
     id: "network.tool",
     category: "network_egress",
     title: "Uses an outbound network tool",

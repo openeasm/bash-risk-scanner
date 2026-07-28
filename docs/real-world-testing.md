@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 60 条离线语料：59 条完全匹配，precision 100%、recall 99.2%、
-F1 99.6%。前十六轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 61 条离线语料：60 条完全匹配，precision 100%、recall 99.2%、
+F1 99.6%。前十七轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -178,22 +178,25 @@ validation 回归：
   `xxd -p input > encoded`、`for value in $(cat encoded)` 和
   `dig "$value.static.domain"`；中间文件不一致、普通循环、静态查询和缺少静态
   域名后缀均不命中数据外传。
+- Atomic Red Team timestomp：`touch -t` 的 POSIX 显式时间戳和
+  `touch -r/--reference` 的时间复制识别为防御规避；普通创建、更新为当前时间、
+  `-c` 以及仅出现在 `echo` 文本中的命令均不命中。
 
 本轮重新冻结的公开恶意样本尚未用于调参：
 
-- Atomic Red Team T1070.006 的 Linux timestomp 步骤使用
-  `touch -a -t 197001010000.00` 修改文件访问时间。目前未命中
-  `defense_evasion`，作为下一轮待修复 FN。
+- Atomic Red Team T1552.001 的 Linux/macOS 步骤先用 `find` 查找 `.netrc`，
+  再在循环中逐个 `cat` 文件。目前未命中 `credential_access`，作为下一轮待修复
+  FN。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
-  `/tmp/atomic-timestomp.txt`，评测器不会执行命令。
+  `/tmp/atomic-home` 下的惰性路径，评测器不会执行命令。
 
 新 test 分层只有一个预期正例且当前漏报，因此 recall 基线为 0；precision 没有
 预测正例，不能单独解读。整体门槛仍保持 precision 95%、recall 90%。下一轮应
-修复 timestomp FN，并用普通文件创建、保留当前时间、只修改非时间属性等
-hard-negative 约束误报后立即提高 test 门槛。
+修复 `.netrc` 凭据访问 FN，并用普通隐藏文件、只查找不读取、循环读取普通配置和
+文本中出现 `.netrc` 等 hard-negative 约束误报后立即提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-103 个单元测试或当前小规模公开语料外推生产环境准确率。
+104 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
