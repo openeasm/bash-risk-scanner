@@ -517,6 +517,17 @@ function bashDisablesSudoTtyTickets(text: string): boolean {
     && /(?:>>?|tee(?:\s+-a)?)\s*["']?(?:\/etc\/sudoers|\/usr\/local\/etc\/sudoers)/.test(text);
 }
 
+function bashOpensSudoersEditor(text: string): boolean {
+  if (!/^\s*(?:vi|vim|nvim|nano|emacs|ee)(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words.some((word) =>
+    /^(?:-R|--readonly|-M|--help|-h|--version|-v)$/.test(word)
+  )) return false;
+  return words.some((word) =>
+    /^(?:\/etc\/sudoers(?:[.]d\/[^/]+)?|\/usr\/local\/etc\/sudoers)$/.test(word)
+  );
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1783,6 +1794,10 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const hasDisabledSudoTtyTicketsCandidate =
     source.includes("tty_tickets")
     && source.includes("sudoers");
+  const hasSudoersEditorCandidate =
+    source.includes("sudoers")
+    && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*(?:vi|vim|nvim|nano|emacs|ee)(?:\s|$)/m
+      .test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2153,6 +2168,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Allows cached sudo authentication to be reused across terminal sessions.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasSudoersEditorCandidate) {
+      const directEditor = statement.text.match(
+        /^\s*["']?(vi|vim|nvim|nano|emacs|ee)["']?(?:\s|$)/,
+      )?.[1];
+      if (
+        !(directEditor && definedFunctions.has(directEditor))
+        && variants.some((variant) => bashOpensSudoersEditor(variant))
+      ) {
+        findings.push({
+          ruleId: "system.sudoers-editor",
+          category: "system_modification",
+          title: "Opens sudoers in an interactive editor",
+          severity: "critical",
+          confidence: "high",
+          message: "Opens a sudo policy file in a writable interactive editor.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

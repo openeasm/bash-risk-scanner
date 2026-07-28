@@ -2677,7 +2677,7 @@
     },
     {
       "id": "holdout-atomic-edit-sudoers-with-vim-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/edit-sudoers-with-vim.sh.txt",
@@ -2706,6 +2706,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single Linux executor command that opens sudoers in an interactive editor; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-discover-gnupg-directory-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/discover-gnupg-directory.sh.txt",
+      "sha256": "04c7e6431d64b6eb758eefe5c87e96d04bc51fea31713ff80dd85774a6f6d130",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.gnupg-discovery",
+          "evidencePattern": "find\\s+/\\s+-type\\s+d\\s+-name\\s+['\"]?[.]gnupg"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "2a5a0601-f5fb-4e2e-aa09-73282ae6afca",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the GnuPG discovery executor command; the evaluation harness never executes it."
       }
     }
   ]

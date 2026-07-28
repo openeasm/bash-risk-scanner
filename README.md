@@ -170,8 +170,8 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 方向、awk shell escape、密码哈希访问控制、信任存储修改、瞬态 systemd timer、
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
 近期修复的 T1685.004、T1543.002、T1136.001、T1556.003，以及 T1548.003 的
-无限 sudo 缓存和 `!tty_tickets` 均已进入 validation；当前冻结 test 为使用
-Vim 直接编辑 sudoers。
+无限 sudo 缓存、`!tty_tickets` 和 sudoers 编辑器均已进入 validation；当前
+冻结 test 为递归发现用户 `.gnupg` 凭据目录。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

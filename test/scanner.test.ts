@@ -1240,6 +1240,46 @@ describe("scan", () => {
     }
   });
 
+  it("detects writable sudoers editor access without matching read-only inspection", () => {
+    const editors = [
+      "sudo vim /etc/sudoers",
+      "vi /etc/sudoers.d/project",
+      "doas nvim /usr/local/etc/sudoers",
+      "nano /etc/sudoers",
+      "emacs /etc/sudoers.d/admin",
+      "ee /usr/local/etc/sudoers",
+    ];
+    for (const source of editors) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "system.sudoers-editor",
+          category: "system_modification",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "sudo -l",
+      "sudo cat /etc/sudoers",
+      "less /etc/sudoers",
+      "visudo -c -f /etc/sudoers",
+      "vim -R /etc/sudoers",
+      "vim -M /etc/sudoers",
+      "vim /tmp/sudoers",
+      `vim "$sudoers_path"`,
+      "echo 'sudo vim /etc/sudoers'",
+      "# nano /etc/sudoers",
+      `vim() { echo "project helper"; }
+       vim /etc/sudoers`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.sudoers-editor"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",
