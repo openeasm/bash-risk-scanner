@@ -439,6 +439,46 @@ describe("scan", () => {
     expect(result.summary.byCategory.credential_access).toBe(1);
   });
 
+  it("detects OCI session-token access without matching ordinary OCI or token files", () => {
+    const credentialAccesses = [
+      "find /home/alice/.oci/sessions -name token -type f",
+      "find \"$HOME/.oci/sessions\" -type f -name 'token'",
+      "cat ~/.oci/sessions/DEFAULT/token",
+      "head -c 32 '/tmp/user/.oci/sessions/profile/token'",
+      "cp /root/.oci/sessions/admin/token /tmp/copied-token",
+      "grep -n . /Users/alice/.oci/sessions/DEFAULT/token",
+    ];
+    for (const source of credentialAccesses) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.oci-session-token",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "find /home/alice/.oci -name config -type f",
+      "find /home/alice/.oci/sessions -name metadata -type f",
+      "find /srv/project -name token -type f",
+      "find \"$oci_sessions\" -name token -type f",
+      "cat ~/.oci/config",
+      "cat ~/.oci/sessions/DEFAULT/metadata",
+      "touch ~/.oci/sessions/DEFAULT/token",
+      "rm ~/.oci/sessions/DEFAULT/token",
+      "echo token > ~/.oci/sessions/DEFAULT/token",
+      "find --help",
+      "echo 'find ~/.oci/sessions -name token'",
+      "# cat ~/.oci/sessions/DEFAULT/token",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.oci-session-token"
+      ), source).toBe(false);
+    }
+  });
+
   it("distinguishes crontab replacement from read, edit, and removal operations", () => {
     const replacements = [
       "crontab /tmp/jobs",

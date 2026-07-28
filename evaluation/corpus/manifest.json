@@ -2085,7 +2085,7 @@
     },
     {
       "id": "holdout-atomic-find-oci-session-token-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/find-oci-session-token.sh.txt",
@@ -2109,6 +2109,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced the search root with an inert /tmp/atomic-home path and retained the .oci/sessions token filename search."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-aslr-sysctl-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-aslr-sysctl.sh.txt",
+      "sha256": "863a8d2c98833b8f3390bf8a76168773b57b9b9b555ac60459ac65843b246114",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.aslr-disable",
+          "evidencePattern": "sysctl\\s+-w\\s+kernel[.]randomize_va_space=0"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.aslr-disable",
+          "evidencePattern": "sysctl\\s+-w\\s+kernel[.]randomize_va_space=0"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "ac333fe1-ce2b-400b-a117-538634427439",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Linux bash executor command without its cleanup command; the evaluation harness never executes it."
       }
     }
   ]

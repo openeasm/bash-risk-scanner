@@ -96,6 +96,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:cat|head|tail|less|more|cp|grep)\b[^;\n]*(?:^|\/)\.netrc(?:["']?\s|$)/i,
   },
   {
+    id: "credential.oci-session-token",
+    category: "credential_access",
+    title: "Accesses an OCI session token",
+    severity: "high",
+    confidence: "high",
+    message: "Reads or locates a token file in OCI CLI session credential storage.",
+    pattern: /^\s*(?:cat|head|tail|less|more|cp|find|ls|grep)\b(?=[^;\n]*\/\.oci\/sessions(?:\/|["']?(?:\s|$)))(?=[^;\n]*(?:\/token(?:["']?(?:\s|$))|-name\s+(?:"token"|'token'|token)(?:\s|$)))[^;\n]*$/i,
+  },
+  {
     id: "credential.macos-keychain",
     category: "credential_access",
     title: "Extracts credentials from macOS Keychain",
