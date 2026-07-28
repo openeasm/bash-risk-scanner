@@ -5,8 +5,8 @@
   },
   "minimumBySplit": {
     "test": {
-      "precision": 0.5,
-      "recall": 0.14285714285714285
+      "precision": 1,
+      "recall": 0.25
     }
   },
   "requiredPerfectSplits": ["regression"],

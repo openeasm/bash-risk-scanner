@@ -64,13 +64,17 @@ function statements(root: SyntaxNode, source: string): Statement[] {
   return result.sort((a, b) => a.range.startIndex - b.range.startIndex);
 }
 
-function elevatedBashWrappers(source: string): Map<string, Set<string>> {
+function staticBashCommandWrappers(source: string): Map<string, Set<string>> {
   const wrappers = new Map<string, Set<string>>();
   for (const match of source.matchAll(
-    /^\s*([A-Za-z_]\w*)\s*=\s*(?:(["'])(sudo|doas)\2|(sudo|doas))\s*$/gmi,
+    /^\s*([A-Za-z_]\w*)\s*=\s*(?:(["'])([^"'$\r\n]+)\2|(sudo|doas))\s*$/gmi,
   )) {
     const name = match[1]!;
-    const command = (match[3] ?? match[4])!.toLowerCase();
+    const command = (match[3] ?? match[4])!.trim().replace(/\s+/g, " ").toLowerCase();
+    if (
+      !/^(?:(?:ba)?sh\s+-c|su\s+-c|(?:sudo|doas)(?:\s+(?:-[a-z]+|--[\w-]+(?:=\S+)?))*(?:\s+(?:ba)?sh\s+-c)?)$/i
+        .test(command)
+    ) continue;
     const commands = wrappers.get(name) ?? new Set<string>();
     commands.add(command);
     wrappers.set(name, commands);
@@ -80,14 +84,14 @@ function elevatedBashWrappers(source: string): Map<string, Set<string>> {
 
 function bashCommandVariants(
   text: string,
-  elevatedWrappers: Map<string, Set<string>> = new Map(),
+  commandWrappers: Map<string, Set<string>> = new Map(),
 ): string[] {
   const initial = [text];
   const wrapped = text.match(/^\s*\$(?:\{([A-Za-z_]\w*)\}|([A-Za-z_]\w*))\s+/);
   const wrapperName = wrapped?.[1] ?? wrapped?.[2];
   if (wrapperName) {
     const remainder = text.slice(wrapped![0].length);
-    for (const command of elevatedWrappers.get(wrapperName) ?? []) {
+    for (const command of commandWrappers.get(wrapperName) ?? []) {
       initial.push(`${command} ${remainder}`);
     }
   }
@@ -106,9 +110,10 @@ function bashCommandVariants(
         "",
       );
       next = next.replace(
-        /^\s*(?:nohup|sudo|doas|\/usr\/bin\/sudo|execute_sudo|execute|retry)\s+/i,
+        /^\s*(?:(?:sudo|doas|\/usr\/bin\/sudo)(?:\s+(?:-[A-Za-z]+|--[\w-]+(?:=\S+)?))*|su\s+-c|nohup|execute_sudo|execute|retry)\s+/i,
         "",
       );
+      next = next.replace(/^\s*(?:ba)?sh\s+-c\s+/i, "");
       next = next.replace(/^\s*(["'])([^"']+)\1/, "$2");
       if (next === current) break;
       variants.add(next);
@@ -225,8 +230,8 @@ const CALLEE_BY_CATEGORY: Record<
     second_stage_payload: /(?:^|\.)(?:get|urlretrieve|unpack_archive|open|ZipFile)$/,
   },
   javascript: {
-    download_execution: /(?:^|\.)(?:eval|Function|exec|execSync|spawn|spawnSync)$/,
-    dynamic_execution: /(?:^|\.)(?:eval|Function|runIn\w+|compileFunction|exec|execSync|spawn|spawnSync|execa|execaCommand)$/,
+    download_execution: /^(?:eval|Function|child_process\.(?:exec|execSync|spawn|spawnSync))$/,
+    dynamic_execution: /^(?:eval|Function|vm\.(?:runIn\w+|compileFunction)|child_process\.(?:exec|execSync|spawn|spawnSync)|execa\.(?:execa|execaCommand))$/,
     persistence: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
     credential_access: /(?:^|\.)(?:readFile|readFileSync|readdir|readdirSync|stat|statSync|access|accessSync|keys|values|entries|stringify)$/,
     system_modification: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
@@ -267,7 +272,7 @@ function executionScopeId(
 }
 
 function moduleName(value: string): string {
-  return value.replace(/^node:/, "").replace(/^["']|["']$/g, "");
+  return value.replace(/^["']|["']$/g, "").replace(/^node:/, "");
 }
 
 function collectAliases(source: string, language: "python" | "javascript"): Map<string, string> {
@@ -668,6 +673,33 @@ function scanAstLanguage(
     }
     if (
       language === "javascript"
+      && callee === "libnpmpublish.publish"
+    ) {
+      findings.push({
+        ruleId: "javascript.network.libnpmpublish",
+        category: "network_egress",
+        title: "Publishes a package through libnpmpublish",
+        severity: "medium",
+        confidence: "high",
+        message: "A function proven to come from libnpmpublish uploads to an npm registry.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+      findings.push({
+        ruleId: "javascript.exfiltration.libnpmpublish",
+        category: "data_exfiltration",
+        title: "Uploads package data through libnpmpublish",
+        severity: "high",
+        confidence: "high",
+        message: "A function proven to come from libnpmpublish uploads package data.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
+    if (
+      language === "javascript"
       && /^execa\.(?:execa|execaCommand)$/.test(callee)
       && /^\s*[\w$]+\s*\(\s*["']npm["']\s*,\s*\[\s*["']publish["']/s.test(text)
     ) {
@@ -885,7 +917,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const commands = statements(tree.rootNode, source);
   const findings: Finding[] = [];
   const parseErrors: SourceRange[] = [];
-  const elevatedWrappers = elevatedBashWrappers(source);
+  const commandWrappers = staticBashCommandWrappers(source);
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -893,7 +925,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
 
   for (const statement of commands) {
     for (const rule of COMMAND_RULES) {
-      const matched = bashCommandVariants(statement.text, elevatedWrappers).some((variant) => {
+      const matched = bashCommandVariants(statement.text, commandWrappers).some((variant) => {
         rule.pattern.lastIndex = 0;
         return rule.pattern.test(variant);
       });

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T15:45:25.228Z",
+  "generatedAt": "2026-07-28T15:55:13.300Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -19,8 +19,8 @@
     },
     "minimumBySplit": {
       "test": {
-        "precision": 0.5,
-        "recall": 0.14285714285714285
+        "precision": 1,
+        "recall": 0.25
       }
     },
     "requiredPerfectSplits": [
@@ -42,30 +42,30 @@
     "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 48,
-    "passedSamples": 46,
+    "sampleCount": 50,
+    "passedSamples": 48,
     "failedSamples": 2,
-    "tp": 90,
-    "fp": 1,
-    "fn": 6,
-    "precision": 0.989010989010989,
-    "recall": 0.9375,
-    "f1": 0.9625668449197862,
-    "parseErrorRate": 0.020833333333333332,
+    "tp": 97,
+    "fp": 0,
+    "fn": 3,
+    "precision": 1,
+    "recall": 0.97,
+    "f1": 0.9847715736040609,
+    "parseErrorRate": 0.04,
     "performance": {
-      "p50Milliseconds": 3.2819009999999764,
-      "p95Milliseconds": 97.200928,
-      "maximumMilliseconds": 108.29568199999994
+      "p50Milliseconds": 4.365747999999996,
+      "p95Milliseconds": 94.15767299999993,
+      "maximumMilliseconds": 107.44822399999998
     }
   },
   "languages": {
     "bash": {
-      "tp": 24,
+      "tp": 29,
       "fp": 0,
-      "fn": 4,
+      "fn": 1,
       "precision": 1,
-      "recall": 0.8571428571428571,
-      "f1": 0.923076923076923
+      "recall": 0.9666666666666667,
+      "f1": 0.983050847457627
     },
     "python": {
       "tp": 34,
@@ -76,12 +76,12 @@
       "f1": 1
     },
     "node": {
-      "tp": 32,
-      "fp": 1,
+      "tp": 34,
+      "fp": 0,
       "fn": 2,
-      "precision": 0.9696969696969697,
-      "recall": 0.9411764705882353,
-      "f1": 0.955223880597015
+      "precision": 1,
+      "recall": 0.9444444444444444,
+      "f1": 0.9714285714285714
     }
   },
   "provenanceGroups": {
@@ -94,12 +94,12 @@
       "f1": 1
     },
     "public-snapshot": {
-      "tp": 59,
-      "fp": 1,
-      "fn": 6,
-      "precision": 0.9833333333333333,
-      "recall": 0.9076923076923077,
-      "f1": 0.944
+      "tp": 66,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.9565217391304348,
+      "f1": 0.9777777777777777
     },
     "synthetic-realistic": {
       "tp": 25,
@@ -121,14 +121,14 @@
     },
     "test": {
       "tp": 1,
-      "fp": 1,
-      "fn": 6,
-      "precision": 0.5,
-      "recall": 0.14285714285714285,
-      "f1": 0.22222222222222224
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.25,
+      "f1": 0.4
     },
     "validation": {
-      "tp": 64,
+      "tp": 71,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -146,12 +146,12 @@
       "f1": 1
     },
     "data_exfiltration": {
-      "tp": 10,
+      "tp": 11,
       "fp": 0,
       "fn": 1,
       "precision": 1,
-      "recall": 0.9090909090909091,
-      "f1": 0.9523809523809523
+      "recall": 0.9166666666666666,
+      "f1": 0.9565217391304348
     },
     "defense_evasion": {
       "tp": 2,
@@ -172,18 +172,18 @@
     "download_execution": {
       "tp": 3,
       "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.75,
+      "f1": 0.8571428571428571
+    },
+    "dynamic_execution": {
+      "tp": 9,
+      "fp": 0,
       "fn": 0,
       "precision": 1,
       "recall": 1,
       "f1": 1
-    },
-    "dynamic_execution": {
-      "tp": 8,
-      "fp": 1,
-      "fn": 1,
-      "precision": 0.8888888888888888,
-      "recall": 0.8888888888888888,
-      "f1": 0.8888888888888888
     },
     "interpreter_escape": {
       "tp": 5,
@@ -194,28 +194,28 @@
       "f1": 1
     },
     "network_egress": {
-      "tp": 27,
+      "tp": 30,
       "fp": 0,
-      "fn": 2,
+      "fn": 1,
       "precision": 1,
-      "recall": 0.9310344827586207,
-      "f1": 0.9642857142857143
+      "recall": 0.967741935483871,
+      "f1": 0.9836065573770492
     },
     "persistence": {
-      "tp": 5,
+      "tp": 6,
       "fp": 0,
-      "fn": 1,
+      "fn": 0,
       "precision": 1,
-      "recall": 0.8333333333333334,
-      "f1": 0.9090909090909091
+      "recall": 1,
+      "f1": 1
     },
     "privilege_escalation": {
-      "tp": 4,
+      "tp": 5,
       "fp": 0,
-      "fn": 1,
+      "fn": 0,
       "precision": 1,
-      "recall": 0.8,
-      "f1": 0.888888888888889
+      "recall": 1,
+      "f1": 1
     },
     "second_stage_payload": {
       "tp": 4,
@@ -278,7 +278,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 14.85139000000001,
+      "durationMilliseconds": 14.94637200000001,
       "passed": true
     },
     {
@@ -337,7 +337,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.136400000000009,
+      "durationMilliseconds": 0.8418860000000024,
       "passed": true
     },
     {
@@ -375,7 +375,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6802009999999967,
+      "durationMilliseconds": 0.563644999999994,
       "passed": true
     },
     {
@@ -413,7 +413,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.110161000000005,
+      "durationMilliseconds": 1.0001469999999983,
       "passed": true
     },
     {
@@ -439,7 +439,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.389963999999992,
+      "durationMilliseconds": 0.38485400000000425,
       "passed": true
     },
     {
@@ -465,7 +465,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2226420000000076,
+      "durationMilliseconds": 1.2770359999999954,
       "passed": true
     },
     {
@@ -503,7 +503,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 7.408091999999982,
+      "durationMilliseconds": 6.689229999999995,
       "passed": true
     },
     {
@@ -549,7 +549,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.390652000000017,
+      "durationMilliseconds": 2.106287999999992,
       "passed": true
     },
     {
@@ -587,7 +587,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.8258790000000147,
+      "durationMilliseconds": 1.6571110000000004,
       "passed": true
     },
     {
@@ -646,7 +646,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.2819009999999764,
+      "durationMilliseconds": 2.8245489999999904,
       "passed": true
     },
     {
@@ -684,7 +684,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.3714929999999868,
+      "durationMilliseconds": 1.0434799999999882,
       "passed": true
     },
     {
@@ -710,7 +710,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.8236949999999865,
+      "durationMilliseconds": 1.7082690000000014,
       "passed": true
     },
     {
@@ -736,7 +736,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.37930399999999054,
+      "durationMilliseconds": 0.2896120000000053,
       "passed": true
     },
     {
@@ -782,7 +782,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.781841999999983,
+      "durationMilliseconds": 5.451950000000011,
       "passed": true
     },
     {
@@ -820,7 +820,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.8482110000000205,
+      "durationMilliseconds": 1.7217739999999822,
       "passed": true
     },
     {
@@ -879,7 +879,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.9300649999999848,
+      "durationMilliseconds": 1.8281069999999886,
       "passed": true
     },
     {
@@ -933,7 +933,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.7462089999999932,
+      "durationMilliseconds": 1.5397370000000024,
       "passed": true
     },
     {
@@ -971,7 +971,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1208809999999971,
+      "durationMilliseconds": 0.9375980000000084,
       "passed": true
     },
     {
@@ -997,7 +997,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.8994129999999814,
+      "durationMilliseconds": 0.6885730000000194,
       "passed": true
     },
     {
@@ -1023,7 +1023,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3516219999999919,
+      "durationMilliseconds": 0.2689330000000041,
       "passed": true
     },
     {
@@ -1091,7 +1091,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 69.35183999999998,
+      "durationMilliseconds": 68.105106,
       "passed": true
     },
     {
@@ -1295,7 +1295,7 @@
       "findingCount": 32,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 97.200928,
+      "durationMilliseconds": 99.59455399999999,
       "passed": true
     },
     {
@@ -1345,7 +1345,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.3851589999999874,
+      "durationMilliseconds": 1.360996,
       "passed": true
     },
     {
@@ -1387,7 +1387,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.2692870000000198,
+      "durationMilliseconds": 0.24979700000000093,
       "passed": true
     },
     {
@@ -1429,7 +1429,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.41813700000000154,
+      "durationMilliseconds": 0.38796000000002095,
       "passed": true
     },
     {
@@ -1479,7 +1479,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4346689999999853,
+      "durationMilliseconds": 0.573094000000026,
       "passed": true
     },
     {
@@ -1550,7 +1550,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 59.666920000000005,
+      "durationMilliseconds": 53.701108999999974,
       "passed": true
     },
     {
@@ -1614,7 +1614,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 15.716849000000025,
+      "durationMilliseconds": 15.066601000000048,
       "passed": true
     },
     {
@@ -1679,7 +1679,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.024885999999981,
+      "durationMilliseconds": 4.966965000000016,
       "passed": true
     },
     {
@@ -1750,7 +1750,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 39.96533599999998,
+      "durationMilliseconds": 41.08041400000002,
       "passed": true
     },
     {
@@ -1790,7 +1790,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.104202999999984,
+      "durationMilliseconds": 4.365747999999996,
       "passed": true
     },
     {
@@ -1830,7 +1830,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 8.621375999999998,
+      "durationMilliseconds": 8.056928999999968,
       "passed": true
     },
     {
@@ -1878,7 +1878,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.4107399999999757,
+      "durationMilliseconds": 2.16960899999998,
       "passed": true
     },
     {
@@ -1918,7 +1918,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.849459999999965,
+      "durationMilliseconds": 0.8249030000000062,
       "passed": true
     },
     {
@@ -1979,7 +1979,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 31.195420000000013,
+      "durationMilliseconds": 33.40259800000001,
       "passed": true
     },
     {
@@ -2019,7 +2019,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 8.49859600000002,
+      "durationMilliseconds": 7.8964129999999955,
       "passed": true
     },
     {
@@ -2151,7 +2151,7 @@
       "findingCount": 17,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 18.384924999999953,
+      "durationMilliseconds": 17.30822599999999,
       "passed": true
     },
     {
@@ -2191,7 +2191,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 52.4572720000001,
+      "durationMilliseconds": 51.77554600000008,
       "passed": true
     },
     {
@@ -2239,7 +2239,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.126305000000002,
+      "durationMilliseconds": 2.510418999999956,
       "passed": true
     },
     {
@@ -2315,7 +2315,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 14.791757000000075,
+      "durationMilliseconds": 15.442246999999952,
       "passed": true
     },
     {
@@ -2355,7 +2355,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.1975649999999405,
+      "durationMilliseconds": 4.6125489999999445,
       "passed": true
     },
     {
@@ -2428,7 +2428,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 88.47475399999996,
+      "durationMilliseconds": 91.44779399999993,
       "passed": true
     },
     {
@@ -2623,7 +2623,7 @@
       "findingCount": 29,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 101.78925800000002,
+      "durationMilliseconds": 94.15767299999993,
       "passed": true
     },
     {
@@ -2681,7 +2681,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 108.29568199999994,
+      "durationMilliseconds": 107.44822399999998,
       "passed": true
     },
     {
@@ -3035,7 +3035,7 @@
       "findingCount": 62,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 55.93914900000004,
+      "durationMilliseconds": 56.24940800000002,
       "passed": true
     },
     {
@@ -3091,12 +3091,12 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.087988999999993,
+      "durationMilliseconds": 5.853566000000001,
       "passed": true
     },
     {
       "id": "holdout-docker-installer-wrapper-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/docker-install/install.sh.txt",
@@ -3117,35 +3117,373 @@
         "system_modification"
       ],
       "actualCategories": [
+        "dynamic_execution",
+        "network_egress",
+        "persistence",
+        "privilege_escalation",
         "system_modification"
       ],
       "actualFindings": [
         {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"systemctl enable --now docker.service 2>/dev/null\""
+        },
+        {
+          "ruleId": "persistence.scheduler",
+          "category": "persistence",
+          "evidence": "$sh_c \"systemctl enable --now docker.service 2>/dev/null\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"systemctl enable --now docker.service 2>/dev/null\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c 'docker version'"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c 'docker version'"
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c 'apt-get -qq update >/dev/null'"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c 'apt-get -qq update >/dev/null'"
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"DEBIAN_FRONTEND=noninteractive apt-get -y -qq install $pre_reqs >/dev/null\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"DEBIAN_FRONTEND=noninteractive apt-get -y -qq install $pre_reqs >/dev/null\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c 'install -m 0755 -d /etc/apt/keyrings'"
+        },
+        {
+          "ruleId": "system.sensitive-config",
+          "category": "system_modification",
+          "evidence": "$sh_c 'install -m 0755 -d /etc/apt/keyrings'"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c 'install -m 0755 -d /etc/apt/keyrings'"
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"curl -fsSL \\\"$DOWNLOAD_URL/linux/$apt_repo_lsb_dist/gpg\\\" -o /etc/apt/keyrings/docker.asc\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"curl -fsSL \\\"$DOWNLOAD_URL/linux/$apt_repo_lsb_dist/gpg\\\" -o /etc/apt/keyrings/docker.asc\""
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "$sh_c \"curl -fsSL \\\"$DOWNLOAD_URL/linux/$apt_repo_lsb_dist/gpg\\\" -o /etc/apt/keyrings/docker.asc\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"chmod a+r /etc/apt/keyrings/docker.asc\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"chmod a+r /etc/apt/keyrings/docker.asc\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"echo \\\"$apt_repo\\\" > /etc/apt/sources.list.d/docker.list\""
+        },
+        {
           "ruleId": "system.sensitive-config",
           "category": "system_modification",
           "evidence": "$sh_c \"echo \\\"$apt_repo\\\" > /etc/apt/sources.list.d/docker.list\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"echo \\\"$apt_repo\\\" > /etc/apt/sources.list.d/docker.list\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c 'apt-get -qq update >/dev/null'"
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c 'apt-get -qq update >/dev/null'"
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"DEBIAN_FRONTEND=noninteractive apt-get $apt_flags install $pkgs >/dev/null\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"DEBIAN_FRONTEND=noninteractive apt-get $apt_flags install $pkgs >/dev/null\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf -y -q --setopt=install_weak_deps=False install dnf-plugins-core\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf -y -q --setopt=install_weak_deps=False install dnf-plugins-core\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf5 config-manager addrepo --overwrite --save-filename=docker-ce.repo --from-repofile='$repo_file_url'\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf5 config-manager addrepo --overwrite --save-filename=docker-ce.repo --from-repofile='$repo_file_url'\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf5 config-manager setopt \\\"docker-ce-*.enabled=0\\\"\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf5 config-manager setopt \\\"docker-ce-*.enabled=0\\\"\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf5 config-manager setopt \\\"docker-ce-$CHANNEL.enabled=1\\\"\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf5 config-manager setopt \\\"docker-ce-$CHANNEL.enabled=1\\\"\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf makecache\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf makecache\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf -y -q --setopt=install_weak_deps=False install dnf-plugins-core\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf -y -q --setopt=install_weak_deps=False install dnf-plugins-core\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"rm -f /etc/yum.repos.d/docker-ce.repo /etc/yum.repos.d/docker-ce-staging.repo\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"rm -f /etc/yum.repos.d/docker-ce.repo /etc/yum.repos.d/docker-ce-staging.repo\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf config-manager --add-repo $repo_file_url\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf config-manager --add-repo $repo_file_url\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf config-manager --set-disabled \\\"docker-ce-*\\\"\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf config-manager --set-disabled \\\"docker-ce-*\\\"\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf config-manager --set-enabled \\\"docker-ce-$CHANNEL\\\"\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf config-manager --set-enabled \\\"docker-ce-$CHANNEL\\\"\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"dnf makecache\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"dnf makecache\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"yum -y -q install yum-utils\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"yum -y -q install yum-utils\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"rm -f /etc/yum.repos.d/docker-ce.repo /etc/yum.repos.d/docker-ce-staging.repo\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"rm -f /etc/yum.repos.d/docker-ce.repo /etc/yum.repos.d/docker-ce-staging.repo\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"yum-config-manager --add-repo $repo_file_url\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"yum-config-manager --add-repo $repo_file_url\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"yum-config-manager --disable \\\"docker-ce-*\\\"\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"yum-config-manager --disable \\\"docker-ce-*\\\"\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"yum-config-manager --enable \\\"docker-ce-$CHANNEL\\\"\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"yum-config-manager --enable \\\"docker-ce-$CHANNEL\\\"\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"yum makecache\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"yum makecache\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"$search_command\""
+        },
+        {
+          "ruleId": "dynamic.eval",
+          "category": "dynamic_execution",
+          "evidence": "$sh_c \"$pkg_manager $pkg_manager_flags install $pkgs\""
+        },
+        {
+          "ruleId": "privilege.sudo",
+          "category": "privilege_escalation",
+          "evidence": "$sh_c \"$pkg_manager $pkg_manager_flags install $pkgs\""
         }
       ],
       "truePositives": [
-        "system_modification"
-      ],
-      "falsePositives": [],
-      "falseNegatives": [
         "dynamic_execution",
         "network_egress",
         "persistence",
-        "privilege_escalation"
+        "privilege_escalation",
+        "system_modification"
       ],
+      "falsePositives": [],
+      "falseNegatives": [],
       "missingExpectedFindings": [],
-      "findingCount": 1,
+      "findingCount": 68,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 54.57922899999994,
-      "passed": false
+      "durationMilliseconds": 62.72273599999994,
+      "passed": true
     },
     {
       "id": "holdout-npm-cli-publish-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/npm-cli/publish.js.txt",
@@ -3163,28 +3501,187 @@
         "network_egress"
       ],
       "actualCategories": [
-        "dynamic_execution"
+        "data_exfiltration",
+        "network_egress"
       ],
       "actualFindings": [
         {
-          "ruleId": "javascript.dynamic-code",
-          "category": "dynamic_execution",
-          "evidence": "this.exec(args)"
+          "ruleId": "javascript.network.libnpmpublish",
+          "category": "network_egress",
+          "evidence": "libpub(manifest, tarballData, { ...opts, command: this.#command, stage: true, })"
+        },
+        {
+          "ruleId": "javascript.exfiltration.libnpmpublish",
+          "category": "data_exfiltration",
+          "evidence": "libpub(manifest, tarballData, { ...opts, command: this.#command, stage: true, })"
+        },
+        {
+          "ruleId": "javascript.network.libnpmpublish",
+          "category": "network_egress",
+          "evidence": "libpub(manifest, tarballData, o)"
+        },
+        {
+          "ruleId": "javascript.exfiltration.libnpmpublish",
+          "category": "data_exfiltration",
+          "evidence": "libpub(manifest, tarballData, o)"
         }
       ],
-      "truePositives": [],
-      "falsePositives": [
-        "dynamic_execution"
+      "truePositives": [
+        "data_exfiltration",
+        "network_egress"
       ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 4,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 34.625068000000056,
+      "passed": true
+    },
+    {
+      "id": "holdout-rustup-init-download-execute-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/rustup/rustup-init.sh.txt",
+      "sha256": "9a47c3dd4d35d36397cf8e3c8dd9319741393e81476f5d6f0c650590635ace77",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "rust-lang/rustup",
+        "commit": "720e6b862df1309c0a5b2aea7f81be1f975af41f",
+        "sourceUrl": "https://github.com/rust-lang/rustup/blob/720e6b862df1309c0a5b2aea7f81be1f975af41f/rustup-init.sh",
+        "license": "Apache-2.0 OR MIT",
+        "licenseFile": "public/rustup/LICENSE-APACHE",
+        "additionalLicenseFiles": [
+          "public/rustup/LICENSE-MIT"
+        ]
+      },
+      "expectedCategories": [
+        "download_execution",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "network_egress"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl $_retry --proto '=https' --tlsv1.2 --ciphers \"$_ciphersuites\" --silent --show-error --fail --location \"$1\" --output \"$2\" 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl $_retry --silent --show-error --fail --location \"$1\" --output \"$2\" 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl $_retry --proto '=https' --tlsv1.2 --silent --show-error --fail --location \"$1\" --output \"$2\" 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "wget -V 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "wget \"$1\" -O \"$2\" 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "wget --https-only --secure-protocol=TLSv1_2 --ciphers \"$_ciphersuites\" \"$1\" -O \"$2\" 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "wget \"$1\" -O \"$2\" 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "wget --https-only --secure-protocol=TLSv1_2 \"$1\" -O \"$2\" 2>&1"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl -V"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl -V"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl -V"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "curl -V"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "wget -V"
+        },
+        {
+          "ruleId": "network.tool",
+          "category": "network_egress",
+          "evidence": "wget -V"
+        }
+      ],
+      "truePositives": [
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        "download_execution"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 14,
+      "parseErrorCount": 1,
+      "maximumParseErrors": 1,
+      "durationMilliseconds": 58.56754000000001,
+      "passed": false
+    },
+    {
+      "id": "holdout-semantic-release-github-assets-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/semantic-release-github/publish.js.txt",
+      "sha256": "423e316e0ac5bab0c0d81fc195375aa4c1f6b4dbc946606b51b63f302815c305",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "semantic-release/github",
+        "commit": "33e8734811bd66937809f9fe884cb283fef238b4",
+        "sourceUrl": "https://github.com/semantic-release/github/blob/33e8734811bd66937809f9fe884cb283fef238b4/lib/publish.js",
+        "license": "MIT",
+        "licenseFile": "public/semantic-release-github/LICENSE"
+      },
+      "expectedCategories": [
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [],
+      "actualFindings": [],
+      "truePositives": [],
+      "falsePositives": [],
       "falseNegatives": [
         "data_exfiltration",
         "network_egress"
       ],
       "missingExpectedFindings": [],
-      "findingCount": 1,
+      "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 34.51218599999993,
+      "durationMilliseconds": 14.472166000000016,
       "passed": false
     }
   ]

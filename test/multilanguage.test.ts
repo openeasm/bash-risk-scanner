@@ -314,6 +314,52 @@ await execa("npm", ["install", "--ignore-scripts"])
     )).toBe(false);
   });
 
+  it("recognizes libnpmpublish bindings without treating arbitrary object exec as code execution", () => {
+    const result = scanJavaScript(`
+const libpub = require("libnpmpublish").publish
+await libpub(manifest, tarballData, options)
+this.exec(args)
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.network.libnpmpublish",
+        category: "network_egress",
+      }),
+      expect.objectContaining({
+        ruleId: "javascript.exfiltration.libnpmpublish",
+        category: "data_exfiltration",
+      }),
+    ]));
+    expect(result.findings.some((finding) =>
+      finding.category === "dynamic_execution",
+    )).toBe(false);
+
+    const local = scanJavaScript(`
+const libpub = (manifest, data) => ({ manifest, data })
+libpub(manifest, tarballData)
+`);
+    expect(local.findings.some((finding) =>
+      finding.category === "network_egress" || finding.category === "data_exfiltration",
+    )).toBe(false);
+  });
+
+  it("normalizes node-prefixed builtin module imports before applying execution rules", () => {
+    const result = scanJavaScript(`
+const { exec: runCommand } = require("node:child_process")
+runCommand("bash -c id")
+`);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "javascript.dynamic-code",
+        category: "dynamic_execution",
+      }),
+      expect.objectContaining({
+        ruleId: "javascript.interpreter-escape",
+        category: "interpreter_escape",
+      }),
+    ]));
+  });
+
   it("detects a relative Node.js download wrapper with a URL argument", () => {
     const result = scanJavaScript(`
 const { download } = require('./download')

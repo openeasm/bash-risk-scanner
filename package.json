@@ -27,6 +27,7 @@
     "check": "npm run lint && npm test && npm run evaluate",
     "evaluate": "npm run build && node scripts/evaluate.mjs",
     "evaluate:import-public": "node scripts/import-public-corpus.mjs",
+    "evaluate:import-public:refresh": "node scripts/import-public-corpus.mjs --refresh",
     "test": "vitest run",
     "test:report": "vitest run --reporter=default --reporter=html --outputFile.html=reports/test-report.html",
     "test:watch": "vitest",

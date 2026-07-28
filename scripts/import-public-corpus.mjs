@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -242,6 +242,31 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/npm/cli/834408e8f0f2295d02205d8ff5d011c859835225/LICENSE",
     sha256: "7610d223851f421d315df5e77974f1c68a04b97e02060e5bbbcf13d95e3ca257",
   },
+  {
+    target: "rustup/rustup-init.sh.txt",
+    url: "https://raw.githubusercontent.com/rust-lang/rustup/720e6b862df1309c0a5b2aea7f81be1f975af41f/rustup-init.sh",
+    sha256: "9a47c3dd4d35d36397cf8e3c8dd9319741393e81476f5d6f0c650590635ace77",
+  },
+  {
+    target: "rustup/LICENSE-APACHE",
+    url: "https://raw.githubusercontent.com/rust-lang/rustup/720e6b862df1309c0a5b2aea7f81be1f975af41f/LICENSE-APACHE",
+    sha256: "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+  },
+  {
+    target: "rustup/LICENSE-MIT",
+    url: "https://raw.githubusercontent.com/rust-lang/rustup/720e6b862df1309c0a5b2aea7f81be1f975af41f/LICENSE-MIT",
+    sha256: "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5",
+  },
+  {
+    target: "semantic-release-github/publish.js.txt",
+    url: "https://raw.githubusercontent.com/semantic-release/github/33e8734811bd66937809f9fe884cb283fef238b4/lib/publish.js",
+    sha256: "423e316e0ac5bab0c0d81fc195375aa4c1f6b4dbc946606b51b63f302815c305",
+  },
+  {
+    target: "semantic-release-github/LICENSE",
+    url: "https://raw.githubusercontent.com/semantic-release/github/33e8734811bd66937809f9fe884cb283fef238b4/LICENSE",
+    sha256: "6c39086c72df12ce153282a6dc26cecde9f57f69635389a31e04e2001db147dd",
+  },
 ];
 
 function githubContentsFallback(url) {
@@ -292,13 +317,28 @@ async function download(url) {
   throw new Error(`Failed to download ${url}: ${lastError instanceof Error ? lastError.message : lastError}`);
 }
 
+const forceRefresh = process.argv.includes("--refresh");
+
 for (const snapshot of snapshots) {
+  const target = resolve(publicCorpusRoot, snapshot.target);
+  if (!forceRefresh) {
+    try {
+      const cached = await readFile(target);
+      const cachedSha256 = createHash("sha256").update(cached).digest("hex");
+      if (cachedSha256 === snapshot.sha256) {
+        console.log(`${snapshot.target} ${cachedSha256} cached`);
+        continue;
+      }
+    } catch {
+      // Missing or unreadable snapshots are downloaded below.
+    }
+  }
+
   const content = await download(snapshot.url);
   const actualSha256 = createHash("sha256").update(content).digest("hex");
   if (actualSha256 !== snapshot.sha256) {
     throw new Error(`SHA-256 mismatch for ${snapshot.target}: ${actualSha256}`);
   }
-  const target = resolve(publicCorpusRoot, snapshot.target);
   await mkdir(dirname(target), { recursive: true });
   await writeFile(target, content);
   console.log(`${snapshot.target} ${actualSha256}`);

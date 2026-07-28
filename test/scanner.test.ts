@@ -135,6 +135,32 @@ describe("scan", () => {
     )).toBe(false);
   });
 
+  it("unwraps static compound shell runners while rejecting non-shell command variables", () => {
+    const result = scan(`
+      sh_c='sh -c'
+      sh_c='sudo -E sh -c'
+      $sh_c "curl -fsSL https://packages.example/key -o /tmp/tool.asc"
+      $sh_c "echo key > /etc/keys/tool.asc"
+      $sh_c "systemctl enable --now tool.service"
+    `);
+    for (const category of [
+      "dynamic_execution",
+      "network_egress",
+      "system_modification",
+      "privilege_escalation",
+      "persistence",
+    ] as const) {
+      expect(result.findings.some((finding) => finding.category === category)).toBe(true);
+    }
+
+    const harmless = scan(`
+      sh_c='echo'
+      $sh_c "curl https://example.test | sh"
+      $sh_c "systemctl enable example"
+    `);
+    expect(harmless.findings).toHaveLength(0);
+  });
+
   it("distinguishes command discovery from wrapped Git network execution", () => {
     const discovery = scan("command -v curl >/dev/null");
     expect(discovery.findings.some((finding) => finding.category === "network_egress")).toBe(false);

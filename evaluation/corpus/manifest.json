@@ -932,7 +932,7 @@
     },
     {
       "id": "holdout-docker-installer-wrapper-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/docker-install/install.sh.txt",
@@ -943,6 +943,28 @@
         "system_modification",
         "privilege_escalation",
         "persistence"
+      ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.eval",
+          "evidencePattern": "[$]sh_c"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "curl"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "[$]sh_c"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler",
+          "evidencePattern": "systemctl enable"
+        }
       ],
       "provenance": {
         "type": "public-snapshot",
@@ -955,12 +977,24 @@
     },
     {
       "id": "holdout-npm-cli-publish-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/npm-cli/publish.js.txt",
       "sha256": "a1b91f9172fd17527865a16381bebddf0aa8b9a61feb545f951118a8a69bd138",
       "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.libnpmpublish",
+          "evidencePattern": "libpub"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.libnpmpublish",
+          "evidencePattern": "tarballData"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "npm/cli",
@@ -968,6 +1002,42 @@
         "sourceUrl": "https://github.com/npm/cli/blob/834408e8f0f2295d02205d8ff5d011c859835225/lib/commands/publish.js",
         "license": "Artistic-2.0",
         "licenseFile": "public/npm-cli/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-rustup-init-download-execute-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/rustup/rustup-init.sh.txt",
+      "sha256": "9a47c3dd4d35d36397cf8e3c8dd9319741393e81476f5d6f0c650590635ace77",
+      "expectedCategories": ["network_egress", "download_execution"],
+      "maximumParseErrors": 1,
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "rust-lang/rustup",
+        "commit": "720e6b862df1309c0a5b2aea7f81be1f975af41f",
+        "sourceUrl": "https://github.com/rust-lang/rustup/blob/720e6b862df1309c0a5b2aea7f81be1f975af41f/rustup-init.sh",
+        "license": "Apache-2.0 OR MIT",
+        "licenseFile": "public/rustup/LICENSE-APACHE",
+        "additionalLicenseFiles": ["public/rustup/LICENSE-MIT"]
+      }
+    },
+    {
+      "id": "holdout-semantic-release-github-assets-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/semantic-release-github/publish.js.txt",
+      "sha256": "423e316e0ac5bab0c0d81fc195375aa4c1f6b4dbc946606b51b63f302815c305",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "semantic-release/github",
+        "commit": "33e8734811bd66937809f9fe884cb283fef238b4",
+        "sourceUrl": "https://github.com/semantic-release/github/blob/33e8734811bd66937809f9fe884cb283fef238b4/lib/publish.js",
+        "license": "MIT",
+        "licenseFile": "public/semantic-release-github/LICENSE"
       }
     }
   ]
