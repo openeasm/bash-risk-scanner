@@ -757,6 +757,90 @@ function collectJavaScriptDerivedAliases(
   return shadows;
 }
 
+function pythonDownloadWriteExecuteChain(
+  root: SyntaxNode,
+  aliases: Map<string, string>,
+): boolean {
+  const staticValues = new Map<string, string | undefined>();
+  const responseScopes = new Map<string, number>();
+  const writtenPaths = new Map<number, Set<string>>();
+  const executedCommands = new Map<number, string[]>();
+
+  for (const assignment of root.descendantsOfType("assignment")) {
+    const left = assignment.childForFieldName("left");
+    const right = assignment.childForFieldName("right");
+    if (left?.type !== "identifier" || !right) continue;
+    const scopeId = executionScopeId(assignment, "python");
+    const key = `${scopeId}:${left.text}`;
+    const value = quotedValue(right.text);
+    if (staticValues.has(key)) {
+      staticValues.set(key, staticValues.get(key) === value ? value : undefined);
+    } else {
+      staticValues.set(key, value);
+    }
+    if (
+      right.type === "call"
+      && /^(?:requests\.(?:get|request)|urllib\.request\.(?:urlopen|urlretrieve))$/
+        .test(canonicalizeCallee(calleeOf(right), aliases))
+    ) {
+      responseScopes.set(`${scopeId}:${left.text}`, scopeId);
+    }
+  }
+
+  for (const call of root.descendantsOfType("call")) {
+    const scopeId = executionScopeId(call, "python");
+    const callee = canonicalizeCallee(calleeOf(call), aliases);
+    const argumentsNode = call.childForFieldName("arguments");
+    if (!argumentsNode) continue;
+
+    if (/(?:^|\.)write$/.test(callee)) {
+      const functionNode = call.childForFieldName("function");
+      const openCall = functionNode?.childForFieldName("object");
+      const openArguments = openCall?.type === "call"
+        && canonicalizeCallee(calleeOf(openCall), aliases) === "open"
+        ? openCall.childForFieldName("arguments")?.namedChildren
+        : undefined;
+      const path = openArguments?.[0] ? quotedValue(openArguments[0].text) : undefined;
+      const mode = openArguments?.[1] ? quotedValue(openArguments[1].text) : undefined;
+      const content = argumentsNode.namedChildren[0]?.text.match(
+        /^([A-Za-z_]\w*)\.(?:content|text)$/,
+      );
+      if (
+        path
+        && mode?.includes("w")
+        && content
+        && responseScopes.get(`${scopeId}:${content[1]!}`) === scopeId
+      ) {
+        const paths = writtenPaths.get(scopeId) ?? new Set<string>();
+        paths.add(path);
+        writtenPaths.set(scopeId, paths);
+      }
+    }
+
+    if (/^(?:os\.(?:system|popen)|subprocess\.(?:run|call|Popen|check_call|check_output))$/
+      .test(callee)) {
+      const argument = argumentsNode.namedChildren[0];
+      if (!argument) continue;
+      const command = quotedValue(argument.text)
+        ?? (
+          argument.type === "identifier"
+            ? staticValues.get(`${scopeId}:${argument.text}`)
+            : undefined
+        );
+      if (!command) continue;
+      const commands = executedCommands.get(scopeId) ?? [];
+      commands.push(command);
+      executedCommands.set(scopeId, commands);
+    }
+  }
+
+  return [...writtenPaths].some(([scopeId, paths]) =>
+    (executedCommands.get(scopeId) ?? []).some((command) =>
+      [...paths].some((path) => staticBashWords(command).includes(path)),
+    ),
+  );
+}
+
 function scanAstLanguage(
   source: string,
   language: "python" | "javascript",
@@ -1182,6 +1266,18 @@ function scanAstLanguage(
       message: "A wrapped download is moved into an executable system path or made executable.",
     });
   }
+  const hasPythonDownloadWriteExecute = language === "python"
+    && pythonDownloadWriteExecuteChain(tree.rootNode, aliases);
+  if (hasPythonDownloadWriteExecute && !isAllowedDownload(callText, options)) {
+    addWholeSourceChain({
+      ruleId: "python.chain.download-write-execute",
+      category: "download_execution",
+      title: "Downloads, writes, and executes the same file",
+      severity: "critical",
+      confidence: "high",
+      message: "Downloaded response content is written to a static path that is subsequently executed.",
+    });
+  }
   const readCallee = language === "python"
     ? /(?:^|\.)(?:open|read_text|read_bytes)$/
     : /(?:^|\.)(?:readFile|readFileSync)$/;
@@ -1206,9 +1302,18 @@ function scanAstLanguage(
     : /(?:^|\.)(?:fetch|get)$/;
   const dynamicExecutionScopes = scopesWithFinding("dynamic_execution");
   if (
-    canonicalCalls.some((downloadCall) =>
-      downloadCallee.test(downloadCall.callee)
-      && dynamicExecutionScopes.has(downloadCall.scopeId),
+    (
+      (
+        language === "javascript"
+        && canonicalCalls.some((downloadCall) =>
+          downloadCallee.test(downloadCall.callee)
+          && dynamicExecutionScopes.has(downloadCall.scopeId),
+        )
+      )
+      || (
+        language === "python"
+        && findings.some((finding) => finding.ruleId === "python.download-execute")
+      )
     )
     && !isAllowedDownload(callText, options)
   ) {
@@ -1701,7 +1806,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
 
   if ((options.maxEmbeddedDepth ?? 2) > 0) {
     const maxLength = Math.max(1, options.maxEmbeddedCodeLength ?? 100_000);
-    for (const payload of extractEmbeddedPayloads(tree.rootNode)) {
+    for (const payload of extractEmbeddedPayloads(tree.rootNode, {
+      trustedPythonVariables: discoveredPythonVariables,
+    })) {
       if (payload.source.length > maxLength) continue;
       const nested = scanAstLanguage(payload.source, payload.language, {
         ...options,

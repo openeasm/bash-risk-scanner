@@ -71,12 +71,21 @@ function pipelineInput(command: SyntaxNode): { source: string; range: SourceRang
   return source ? { source, range: rangeOf(producer) } : undefined;
 }
 
-export function extractEmbeddedPayloads(root: SyntaxNode): EmbeddedPayload[] {
+export function extractEmbeddedPayloads(
+  root: SyntaxNode,
+  options: { trustedPythonVariables?: ReadonlySet<string> } = {},
+): EmbeddedPayload[] {
   const payloads: EmbeddedPayload[] = [];
   const visit = (node: SyntaxNode): void => {
     if (node.type === "command") {
       const name = commandName(node) ?? "";
-      const isPython = /^(?:python|python\d+(?:\.\d+)?)$/.test(name);
+      const variableName = node.childForFieldName("name")
+        ?.descendantsOfType("variable_name")[0]?.text;
+      const isPython = /^(?:python|python\d+(?:\.\d+)?)$/.test(name)
+        || (
+          variableName !== undefined
+          && options.trustedPythonVariables?.has(variableName) === true
+        );
       const isNode = /^(?:node|nodejs)$/.test(name);
       if (isPython || isNode) {
         const interpreter = isPython ? "python" : "node";

