@@ -6,7 +6,7 @@ type SyntaxNode = Parser.SyntaxNode;
 export interface EmbeddedPayload {
   language: "python" | "javascript";
   interpreter: "python" | "node";
-  kind: "argument" | "heredoc" | "pipeline" | "generated-file";
+  kind: "argument" | "heredoc" | "pipeline" | "generated-file" | "compiled-file";
   source: string;
   range: SourceRange;
 }
@@ -115,6 +115,10 @@ function staticRedirectOutput(command: SyntaxNode): string | undefined {
 function extractGeneratedPythonPayloads(
   root: SyntaxNode,
   trustedPythonVariables: ReadonlySet<string>,
+  staticPythonCompilation?: (source: string) => {
+    input: string;
+    output: string;
+  } | undefined,
 ): EmbeddedPayload[] {
   interface GeneratedFile {
     source?: string;
@@ -122,6 +126,7 @@ function extractGeneratedPythonPayloads(
     lastWriteEndIndex: number;
   }
   const files = new Map<string, GeneratedFile>();
+  const compiledFiles = new Map<string, GeneratedFile>();
   const payloads: EmbeddedPayload[] = [];
   const commands = root.descendantsOfType("command")
     .sort((left, right) => left.startIndex - right.startIndex);
@@ -135,6 +140,10 @@ function extractGeneratedPythonPayloads(
     if (redirect) {
       const destinationNode = redirect.childForFieldName("destination");
       const destination = destinationNode ? staticShellValue(destinationNode) : undefined;
+      if (destination?.endsWith(".pyc")) {
+        compiledFiles.delete(`${scopeId}:${destination}`);
+        continue;
+      }
       if (!destination?.endsWith(".py")) continue;
       const key = `${scopeId}:${destination}`;
       const previous = files.get(key);
@@ -159,9 +168,29 @@ function extractGeneratedPythonPayloads(
       ?.descendantsOfType("variable_name")[0]?.text;
     if (!variableName || !trustedPythonVariables.has(variableName)) continue;
     const args = commandArguments(command);
+    if (args[0]?.text === "-c" && args[1] && staticPythonCompilation) {
+      const source = staticShellValue(args[1]);
+      const compilation = source ? staticPythonCompilation(source) : undefined;
+      if (!compilation || !compilation.output.endsWith(".pyc")) continue;
+      const generated = files.get(`${scopeId}:${compilation.input}`);
+      if (
+        !generated?.source
+        || !generated.range
+        || generated.lastWriteEndIndex >= command.startIndex
+      ) continue;
+      compiledFiles.set(`${scopeId}:${compilation.output}`, {
+        source: generated.source,
+        range: combinedRange(generated.range, rangeOf(command)),
+        lastWriteEndIndex: command.endIndex,
+      });
+      continue;
+    }
     const script = args[0] ? staticShellValue(args[0]) : undefined;
-    if (!script?.endsWith(".py")) continue;
-    const generated = files.get(`${scopeId}:${script}`);
+    if (!script || (!script.endsWith(".py") && !script.endsWith(".pyc"))) continue;
+    const compiled = script.endsWith(".pyc");
+    const generated = compiled
+      ? compiledFiles.get(`${scopeId}:${script}`)
+      : files.get(`${scopeId}:${script}`);
     if (
       !generated?.source
       || !generated.range
@@ -170,7 +199,7 @@ function extractGeneratedPythonPayloads(
     payloads.push({
       language: "python",
       interpreter: "python",
-      kind: "generated-file",
+      kind: compiled ? "compiled-file" : "generated-file",
       source: generated.source,
       range: combinedRange(generated.range, rangeOf(command)),
     });
@@ -180,7 +209,13 @@ function extractGeneratedPythonPayloads(
 
 export function extractEmbeddedPayloads(
   root: SyntaxNode,
-  options: { trustedPythonVariables?: ReadonlySet<string> } = {},
+  options: {
+    trustedPythonVariables?: ReadonlySet<string>;
+    staticPythonCompilation?: (source: string) => {
+      input: string;
+      output: string;
+    } | undefined;
+  } = {},
 ): EmbeddedPayload[] {
   const payloads: EmbeddedPayload[] = [];
   const visit = (node: SyntaxNode): void => {
@@ -228,7 +263,11 @@ export function extractEmbeddedPayloads(
   };
   visit(root);
   if (options.trustedPythonVariables) {
-    payloads.push(...extractGeneratedPythonPayloads(root, options.trustedPythonVariables));
+    payloads.push(...extractGeneratedPythonPayloads(
+      root,
+      options.trustedPythonVariables,
+      options.staticPythonCompilation,
+    ));
   }
   return payloads;
 }

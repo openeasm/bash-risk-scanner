@@ -2033,8 +2033,8 @@
         },
         {
           "category": "download_execution",
-          "ruleId": "chain.generated-compiled-python-download-execute",
-          "evidencePattern": "atomic-stage[.]py[\\s\\S]*atomic-stage[.]pyc"
+          "ruleId": "python.chain.download-write-execute",
+          "evidencePattern": "requests[.]get[\\s\\S]*os[.]system"
         }
       ],
       "provenance": {
@@ -2048,6 +2048,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Reduced interpreter discovery to command -v python3, replaced the URL, source, bytecode, and payload paths with inert example.invalid and /tmp/atomic-* values, and retained the echo-built source, py_compile step, and bytecode execution."
+      }
+    },
+    {
+      "id": "holdout-atomic-delete-iptables-drop-rule-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/delete-iptables-drop-rule.sh.txt",
+      "sha256": "9933d66950021632aa83fa7d2c26619b031056f95dead182506cf1d7595b1702",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.firewall-rule-delete",
+          "evidencePattern": "iptables\\s+-D\\s+OUTPUT[\\s\\S]*-j\\s+DROP"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.firewall-rule-delete",
+          "evidencePattern": "iptables\\s+-D\\s+OUTPUT[\\s\\S]*-j\\s+DROP"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1686/T1686.yaml",
+        "upstreamFile": "public/atomic-red-team/T1686.yaml.txt",
+        "upstreamSha256": "64c9ef50a35974d2523484e7577890da241ffe7fabcde4f3e64c28c7da88ffd3",
+        "upstreamId": "899a7fb5-d197-4951-8614-f19ac4a73ad4",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without its prerequisite setup and cleanup commands."
       }
     }
   ]

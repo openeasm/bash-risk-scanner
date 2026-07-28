@@ -757,6 +757,26 @@ function collectJavaScriptDerivedAliases(
   return shadows;
 }
 
+function staticPythonCompilation(source: string): {
+  input: string;
+  output: string;
+} | undefined {
+  const tree = pythonParser.parse(source);
+  if (tree.rootNode.hasError) return undefined;
+  const aliases = collectAliases(source, "python");
+  const calls = tree.rootNode.descendantsOfType("call")
+    .filter((call) =>
+      canonicalizeCallee(calleeOf(call), aliases) === "py_compile.compile"
+    );
+  if (calls.length !== 1) return undefined;
+  const args = calls[0]!.childForFieldName("arguments")?.namedChildren;
+  if (args?.length !== 2) return undefined;
+  const input = quotedValue(args[0]!.text);
+  const output = quotedValue(args[1]!.text);
+  if (!input?.endsWith(".py") || !output?.endsWith(".pyc")) return undefined;
+  return { input, output };
+}
+
 function pythonDownloadWriteExecuteChain(
   root: SyntaxNode,
   aliases: Map<string, string>,
@@ -1828,6 +1848,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     const maxLength = Math.max(1, options.maxEmbeddedCodeLength ?? 100_000);
     for (const payload of extractEmbeddedPayloads(tree.rootNode, {
       trustedPythonVariables: discoveredPythonVariables,
+      staticPythonCompilation,
     })) {
       if (payload.source.length > maxLength) continue;
       const nested = scanAstLanguage(payload.source, payload.language, {

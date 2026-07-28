@@ -165,9 +165,9 @@ Hugging Face Hub、node-pre-gyp、Ansible 和 Google Cloud Storage 的完整许�
 Atomic Red Team DNS 外传、timestomp、`.netrc`、crontab、SUID、UFW、GCS 删除、
 变量 Python、Keychain、emond、Python HTTP server、iptables flush、变量定位
 GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行和 rsync 远程传输已转为 validation
-回归；UFW 日志关闭也已转为 validation。冻结 test 分层当前保留已修复的可信变量
-`python -c` 与生成 Python 文件控制，并新增 T1059.006“生成 `.py`、编译 `.pyc`
-再执行”盲测。本轮不针对
+回归；UFW 日志关闭也已转为 validation。冻结 test 分层当前保留三条已修复的
+T1059.006 跨语言控制，并新增 T1686“删除 iptables 的 OUTPUT DROP 规则”盲测。
+本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 
 导入器默认复核已有本地文件的 SHA-256，只下载缺失或不匹配的快照；使用

