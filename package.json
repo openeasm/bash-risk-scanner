@@ -1,13 +1,14 @@
 {
   "name": "bash-risk-scanner",
   "version": "0.1.0",
-  "description": "Tree-sitter based static risk scanner for Bash scripts",
+  "description": "Tree-sitter based static risk scanner for Bash, Python, and Node.js",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "bash-risk-scan": "./dist/cli.cjs"
+    "bash-risk-scan": "./dist/cli.cjs",
+    "code-risk-scan": "./dist/cli.cjs"
   },
   "exports": {
     ".": {
@@ -28,7 +29,15 @@
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run lint && npm test && npm run build"
   },
-  "keywords": ["bash", "shell", "security", "static-analysis", "tree-sitter"],
+  "keywords": [
+    "bash",
+    "python",
+    "nodejs",
+    "shell",
+    "security",
+    "static-analysis",
+    "tree-sitter"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -43,7 +52,9 @@
   },
   "dependencies": {
     "tree-sitter": "^0.25.0",
-    "tree-sitter-bash": "^0.25.1"
+    "tree-sitter-bash": "^0.25.1",
+    "tree-sitter-javascript": "^0.25.0",
+    "tree-sitter-python": "^0.25.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

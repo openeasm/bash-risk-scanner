@@ -14,6 +14,7 @@ export type RiskCategory =
 
 export type Severity = "low" | "medium" | "high" | "critical";
 export type Confidence = "low" | "medium" | "high";
+export type SupportedLanguage = "bash" | "python" | "javascript" | "node";
 
 export interface Position {
   row: number;
@@ -37,6 +38,16 @@ export interface Finding {
   evidence: string;
   range: SourceRange;
   relatedRanges?: SourceRange[];
+  /** Language in which the risky behavior was found. */
+  language?: Exclude<SupportedLanguage, "node">;
+  /** Location inside an embedded `python -c` / `node -e` payload. */
+  innerRange?: SourceRange;
+  /** Bash construct which introduced an embedded payload. */
+  origin?: {
+    language: "bash";
+    interpreter: "python" | "node";
+    kind: "argument" | "heredoc" | "pipeline";
+  };
 }
 
 export interface ScanResult {
@@ -50,6 +61,8 @@ export interface ScanResult {
 }
 
 export interface ScanOptions {
+  /** Source language. `node` is an alias for `javascript`. Default: `bash`. */
+  language?: SupportedLanguage;
   /** Include low confidence heuristic findings. Default: true. */
   includeLowConfidence?: boolean;
   /** Maximum source characters retained in evidence. Default: 240. */
@@ -68,4 +81,8 @@ export interface ScanOptions {
    * Default: false. Hostnames are never resolved through DNS.
    */
   allowPrivateDownloadIps?: boolean;
+  /** Recursion limit for statically embedded interpreter payloads. Default: 2. */
+  maxEmbeddedDepth?: number;
+  /** Maximum embedded payload size in UTF-16 code units. Default: 100000. */
+  maxEmbeddedCodeLength?: number;
 }

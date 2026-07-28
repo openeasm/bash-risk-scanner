@@ -1,4 +1,4 @@
-export { scan } from "./scanner.js";
+export { scan, scanJavaScript, scanPython } from "./scanner.js";
 export type {
   Confidence,
   Finding,
@@ -8,4 +8,5 @@ export type {
   ScanResult,
   Severity,
   SourceRange,
+  SupportedLanguage,
 } from "./types.js";

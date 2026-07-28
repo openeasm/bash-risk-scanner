@@ -1,5 +1,9 @@
 import Parser from "tree-sitter";
 import Bash from "tree-sitter-bash";
+import Python from "tree-sitter-python";
+import JavaScript from "tree-sitter-javascript";
+import { extractEmbeddedPayloads } from "./embedded.js";
+import { JAVASCRIPT_RULES, PYTHON_RULES, type LanguageRule } from "./language-rules.js";
 import {
   ARCHIVE_DOWNLOAD,
   COMMAND_RULES,
@@ -10,7 +14,7 @@ import {
   INSTALL_OR_BINARY,
   UPLOAD,
 } from "./rules.js";
-import type { Finding, ScanOptions, ScanResult, SourceRange } from "./types.js";
+import type { Finding, ScanOptions, ScanResult, SourceRange, SupportedLanguage } from "./types.js";
 
 type SyntaxNode = Parser.SyntaxNode;
 
@@ -20,8 +24,15 @@ interface Statement {
   range: SourceRange;
 }
 
-const parser = new Parser();
-parser.setLanguage(Bash as unknown as Parser.Language);
+function createParser(language: Parser.Language): Parser {
+  const instance = new Parser();
+  instance.setLanguage(language);
+  return instance;
+}
+
+const bashParser = createParser(Bash as unknown as Parser.Language);
+const pythonParser = createParser(Python as unknown as Parser.Language);
+const javascriptParser = createParser(JavaScript as unknown as Parser.Language);
 
 function rangeOf(node: SyntaxNode): SourceRange {
   return {
@@ -131,9 +142,157 @@ function isAllowedDownload(text: string, options: ScanOptions): boolean {
   );
 }
 
-export function scan(source: string, options: ScanOptions = {}): ScanResult {
+function emptySummary(findings: Finding[]): ScanResult["summary"] {
+  const byCategory: ScanResult["summary"]["byCategory"] = {};
+  const bySeverity: ScanResult["summary"]["bySeverity"] = {};
+  for (const item of findings) {
+    byCategory[item.category] = (byCategory[item.category] ?? 0) + 1;
+    bySeverity[item.severity] = (bySeverity[item.severity] ?? 0) + 1;
+  }
+  return { total: findings.length, byCategory, bySeverity };
+}
+
+const CALLEE_BY_CATEGORY: Record<
+  "python" | "javascript",
+  Partial<Record<Finding["category"], RegExp>>
+> = {
+  python: {
+    download_execution: /^(?:exec|eval|os\.system|os\.popen|subprocess\.\w+)$/,
+    dynamic_execution: /^(?:eval|exec|compile|os\.(?:system|popen)|subprocess\.\w+)$/,
+    persistence: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile)$/,
+    credential_access: /(?:^|\.)(?:open|Path|read_text|read_bytes|getenv|items|copy|keys|values|\w*password\w*|\w*credential\w*)$/i,
+    system_modification: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile|move)$/,
+    privilege_escalation: /(?:^|\.)(?:setuid|seteuid|setgid|setegid|chmod|chown|run|call|Popen|check_call)$/,
+    defense_evasion: /(?:^|\.)(?:remove|unlink|kill|rmtree|run|call|Popen)$/,
+    network_egress: /(?:^|\.)(?:get|post|put|patch|request|urlopen|urlretrieve|socket|create_connection|connect)$/,
+    data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall)$/,
+    destructive_behavior: /(?:^|\.)(?:rmtree|remove|unlink|removedirs|open)$/,
+    interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output)$/,
+    second_stage_payload: /(?:^|\.)(?:get|urlretrieve|unpack_archive|open|ZipFile)$/,
+  },
+  javascript: {
+    download_execution: /(?:^|\.)(?:eval|Function|exec|execSync|spawn|spawnSync)$/,
+    dynamic_execution: /(?:^|\.)(?:eval|Function|runIn\w+|compileFunction|exec|execSync|spawn|spawnSync)$/,
+    persistence: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
+    credential_access: /(?:^|\.)(?:readFile|readFileSync|readdir|readdirSync|stat|statSync|access|accessSync|keys|values|entries|stringify)$/,
+    system_modification: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
+    privilege_escalation: /(?:^|\.)(?:setuid|setgid|chmod|chmodSync|chown|chownSync|exec|execSync)$/,
+    defense_evasion: /(?:^|\.)(?:rm|rmSync|unlink|unlinkSync|rmdir|rmdirSync|kill|exec|execSync|spawn|spawnSync)$/,
+    network_egress: /(?:^|\.)(?:fetch|get|request|connect|createConnection)$/,
+    data_exfiltration: /(?:^|\.)(?:fetch|post|put|patch|send|write|upload|putObject|sendCommand)$/,
+    destructive_behavior: /(?:^|\.)(?:rm|rmSync|rmdir|rmdirSync|unlink|unlinkSync|writeFile|writeFileSync|open|openSync)$/,
+    interpreter_escape: /(?:^|\.)(?:exec|execSync|spawn|spawnSync)$/,
+    second_stage_payload: /(?:^|\.)(?:fetch|get|extract|unzip|tar)$/,
+  },
+};
+
+function calleeOf(node: SyntaxNode): string {
+  return node.childForFieldName("function")?.text
+    ?? node.childForFieldName("constructor")?.text
+    ?? "";
+}
+
+function scanAstLanguage(
+  source: string,
+  language: "python" | "javascript",
+  options: ScanOptions,
+): ScanResult {
+  const parser = language === "python" ? pythonParser : javascriptParser;
+  const rules = language === "python" ? PYTHON_RULES : JAVASCRIPT_RULES;
   const maxEvidence = Math.max(40, options.maxEvidenceLength ?? 240);
   const tree = parser.parse(source);
+  const findings: Finding[] = [];
+  const parseErrors: SourceRange[] = [];
+  const interestingNodes: SyntaxNode[] = [];
+
+  walk(tree.rootNode, (node) => {
+    if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
+    if ((language === "python" && node.type === "call")
+      || (language === "javascript" && ["call_expression", "new_expression"].includes(node.type))) {
+      interestingNodes.push(node);
+    }
+  });
+
+  for (const node of interestingNodes) {
+    const text = source.slice(node.startIndex, node.endIndex);
+    const callee = calleeOf(node);
+    for (const rule of rules as LanguageRule[]) {
+      if (!rule.nodeTypes.includes(node.type)) continue;
+      const calleePattern = CALLEE_BY_CATEGORY[language][rule.category];
+      if (!calleePattern?.test(callee)) continue;
+      rule.pattern.lastIndex = 0;
+      if (!rule.pattern.test(text)) continue;
+      if (rule.category === "download_execution" && isAllowedDownload(text, options)) continue;
+      if (rule.confidence === "low" && options.includeLowConfidence === false) continue;
+      findings.push({
+        ruleId: rule.id,
+        category: rule.category,
+        title: rule.title,
+        severity: rule.severity,
+        confidence: rule.confidence,
+        message: rule.message,
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language,
+      });
+    }
+  }
+
+  const callText = interestingNodes.map((node) => source.slice(node.startIndex, node.endIndex)).join("\n");
+  const callees = interestingNodes.map(calleeOf);
+  const rootRange = rangeOf(tree.rootNode);
+  const addWholeSourceChain = (finding: Omit<Finding, "range" | "evidence" | "language">): void => {
+    findings.push({
+      ...finding,
+      evidence: evidence(callText, maxEvidence),
+      range: rootRange,
+      language,
+    });
+  };
+  const readCallee = language === "python"
+    ? /(?:^|\.)(?:open|read_text|read_bytes)$/
+    : /(?:^|\.)(?:readFile|readFileSync)$/;
+  if (
+    callees.some((callee) => readCallee.test(callee))
+    && findings.some((finding) => finding.category === "data_exfiltration")
+  ) {
+    addWholeSourceChain({
+      ruleId: `${language}.chain.read-upload`,
+      category: "data_exfiltration",
+      title: "Reads then uploads data",
+      severity: "high",
+      confidence: "medium",
+      message: "Local data access and an outbound data sink occur in the same payload.",
+    });
+  }
+  const downloadCallee = language === "python"
+    ? /(?:^|\.)(?:get|urlopen|urlretrieve)$/
+    : /(?:^|\.)(?:fetch|get)$/;
+  if (
+    callees.some((callee) => downloadCallee.test(callee))
+    && findings.some((finding) => finding.category === "dynamic_execution")
+    && !isAllowedDownload(callText, options)
+  ) {
+    addWholeSourceChain({
+      ruleId: `${language}.chain.download-execute`,
+      category: "download_execution",
+      title: "Downloads then executes content",
+      severity: "critical",
+      confidence: "medium",
+      message: "A network download and dynamic execution occur in the same payload.",
+    });
+  }
+
+  const unique = [...new Map(findings.map((item) => [
+    `${item.ruleId}:${item.range.startIndex}`,
+    item,
+  ])).values()].sort((a, b) => a.range.startIndex - b.range.startIndex);
+  return { findings: unique, summary: emptySummary(unique), parseErrors };
+}
+
+function scanBash(source: string, options: ScanOptions): ScanResult {
+  const maxEvidence = Math.max(40, options.maxEvidenceLength ?? 240);
+  const tree = bashParser.parse(source);
   const commands = statements(tree.rootNode, source);
   const findings: Finding[] = [];
   const parseErrors: SourceRange[] = [];
@@ -156,6 +315,7 @@ export function scan(source: string, options: ScanOptions = {}): ScanResult {
         message: rule.message,
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
+        language: "bash",
       });
     }
   }
@@ -172,6 +332,7 @@ export function scan(source: string, options: ScanOptions = {}): ScanResult {
         severity: "critical",
         confidence: "high",
         message: "Remote content flows into a shell or is made executable.",
+        language: "bash",
       }, maxEvidence);
     }
   });
@@ -194,6 +355,7 @@ export function scan(source: string, options: ScanOptions = {}): ScanResult {
         severity: "critical",
         confidence: "medium",
         message: "A download is followed shortly by shell execution or an executable permission change.",
+        language: "bash",
       }, maxEvidence);
     }
 
@@ -206,6 +368,7 @@ export function scan(source: string, options: ScanOptions = {}): ScanResult {
         severity: "high",
         confidence: "medium",
         message: "Local data access is followed shortly by an upload command.",
+        language: "bash",
       }, maxEvidence);
     }
 
@@ -220,7 +383,32 @@ export function scan(source: string, options: ScanOptions = {}): ScanResult {
           severity: "critical",
           confidence: "high",
           message: "An archive download is followed by extraction and installer or binary execution.",
+          language: "bash",
         }, maxEvidence);
+      }
+    }
+  }
+
+  if ((options.maxEmbeddedDepth ?? 2) > 0) {
+    const maxLength = Math.max(1, options.maxEmbeddedCodeLength ?? 100_000);
+    for (const payload of extractEmbeddedPayloads(tree.rootNode)) {
+      if (payload.source.length > maxLength) continue;
+      const nested = scanAstLanguage(payload.source, payload.language, {
+        ...options,
+        language: payload.language,
+        maxEmbeddedDepth: (options.maxEmbeddedDepth ?? 2) - 1,
+      });
+      for (const nestedFinding of nested.findings) {
+        findings.push({
+          ...nestedFinding,
+          innerRange: nestedFinding.range,
+          range: payload.range,
+          origin: {
+            language: "bash",
+            interpreter: payload.interpreter,
+            kind: payload.kind,
+          },
+        });
       }
     }
   }
@@ -230,16 +418,26 @@ export function scan(source: string, options: ScanOptions = {}): ScanResult {
     item,
   ])).values()].sort((a, b) => a.range.startIndex - b.range.startIndex);
 
-  const byCategory: ScanResult["summary"]["byCategory"] = {};
-  const bySeverity: ScanResult["summary"]["bySeverity"] = {};
-  for (const item of unique) {
-    byCategory[item.category] = (byCategory[item.category] ?? 0) + 1;
-    bySeverity[item.severity] = (bySeverity[item.severity] ?? 0) + 1;
-  }
-
   return {
     findings: unique,
-    summary: { total: unique.length, byCategory, bySeverity },
+    summary: emptySummary(unique),
     parseErrors,
   };
+}
+
+export function scan(source: string, options: ScanOptions = {}): ScanResult {
+  const language: SupportedLanguage = options.language ?? "bash";
+  if (language === "python") return scanAstLanguage(source, "python", options);
+  if (language === "javascript" || language === "node") {
+    return scanAstLanguage(source, "javascript", options);
+  }
+  return scanBash(source, options);
+}
+
+export function scanPython(source: string, options: Omit<ScanOptions, "language"> = {}): ScanResult {
+  return scanAstLanguage(source, "python", options);
+}
+
+export function scanJavaScript(source: string, options: Omit<ScanOptions, "language"> = {}): ScanResult {
+  return scanAstLanguage(source, "javascript", options);
 }
