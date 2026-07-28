@@ -287,6 +287,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/aws/aws-cli/29b7877a85aa55270de844574d47bdbbdc300b76/LICENSE.txt",
     sha256: "a395e1165c2ed0e2bf041ae28e528245aedd4009b7e94ad407780257f704afc1",
   },
+  {
+    target: "deno-install/install.sh.txt",
+    url: "https://raw.githubusercontent.com/denoland/deno_install/41d4676f8677ec16449b9e2303e7bd52ed81f03b/install.sh",
+    sha256: "9c1a4a0ab8ec6c7e81ec7e4d82465693dc197e65632fec646d703a096b981778",
+  },
+  {
+    target: "deno-install/LICENSE",
+    url: "https://raw.githubusercontent.com/denoland/deno_install/41d4676f8677ec16449b9e2303e7bd52ed81f03b/LICENSE",
+    sha256: "d05b09e3cf2c79d84622d51db741eb263950d97fbc7a8c1811675f3287035d8f",
+  },
+  {
+    target: "ohmyzsh/install.sh.txt",
+    url: "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/7ea697fd8138550ddf7262456d412f0dcd1cbf84/tools/install.sh",
+    sha256: "95118b50d062198597e2b73d3a57b609fd95ca68cdc86faf4460d955f0172b61",
+  },
+  {
+    target: "ohmyzsh/LICENSE.txt",
+    url: "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/7ea697fd8138550ddf7262456d412f0dcd1cbf84/LICENSE.txt",
+    sha256: "6772e603fd19666902ab7541f49f3d9e92637539fb0840605615d8c6d18fc3f6",
+  },
 ];
 
 function githubContentsFallback(url) {

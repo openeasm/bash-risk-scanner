@@ -101,6 +101,45 @@ function bashFunctionSummaries(source: string): {
   return { transparent, downloaders };
 }
 
+const SHELL_STARTUP_PATH = /(?:^|[/.])(?:bashrc|bash_profile|profile|zshrc|zprofile|config\.fish)(?:["'\s]|$)/i;
+
+function bashShellStartupVariables(source: string): Set<string> {
+  const variables = new Set<string>();
+  for (const match of source.matchAll(
+    /^[ \t]*([A-Za-z_]\w*)[ \t]*=[ \t]*([^\r\n]*)$/gm,
+  )) {
+    if (SHELL_STARTUP_PATH.test(match[2]!)) variables.add(match[1]!);
+  }
+  for (const match of source.matchAll(
+    /^[ \t]*([A-Za-z_]\w*)[ \t]*\+?=[ \t]*\(([\s\S]*?)^[ \t]*\)/gm,
+  )) {
+    if (SHELL_STARTUP_PATH.test(match[2]!)) variables.add(match[1]!);
+  }
+  // Propagate an array of known startup paths into its loop variable.
+  for (const match of source.matchAll(
+    /\bfor[ \t]+([A-Za-z_]\w*)[ \t]+in[ \t]+["']?\$\{([A-Za-z_]\w*)\[@\]\}["']?/g,
+  )) {
+    if (variables.has(match[2]!)) variables.add(match[1]!);
+  }
+  return variables;
+}
+
+function bashArchiveOutputVariable(text: string): string | undefined {
+  if (!/\b(?:curl|wget|fetch|aria2c)\b/i.test(text)) return undefined;
+  const output = text.match(
+    /(?:--output(?:=|\s+)|-o\s+|--output-document(?:=|\s+)|-O\s+)(["']?\$(?:\{)?([A-Za-z_]\w*)\}?(?:\.(?:zip|tar|tgz|gz|bz2|xz))?["']?)/i,
+  );
+  if (!output || !/\.(?:zip|tar|tgz|gz|bz2|xz)\b/i.test(output[1]!)) return undefined;
+  return output[2];
+}
+
+function bashInvokesVariable(text: string, variable: string): boolean {
+  const escaped = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    `^\\s*(?:(?:[A-Za-z_]\\w*=\\S+|env)\\s+)*["']?\\$(?:\\{)?${escaped}\\}?["']?(?:\\s|$)`,
+  ).test(text);
+}
+
 function bashCommandVariants(
   text: string,
   commandWrappers: Map<string, Set<string>> = new Map(),
@@ -247,9 +286,9 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:open|Path|write_text|write_bytes|copy|copy2|copyfile|move)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|seteuid|setgid|setegid|chmod|chown|run|call|Popen|check_call)$/,
     defense_evasion: /(?:^|\.)(?:remove|unlink|kill|rmtree|run|call|Popen)$/,
-    network_egress: /(?:^|\.)(?:get|post|put|patch|delete|head|options|request|ws_connect|urlopen|urlretrieve|socket|create_connection|open_connection|connect)$/,
+    network_egress: /(?:^|\.)(?:get|post|put|patch|delete|head|options|request|ws_connect|urlopen|urlretrieve|socket|create_connection|open_connection|connect|upload_file)$/,
     data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall|write)$/,
-    destructive_behavior: /(?:^|\.)(?:rmtree|remove|unlink|removedirs|open)$/,
+    destructive_behavior: /(?:^|\.)(?:rmtree|removedirs|open)$/,
     interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output|create_subprocess_shell)$/,
     second_stage_payload: /(?:^|\.)(?:get|urlretrieve|unpack_archive|open|ZipFile)$/,
   },
@@ -436,6 +475,7 @@ function collectPythonObjectBindings(
       || constructor === "adafruit_shell.Shell"
       || constructor === "socket.socket"
       || constructor === "socket.create_connection"
+      || constructor === "s3transfer.S3Transfer"
     ) {
       aliases.set(
         localName,
@@ -1013,9 +1053,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const parseErrors: SourceRange[] = [];
   const commandWrappers = staticBashCommandWrappers(source);
   const functionSummaries = bashFunctionSummaries(source);
+  const shellStartupVariables = bashShellStartupVariables(source);
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
+    if (node.type !== "redirected_statement") return;
+    const text = source.slice(node.startIndex, node.endIndex);
+    const targetVariable = text.match(/>>?\s*["']?\$(?:\{)?([A-Za-z_]\w*)\}?["']?\s*$/)?.[1];
+    const writesStartupPath = targetVariable !== undefined
+      && shellStartupVariables.has(targetVariable);
+    if (!writesStartupPath) return;
+    findings.push({
+      ruleId: "persistence.shell-rc-variable",
+      category: "persistence",
+      title: "Modifies a shell startup file",
+      severity: "high",
+      confidence: "high",
+      message: "Redirects generated shell configuration into a variable proven to reference a startup file.",
+      evidence: evidence(text, maxEvidence),
+      range: rangeOf(node),
+      language: "bash",
+    });
   });
 
   for (const statement of commands) {
@@ -1053,6 +1111,53 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
       functionSummaries.transparent,
     ),
   }));
+  for (const download of commandVariants) {
+    const archiveVariable = download.variants
+      .map((variant) => bashArchiveOutputVariable(variant))
+      .find((variable) => variable !== undefined);
+    if (!archiveVariable || isAllowedDownload(download.statement.text, options)) continue;
+    const escaped = archiveVariable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const later = commandVariants.filter((candidate) =>
+      candidate.scopeId === download.scopeId
+      && candidate.statement.range.startIndex > download.statement.range.startIndex
+      && candidate.statement.range.startIndex - download.statement.range.startIndex <= 5_000,
+    );
+    const extract = later.find((candidate) => candidate.variants.some((variant) =>
+      EXTRACT.test(variant)
+      && new RegExp(`\\$(?:\\{)?${escaped}\\}?(?:\\.(?:zip|tar|tgz|gz|bz2|xz))?\\b`).test(variant),
+    ));
+    const chmod = later.find((candidate) => candidate.variants.some((variant) =>
+      new RegExp(
+        `^\\s*chmod\\s+(?:[ugo]*\\+x|[0-7]*[1357][0-7]{2})\\s+["']?\\$(?:\\{)?${escaped}\\}?["']?(?:\\s|$)`,
+      ).test(variant),
+    ));
+    const execute = later.find((candidate) =>
+      (!chmod || candidate.statement.range.startIndex > chmod.statement.range.startIndex)
+      && candidate.variants.some((variant) => bashInvokesVariable(variant, archiveVariable)),
+    );
+    if (extract && chmod && execute) {
+      addChainFinding(findings, download.statement, execute.statement, {
+        ruleId: "chain.archive-output-execute",
+        category: "download_execution",
+        title: "Downloads and executes an archive payload",
+        severity: "critical",
+        confidence: "high",
+        message: "An archive written to a variable-derived path is extracted, installed, made executable, and invoked.",
+        language: "bash",
+      }, maxEvidence);
+    }
+    if (extract && execute) {
+      addChainFinding(findings, download.statement, execute.statement, {
+        ruleId: "chain.second-stage-variable-archive",
+        category: "second_stage_payload",
+        title: "Extracts and runs a downloaded archive payload",
+        severity: "critical",
+        confidence: "high",
+        message: "A downloaded archive is extracted and its variable-derived executable is invoked.",
+        language: "bash",
+      }, maxEvidence);
+    }
+  }
   for (const download of commandVariants) {
     let targetVariable: string | undefined;
     for (const variant of download.variants) {

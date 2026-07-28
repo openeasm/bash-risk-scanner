@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 52 条离线语料：50 条完全匹配，precision 98.1%、recall 96.3%、
-F1 97.2%。前十一轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 54 条离线语料：52 条完全匹配，precision 100%、recall 95.8%、
+F1 97.8%。前十二轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -158,21 +158,25 @@ validation 回归：
 - semantic-release/github：`new Octokit()` 实例的 GitHub REST route 识别网络；
   只有带 `data: readFile(...)` 的上传对象识别外传。额外 AST 遍历已合并，连续
   两次 P95 保持在 100 ms 门槛内。
+- Bun：同一作用域内追踪 `curl --output "$exe.zip"`、解压、`chmod` 和变量执行；
+  shell rc 数组传播到循环变量和复合重定向目标。
+- AWS CLI：只有来源绑定为 `s3transfer.S3Transfer` 的 `upload_file()` 才增加
+  网络语义；单文件临时清理和写模式 ZipFile 不再误报破坏或二阶段行为。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Bun installer 下载 zip、解压、移动并执行 `$exe completions`，当前漏报下载执行
-  和二阶段载荷；通过数组生成并写入 shell rc 的持久化也未覆盖。
-- AWS CLI GameLift uploader 的 `S3Transfer.upload_file()` 已识别外传，但未识别
-  网络外联。
-- AWS CLI 创建用于上传的临时 zip 被误报二阶段载荷，上传完成后删除单个临时文件
-  被误报破坏行为。
+- Deno installer 的变量归档链已命中下载执行、网络和二阶段载荷，但漏报
+  `$exe eval`/`$exe run` 的动态执行与解释器逃逸。
+- Oh My Zsh installer 的 Git fetch、sudo 和真实 `eval` 已命中；通过
+  `sed > temp && mv` 替换 `.zshrc`、`chsh` 修改登录 shell、`exec zsh`
+  尚未覆盖。
 
-新 test 分层以实际 precision 60%、recall 42.9% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应先修复两个 FP 和四个 FN，再提高 test 门槛。
+新 test 分层以实际 precision 100%、recall 54.5% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应修复五个 FN，并用相似安全调用约束来源和
+参数语义后再提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-92 个单元测试或当前小规模公开语料外推生产环境准确率。
+96 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

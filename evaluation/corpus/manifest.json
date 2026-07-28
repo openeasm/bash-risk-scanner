@@ -1066,7 +1066,7 @@
     },
     {
       "id": "holdout-bun-installer-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/bun/install.sh.txt",
@@ -1077,6 +1077,23 @@
         "second_stage_payload",
         "persistence",
         "interpreter_escape"
+      ],
+      "expectedFindings": [
+        {
+          "category": "download_execution",
+          "ruleId": "chain.archive-output-execute",
+          "evidencePattern": "curl.*[$]exe completions"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "chain.second-stage-variable-archive",
+          "evidencePattern": "curl.*[$]exe completions"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.shell-rc-variable",
+          "evidencePattern": "fish_config|zsh_config|bash_config"
+        }
       ],
       "provenance": {
         "type": "public-snapshot",
@@ -1089,12 +1106,24 @@
     },
     {
       "id": "holdout-aws-cli-gamelift-upload-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/aws-cli/uploadbuild.py.txt",
       "sha256": "90af33f0fcc0f645e668079a13f4026c744a59de2757b7d8b4431e25729e184f",
       "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "upload_file"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "upload_file"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "aws/aws-cli",
@@ -1102,6 +1131,53 @@
         "sourceUrl": "https://github.com/aws/aws-cli/blob/29b7877a85aa55270de844574d47bdbbdc300b76/awscli/customizations/gamelift/uploadbuild.py",
         "license": "Apache-2.0",
         "licenseFile": "public/aws-cli/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-deno-installer-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/deno-install/install.sh.txt",
+      "sha256": "9c1a4a0ab8ec6c7e81ec7e4d82465693dc197e65632fec646d703a096b981778",
+      "expectedCategories": [
+        "network_egress",
+        "download_execution",
+        "dynamic_execution",
+        "interpreter_escape",
+        "second_stage_payload"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "denoland/deno_install",
+        "commit": "41d4676f8677ec16449b9e2303e7bd52ed81f03b",
+        "sourceUrl": "https://github.com/denoland/deno_install/blob/41d4676f8677ec16449b9e2303e7bd52ed81f03b/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/deno-install/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-ohmyzsh-installer-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/ohmyzsh/install.sh.txt",
+      "sha256": "95118b50d062198597e2b73d3a57b609fd95ca68cdc86faf4460d955f0172b61",
+      "expectedCategories": [
+        "network_egress",
+        "persistence",
+        "system_modification",
+        "privilege_escalation",
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "ohmyzsh/ohmyzsh",
+        "commit": "7ea697fd8138550ddf7262456d412f0dcd1cbf84",
+        "sourceUrl": "https://github.com/ohmyzsh/ohmyzsh/blob/7ea697fd8138550ddf7262456d412f0dcd1cbf84/tools/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/ohmyzsh/LICENSE.txt"
       }
     }
   ]
