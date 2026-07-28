@@ -1176,6 +1176,39 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   }));
   walk(tree.rootNode, (node) => {
     if (node.type !== "for_statement") return;
+    const loopVariable = node.childForFieldName("variable")?.text;
+    const substitution = node.childForFieldName("value");
+    const body = node.childForFieldName("body");
+    if (!loopVariable || substitution?.type !== "command_substitution" || !body) return;
+
+    const findsNetrc = substitution.descendantsOfType("command").some((command) =>
+      /^\s*find(?:\s|$)/.test(command.text)
+      && /(?:^|\s)-(?:i?name)\s+(["']?)\.netrc\1(?:\s|$)/.test(command.text),
+    );
+    if (!findsNetrc) return;
+
+    const escapedVariable = loopVariable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const readsResult = body.descendantsOfType("command").some((command) =>
+      new RegExp(
+        `^\\s*(?:cat|head|tail|less|more)\\s+(?:--\\s+)?["']?\\$(?:\\{)?${escapedVariable}\\}?["']?\\s*$`,
+      ).test(command.text),
+    );
+    if (!readsResult) return;
+
+    findings.push({
+      ruleId: "chain.find-read-netrc",
+      category: "credential_access",
+      title: "Finds and reads netrc credential files",
+      severity: "high",
+      confidence: "high",
+      message: "Finds .netrc files and reads each result inside the same loop.",
+      evidence: evidence(node.text, maxEvidence),
+      range: rangeOf(node),
+      language: "bash",
+    });
+  });
+  walk(tree.rootNode, (node) => {
+    if (node.type !== "for_statement") return;
     const loopVariable = node.namedChildren.find((child) => child.type === "variable_name")?.text;
     const substitution = node.namedChildren.find((child) => child.type === "command_substitution");
     const body = node.namedChildren.find((child) => child.type === "do_group");

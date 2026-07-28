@@ -112,8 +112,9 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 61 条离线语料：60 条完全匹配，precision 100%、recall 99.2%、
-F1 99.6%。前十七轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 62 条离线语料：61 条完全匹配，类别级 precision、recall 和 F1 均为
+100%，但仍有 1 条禁止 finding。前十八轮冻结集暴露的缺口均已转为带具体
+rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -181,29 +182,33 @@ validation 回归：
 - Atomic Red Team timestomp：`touch -t` 的 POSIX 显式时间戳和
   `touch -r/--reference` 的时间复制识别为防御规避；普通创建、更新为当前时间、
   `-c` 以及仅出现在 `echo` 文本中的命令均不命中。
+- Atomic Red Team `.netrc`：直接读取与 `find` 结果在同一 `for` AST 内进入
+  `cat/head/tail/less/more` 分开识别；只查找、只打印、读取普通隐藏文件、读取
+  不同变量和仅在文本中提及命令均不命中。
 
 本轮重新冻结的公开恶意样本尚未用于调参：
 
-- Atomic Red Team T1552.001 的 Linux/macOS 步骤先用 `find` 查找 `.netrc`，
-  再在循环中逐个 `cat` 文件。目前未命中 `credential_access`，作为下一轮待修复
-  FN。
+- Atomic Red Team T1053.003 的 Linux/macOS 步骤先用 `crontab -l` 备份当前任务，
+  再用文件替换 crontab。替换行为正确命中 `persistence`，但只读的 `crontab -l`
+  也被同一宽规则误报，作为下一轮待修复的禁止 finding。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
-  `/tmp/atomic-home` 下的惰性路径，评测器不会执行命令。
+  `/tmp/atomic-*` 下的惰性路径，评测器不会执行命令。
 
-新 test 分层只有一个预期正例且当前漏报，因此 recall 基线为 0；precision 没有
-预测正例，不能单独解读。整体门槛仍保持 precision 95%、recall 90%。下一轮应
-修复 `.netrc` 凭据访问 FN，并用普通隐藏文件、只查找不读取、循环读取普通配置和
-文本中出现 `.netrc` 等 hard-negative 约束误报后立即提高 test 门槛。
+新 test 分层的类别级 precision/recall 基线均为 100%；整体门槛仍保持 precision
+95%、recall 90%。`maximum.forbiddenFindingCount` 暂时固定为实际值 1，使 CI
+能够保留并展示 finding 级已知缺口，未配置时默认仍为 0。下一轮应排除
+`crontab -l/-e` 等查询/交互操作，同时保留文件安装与标准输入替换等写入形式；
+修复后立即把禁止 finding 门槛恢复为 0。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-104 个单元测试或当前小规模公开语料外推生产环境准确率。
+105 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
 降至 82–94 ms；门槛仍保持 100 ms。
 
 类别集合之外，manifest 现在可声明 `forbiddenFindings`，按 category、ruleId 和
-evidencePattern 禁止具体 finding。禁止 finding 数量进入 JSON/HTML 和全局 gate，
+evidencePattern 禁止具体 finding。禁止 finding 数量进入 JSON/HTML 和显式 gate，
 避免同一类别的一条正确 finding 掩盖另一条错误 finding。Oh My Zsh 的
 `command_exists zsh` 已作为首个真实回归约束。
 

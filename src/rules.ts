@@ -69,6 +69,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^(?:\s*(?:env|printenv)(?:\s|$)|\s*set\s*$)/i,
   },
   {
+    id: "credential.netrc-read",
+    category: "credential_access",
+    title: "Reads a netrc credential file",
+    severity: "high",
+    confidence: "high",
+    message: "Reads a .netrc file, which commonly stores plaintext service credentials.",
+    pattern: /^\s*(?:cat|head|tail|less|more|cp|grep)\b[^;\n]*(?:^|\/)\.netrc(?:["']?\s|$)/i,
+  },
+  {
     id: "system.sensitive-config",
     category: "system_modification",
     title: "Modifies sensitive system configuration",

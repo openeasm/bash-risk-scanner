@@ -215,6 +215,39 @@ describe("scan", () => {
     }
   });
 
+  it("tracks discovered netrc files into looped credential reads", () => {
+    const result = scan(`
+      for file in $(find /tmp/home -type f -name .netrc 2>/dev/null); do
+        echo "$file"
+        cat "$file"
+      done
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "chain.find-read-netrc",
+        category: "credential_access",
+      }),
+    ]));
+    expect(scan("cat /tmp/home/.netrc").findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "credential.netrc-read" }),
+    ]));
+
+    const hardNegatives = [
+      "find /tmp/home -type f -name .netrc",
+      `for file in $(find /tmp/home -name .netrc); do echo "$file"; done`,
+      `for file in $(find /tmp/home -name .bashrc); do cat "$file"; done`,
+      `for file in $(find /tmp/home -name .netrc); do cat "$other"; done`,
+      `for file in $(find /tmp/home -name .netrc); do cat /tmp/public.txt; done`,
+      "echo 'cat ~/.netrc'",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "chain.find-read-netrc"
+        || finding.ruleId === "credential.netrc-read"
+      )).toBe(false);
+    }
+  });
+
   it("allows download-execute from an explicitly trusted exact host", () => {
     const result = scan("curl https://artifacts.corp.example/a.sh | sh", {
       allowedDownloadHosts: ["artifacts.corp.example"],

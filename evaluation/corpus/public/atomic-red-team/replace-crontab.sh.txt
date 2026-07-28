@@ -1,0 +1,2 @@
+crontab -l > /tmp/atomic-cron-backup
+echo "* * * * * /tmp/atomic-payload.sh" > /tmp/atomic-cron && crontab /tmp/atomic-cron

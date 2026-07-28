@@ -73,6 +73,11 @@ const snapshots = [
     sha256: "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
   },
   {
+    target: "atomic-red-team/T1053.003.yaml.txt",
+    url: "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1053.003/T1053.003.yaml",
+    sha256: "4830ac00380213b101a686458ddebdbf92757f5b68b285aab09cac909cac63ab",
+  },
+  {
     target: "node-gyp/install.js.txt",
     url: "https://raw.githubusercontent.com/nodejs/node-gyp/42367da5a2683115ff538b92caed5c32c322005f/lib/install.js",
     sha256: "f0a0017fec48692a8eb8922b6eaff8d12f4a4eb1af4e42f23efa3e8797dff2c3",

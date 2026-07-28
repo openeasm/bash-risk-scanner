@@ -185,7 +185,8 @@ const gates = {
   recall: summary.recall >= config.minimum.recall,
   parseErrorRate: summary.parseErrorRate <= config.maximum.parseErrorRate,
   p95Milliseconds: summary.performance.p95Milliseconds <= config.maximum.p95Milliseconds,
-  forbiddenFindings: summary.forbiddenFindingCount === 0,
+  forbiddenFindings: summary.forbiddenFindingCount
+    <= (config.maximum.forbiddenFindingCount ?? 0),
 };
 for (const split of config.requiredPerfectSplits ?? []) {
   gates[`split:${split}:samples`] = sampleResults

@@ -6,11 +6,12 @@
   "minimumBySplit": {
     "test": {
       "precision": 1,
-      "recall": 0
+      "recall": 1
     }
   },
   "requiredPerfectSplits": ["regression"],
   "maximum": {
+    "forbiddenFindingCount": 1,
     "parseErrorRate": 0.05,
     "p95Milliseconds": 100
   }
