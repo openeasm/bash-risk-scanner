@@ -198,6 +198,66 @@ function staticBashPathArgument(text: string): string | undefined {
   return match?.[2];
 }
 
+function staticBashWords(text: string): string[] {
+  return [...text.matchAll(/"(?:\\.|[^"])*"|'[^']*'|[^\s]+/g)]
+    .map((match) => match[0]!.replace(/^(["'])(.*)\1$/, "$2"));
+}
+
+function isRsyncRemoteOperand(value: string): boolean {
+  if (
+    !value
+    || /[$`;&|<>]/.test(value)
+    || /^(?:\.{0,2}\/|[A-Za-z]:[\\/])/.test(value)
+  ) return false;
+  if (/^rsync:\/\/[^/\s]+\/\S+/i.test(value)) return true;
+  return /^(?:(?:[A-Za-z_][\w.-]*)@)?(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:]+\]):{1,2}\S+$/
+    .test(value);
+}
+
+function bashRsyncPushesLocalPath(text: string): boolean {
+  const words = staticBashWords(text);
+  if (words[0]?.toLowerCase() !== "rsync") return false;
+
+  const operands: string[] = [];
+  const longOptionsWithValue = new Set([
+    "--backup-dir", "--bwlimit", "--chmod", "--compare-dest", "--contimeout",
+    "--copy-dest", "--exclude", "--files-from", "--filter", "--groupmap",
+    "--include", "--link-dest", "--log-file", "--max-size", "--min-size",
+    "--password-file", "--partial-dir", "--port", "--rsync-path", "--rsh",
+    "--temp-dir", "--timeout", "--usermap",
+  ]);
+  let optionsEnded = false;
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (!optionsEnded && word === "--") {
+      optionsEnded = true;
+      continue;
+    }
+    if (!optionsEnded && (word === "--dry-run" || /^-[A-Za-z]*n[A-Za-z]*$/.test(word))) {
+      return false;
+    }
+    if (!optionsEnded && word.startsWith("--")) {
+      const option = word.split("=", 1)[0]!;
+      if (!word.includes("=") && longOptionsWithValue.has(option)) index += 1;
+      continue;
+    }
+    if (!optionsEnded && /^-[^-]/.test(word)) {
+      if (/^-(?:e|f)$/.test(word)) index += 1;
+      continue;
+    }
+    operands.push(word);
+  }
+
+  if (operands.length < 2 || !isRsyncRemoteOperand(operands.at(-1)!)) return false;
+  const sources = operands.slice(0, -1);
+  return sources.every((source) => !isRsyncRemoteOperand(source))
+    && sources.some((source) =>
+      source.length > 0
+      && !/[$`;&|<>]/.test(source)
+      && !isRsyncRemoteOperand(source)
+    );
+}
+
 function bashDiscoveredCommandVariables(
   root: SyntaxNode,
   commandPattern: RegExp,
@@ -1223,6 +1283,19 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     ),
   }));
   for (const { statement, variants } of commandVariants) {
+    if (variants.some((variant) => bashRsyncPushesLocalPath(variant))) {
+      findings.push({
+        ruleId: "exfil.rsync-push",
+        category: "data_exfiltration",
+        title: "Uploads local data with rsync",
+        severity: "high",
+        confidence: "high",
+        message: "Transfers one or more static local paths to a remote rsync destination.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
     for (const rule of COMMAND_RULES) {
       if (
         (rule.id === "system.backup-disable" || rule.id === "destructive.backup-disable")

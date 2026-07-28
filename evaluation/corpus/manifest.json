@@ -1854,7 +1854,7 @@
     },
     {
       "id": "holdout-atomic-rsync-remote-push-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/rsync-remote-push.sh.txt",
@@ -1878,6 +1878,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced username, remote host, and paths with inert atomic/example.invalid values; retained rsync push structure."
+      }
+    },
+    {
+      "id": "holdout-atomic-openssl-rsautl-encryption-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/openssl-rsautl-encrypt.sh.txt",
+      "sha256": "7a097060dddfcb957ace90e8da58c212adb560be714785a478741f32464f125e",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.discovered-openssl-encryption",
+          "evidencePattern": "[$]which_openssl\\s+rsautl\\s+-encrypt"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1486/T1486.yaml",
+        "upstreamFile": "public/atomic-red-team/T1486.yaml.txt",
+        "upstreamSha256": "86b6bd3a3c6a53e8e124e86296feea9d1f19f13cc4578cf726f3b26083043b95",
+        "upstreamId": "142752dc-ca71-443b-9359-cf6f497315f1",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Used command -v for inert OpenSSL discovery and replaced key, input, and output paths with /tmp/atomic-* values; retained the RSA key generation and rsautl encryption structure."
       }
     }
   ]

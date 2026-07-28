@@ -164,8 +164,8 @@ publish、Rustup、semantic-release/github、Bun、AWS CLI、Deno、Oh My Zsh、
 Hugging Face Hub、node-pre-gyp、Ansible 和 Google Cloud Storage 的完整许可快照。
 Atomic Red Team DNS 外传、timestomp、`.netrc`、crontab、SUID、UFW、GCS 删除、
 变量 Python、Keychain、emond、Python HTTP server、iptables flush、变量定位
-GPG 加密、Time Machine、LaZagne、下载后执行和 rsync 远程拉取已转为 validation
-回归；冻结 test 分层当前使用 T1105 `rsync` 远程推送本地文件步骤。本轮不针对
+GPG 加密、Time Machine、LaZagne、下载后执行和 rsync 远程传输已转为 validation
+回归；冻结 test 分层当前使用 T1486 OpenSSL `rsautl -encrypt` 文件加密步骤。本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 
 导入器默认复核已有本地文件的 SHA-256，只下载缺失或不匹配的快照；使用
