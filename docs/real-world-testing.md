@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 84 条离线语料：83 条完全匹配，precision 100%、recall 98.9%、
-F1 99.4%。前面的冻结集缺口均已转为带具体
+当前基线为 85 条离线语料：84 条完全匹配，类别级 precision、recall 和
+F1 均为 100%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -263,20 +263,23 @@ validation 回归：
   `.oci/sessions` 路径和 `token` 文件名时才报告 OCI session credential 访问；
   普通 OCI 配置、其他 session 文件、项目 token、动态目录、创建/删除、帮助、
   注释和文本均不命中。
+- Atomic Red Team T1685 只有将 `kernel.randomize_va_space` 静态写为 `0` 时，
+  才同时报告系统修改和防御规避；支持 sysctl 点号/斜杠参数及静态 `/proc/sys`
+  重定向，恢复值 `1/2`、查询、其他参数、动态值、帮助、注释和文本均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-test 分层保留三条已经修复的 T1059.006 控制、iptables 规则删除和 OCI token
-访问控制，并新增 Atomic T1685 通过
-`sysctl -w kernel.randomize_va_space=0` 关闭 Linux ASLR 的样本。当前完全漏掉
-防御规避和系统修改，test 分层合计 recall 87.5%、precision 100%。发布门禁继续要求整体
+test 分层保留三条已经修复的 T1059.006 控制、iptables 规则删除、OCI token
+访问和 ASLR 控制，并新增 Atomic T1105 的 SCP 本地到远端推送样本。当前类别级
+结果正确，但仍由宽泛的 `exfil.upload` 命中，缺少方向感知的高置信
+`exfil.scp-push` finding；85 条中因此有一条未完全匹配。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应要求 sysctl 写操作、完整参数名和
-静态禁用值 `0` 同时成立；恢复值 `2`、查询、其他 sysctl 参数、动态值、帮助、
-注释和文本应作为 hard-negative，并考虑同语义 `/proc/sys` 写入变体。
+`maximum.forbiddenFindingCount` 为 0。下一轮应解析 SCP 选项后的源、目标操作数：
+只有静态本地源到静态远端目标才报告外传；远端到本地 pull、两个本地路径、
+两个远端路径、动态/歧义路径、帮助、注释和文本应作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-127 个单元测试或当前小规模公开语料外推生产环境准确率。
+128 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

@@ -2113,7 +2113,7 @@
     },
     {
       "id": "holdout-atomic-disable-aslr-sysctl-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/disable-aslr-sysctl.sh.txt",
@@ -2142,6 +2142,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single Linux bash executor command without its cleanup command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-scp-remote-push-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/scp-remote-push.sh.txt",
+      "sha256": "cc8b5f2c410d55be52a1482d63eac47de0c61cb069dbc3210b89f51586d82847",
+      "expectedCategories": ["data_exfiltration", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "data_exfiltration",
+          "ruleId": "exfil.scp-push",
+          "evidencePattern": "scp\\s+/tmp/atomic-report[.]txt\\s+analyst@192[.]0[.]2[.]10:"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "scp\\s+/tmp/atomic-report[.]txt\\s+analyst@192[.]0[.]2[.]10:"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "83a49600-222b-4866-80a0-37736ad29344",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced Atomic input arguments with an inert documentation address and /tmp paths while preserving local-to-remote SCP operand direction."
       }
     }
   ]

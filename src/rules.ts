@@ -12,6 +12,7 @@ export interface Rule {
 
 const cmd = String.raw`^\s*`;
 const arg = String.raw`(?:\s|$)`;
+const aslrDisable = String.raw`^\s*(?:sysctl\b(?=[^;\n]*(?:^|\s)(?:-w|--write)(?:\s|$))[^;\n]*\bkernel(?:[./])randomize_va_space\s*=\s*0(?:\s|$)|(?:echo(?:\s+-n)?\s+["']?0["']?|printf\s+(?:["']?0(?:\\n)?["']?|["']?%s(?:\\n)?["']?\s+["']?0["']?))\s*>\s*["']?\/proc\/sys\/kernel\/randomize_va_space["']?\s*)$`;
 
 export const COMMAND_RULES: Rule[] = [
   {
@@ -150,6 +151,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:\s|^)(?:-D|--delete)(?:\s|$))(?=[^;\n]*(?:\s|^)(?:-j|--jump)(?:=|\s+)(?:DROP|REJECT)(?:\s|$))/i,
   },
   {
+    id: "system.aslr-disable",
+    category: "system_modification",
+    title: "Disables Linux ASLR",
+    severity: "critical",
+    confidence: "high",
+    message: "Sets the Linux address-space randomization control to the disabled value.",
+    pattern: new RegExp(aslrDisable, "i"),
+  },
+  {
     id: "system.backup-disable",
     category: "system_modification",
     title: "Disables macOS Time Machine",
@@ -247,6 +257,15 @@ export const COMMAND_RULES: Rule[] = [
     confidence: "high",
     message: "Deletes a static DROP or REJECT rule that may have blocked adversary traffic.",
     pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:\s|^)(?:-D|--delete)(?:\s|$))(?=[^;\n]*(?:\s|^)(?:-j|--jump)(?:=|\s+)(?:DROP|REJECT)(?:\s|$))/i,
+  },
+  {
+    id: "defense.aslr-disable",
+    category: "defense_evasion",
+    title: "Disables Linux ASLR",
+    severity: "critical",
+    confidence: "high",
+    message: "Disables address-space layout randomization and weakens exploit mitigations.",
+    pattern: new RegExp(aslrDisable, "i"),
   },
   {
     id: "defense.timestomp",

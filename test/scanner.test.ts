@@ -628,6 +628,55 @@ describe("scan", () => {
     }
   });
 
+  it("detects static Linux ASLR disable writes without flagging reads or restoration", () => {
+    const disables = [
+      "sysctl -w kernel.randomize_va_space=0",
+      "sudo sysctl --write kernel.randomize_va_space=0",
+      "sysctl -q -w kernel/randomize_va_space=0",
+      "echo 0 > /proc/sys/kernel/randomize_va_space",
+      "echo -n '0' > '/proc/sys/kernel/randomize_va_space'",
+      "printf '0\\n' >/proc/sys/kernel/randomize_va_space",
+      "printf '%s\\n' 0 > /proc/sys/kernel/randomize_va_space",
+    ];
+    for (const source of disables) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "system.aslr-disable",
+          category: "system_modification",
+          confidence: "high",
+        }),
+        expect.objectContaining({
+          ruleId: "defense.aslr-disable",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "sysctl kernel.randomize_va_space",
+      "sysctl -n kernel.randomize_va_space",
+      "sysctl -w kernel.randomize_va_space=2",
+      "sysctl -w kernel.randomize_va_space=1",
+      "sysctl -w net.ipv4.ip_forward=0",
+      "sysctl -w kernel.randomize_va_space=$mode",
+      "sysctl --system",
+      "sysctl --help",
+      "cat /proc/sys/kernel/randomize_va_space",
+      "echo 2 > /proc/sys/kernel/randomize_va_space",
+      "echo \"$mode\" > /proc/sys/kernel/randomize_va_space",
+      "echo 0 > /tmp/randomize_va_space",
+      "echo 'sysctl -w kernel.randomize_va_space=0'",
+      "# sysctl -w kernel.randomize_va_space=0",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.aslr-disable"
+        || finding.ruleId === "defense.aslr-disable"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",
