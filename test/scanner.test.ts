@@ -589,6 +589,54 @@ describe("scan", () => {
     }
   });
 
+  it("detects static shell-history suppression without matching normal history configuration", () => {
+    const suppressions = [
+      "export HISTFILE=\"/dev/null\"",
+      "HISTFILE=/dev/null",
+      "readonly HISTSIZE=0",
+      "export HISTFILESIZE='0'",
+      "HISTIGNORE='*'",
+      "unset HISTFILE",
+      "unset -v HISTFILE",
+      "set +o history",
+      "history -c",
+    ];
+    for (const source of suppressions) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "defense.history-disable",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "echo \"$HISTFILE\"",
+      "export HISTFILE=\"$HOME/.bash_history\"",
+      "HISTFILE=~/.bash_history",
+      "export HISTSIZE=1000",
+      "export HISTFILESIZE=2000",
+      "export HISTIGNORE='ls*:pwd'",
+      "export HISTCONTROL=ignoreboth",
+      "export HISTFILE=\"$target\"",
+      "HISTFILE=/dev/null env",
+      "HISTSIZE=0 command env",
+      "f() { local HISTFILE=/dev/null; echo ok; }",
+      "unset OTHER_VARIABLE",
+      "set -o history",
+      "history",
+      "history --help",
+      "echo 'export HISTFILE=/dev/null'",
+      "# export HISTSIZE=0",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "defense.history-disable"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects OCI session-token access without matching ordinary OCI or token files", () => {
     const credentialAccesses = [
       "find /home/alice/.oci/sessions -name token -type f",

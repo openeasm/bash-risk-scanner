@@ -2245,7 +2245,7 @@
     },
     {
       "id": "holdout-atomic-history-to-dev-null-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/history-to-dev-null.sh.txt",
@@ -2269,6 +2269,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single executor assignment that redirects shell history to /dev/null; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-add-trusted-root-cert-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/add-trusted-root-cert.sh.txt",
+      "sha256": "e909a1a12d1d6cdbf17a9926c83228a11b2cdac7f89d977933aa6b18edea4aba",
+      "expectedCategories": ["privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+security\\s+add-trusted-cert"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.trust-root-install",
+          "evidencePattern": "security\\s+add-trusted-cert"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1553.004/T1553.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1553.004.yaml.txt",
+        "upstreamSha256": "fa18467775f261af1338727bd3f5d749bc710df362a98680cc3ae36f9435d6da",
+        "upstreamId": "cc4a0b8c-426f-40ff-9426-4e10e5bf4c49",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the macOS trust-root installation command and replaced the certificate placeholder with an inert /tmp path; the evaluation harness never executes it."
       }
     }
   ]

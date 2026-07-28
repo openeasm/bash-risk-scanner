@@ -241,6 +241,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:(?:rm|shred|truncate)\b[^;\n]*(?:\/var\/log\b|\.bash_history\b|\.zsh_history\b|audit\.log\b)|dd\b[^;\n]*\bof=\/var\/log\/|history\s+-c\b)/i,
   },
   {
+    id: "defense.history-disable",
+    category: "defense_evasion",
+    title: "Disables shell command history",
+    severity: "high",
+    confidence: "high",
+    message: "Disables shell history collection or clears the in-memory history list.",
+    pattern: /^\s*(?:set\s+\+o\s+history(?:\s|$)|history\s+-c(?:\s|$))/i,
+  },
+  {
     id: "defense.security-control",
     category: "defense_evasion",
     title: "Disables a security control",

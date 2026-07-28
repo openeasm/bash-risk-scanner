@@ -422,6 +422,23 @@ function bashAwkSpawnsStaticShell(text: string): boolean {
       .test(command);
 }
 
+function staticHistoryAssignmentValue(node: SyntaxNode | null): string | undefined {
+  if (!node) return undefined;
+  if (node.type === "word" || node.type === "number") return node.text;
+  if (node.type === "raw_string") return node.text.slice(1, -1);
+  if (
+    node.type === "string"
+    && !node.namedChildren.some((child) =>
+      child.type === "expansion"
+      || child.type === "simple_expansion"
+      || child.type === "command_substitution"
+    )
+  ) {
+    return node.text.slice(1, -1).replace(/\\(["\\])/g, "$1");
+  }
+  return undefined;
+}
+
 function bashDiscoveredCommandVariables(
   root: SyntaxNode,
   commandPattern: RegExp,
@@ -1544,6 +1561,52 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     tree.rootNode,
     /^(?:which|command\s+-v)\s+openssl\s*$/,
   );
+
+  for (const assignment of tree.rootNode.descendantsOfType("variable_assignment")) {
+    if (assignment.parent?.type === "command") continue;
+    if (
+      assignment.parent?.type === "declaration_command"
+      && !/^\s*(?:export|readonly|declare\s+-g)\b/.test(assignment.parent.text)
+    ) continue;
+    const name = assignment.childForFieldName("name")?.text;
+    const value = staticHistoryAssignmentValue(assignment.childForFieldName("value"));
+    const disablesHistory =
+      (name === "HISTFILE" && value === "/dev/null")
+      || ((name === "HISTSIZE" || name === "HISTFILESIZE") && value === "0")
+      || (name === "HISTIGNORE" && value === "*");
+    if (!disablesHistory) continue;
+    const container = assignment.parent?.type === "declaration_command"
+      ? assignment.parent
+      : assignment;
+    findings.push({
+      ruleId: "defense.history-disable",
+      category: "defense_evasion",
+      title: "Disables shell command history",
+      severity: "high",
+      confidence: "high",
+      message: "Assigns a static shell-history setting that suppresses command recording.",
+      evidence: evidence(container.text, maxEvidence),
+      range: rangeOf(container),
+      language: "bash",
+    });
+  }
+
+  for (const unset of tree.rootNode.descendantsOfType("unset_command")) {
+    if (!unset.namedChildren.some((child) =>
+      child.type === "variable_name" && child.text === "HISTFILE"
+    )) continue;
+    findings.push({
+      ruleId: "defense.history-disable",
+      category: "defense_evasion",
+      title: "Disables shell command history",
+      severity: "high",
+      confidence: "high",
+      message: "Unsets HISTFILE so the current shell will not save command history.",
+      evidence: evidence(unset.text, maxEvidence),
+      range: rangeOf(unset),
+      language: "bash",
+    });
+  }
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));

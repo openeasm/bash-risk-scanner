@@ -164,11 +164,11 @@ publish、Rustup、semantic-release/github、Bun、AWS CLI、Deno、Oh My Zsh、
 Hugging Face Hub、node-pre-gyp、Ansible 和 Google Cloud Storage 的完整许可快照。
 Atomic Red Team DNS 外传、timestomp、`.netrc`、crontab、SUID、UFW、GCS 删除、
 变量 Python、Keychain、emond、Python HTTP server、iptables flush、变量定位
-GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行和 rsync 远程传输已转为 validation
-回归；UFW 日志关闭也已转为 validation。冻结 test 分层当前保留三条已修复的
-T1059.006 跨语言控制、iptables 规则删除、OCI session token 访问和 Linux ASLR
-控制、SCP 方向、awk shell escape 和密码哈希访问控制，并新增 T1690“将
-`HISTFILE` 指向 `/dev/null`”盲测。
+GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传输和 T1690
+历史抑制已转为 validation 回归；UFW 日志关闭也已转为 validation。冻结 test
+分层保留跨语言控制、iptables 规则删除、OCI session token、Linux ASLR、SCP
+方向、awk shell escape 和密码哈希访问控制，并新增 T1553.004“安装受信任根
+证书”盲测。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

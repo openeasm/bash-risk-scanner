@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 88 条离线语料：87 条完全匹配，precision 100%、recall 99.5%、
+当前基线为 89 条离线语料：88 条完全匹配，precision 100%、recall 99.5%、
 F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -281,20 +281,24 @@ validation 回归：
   `/etc/master.passwd` 识别内容读取、复制、`getent shadow/gshadow`、受限 find
   枚举及文件描述符输入重定向；普通 passwd/group、备份名、子目录、动态路径、
   写入/删除、仅元数据访问、帮助、注释和文本均不命中。
+- Atomic Red Team T1690 的静态 `HISTFILE=/dev/null`、`HISTSIZE/HISTFILESIZE=0`、
+  `HISTIGNORE='*'`、`unset HISTFILE`、`set +o history` 和 `history -c` 现在识别
+  防御规避；普通历史文件、非零大小、有限忽略列表、读取变量、动态值、命令局部
+  环境变量、函数局部变量、帮助、注释和文本均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-test 分层保留三条已经修复的 T1059.006 控制、iptables 规则删除、OCI token
-访问、ASLR、SCP 方向、awk shell escape 和密码哈希访问控制，并新增 Atomic
-T1690 设置 `export HISTFILE="/dev/null"` 的样本。当前完全漏掉防御规避，
-test 分层 recall 93.3%、precision 100%。发布门禁继续要求整体
+test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI token、ASLR、SCP
+方向、awk shell escape 和密码哈希访问控制，并新增 Atomic T1553.004 使用
+`security add-trusted-cert` 安装系统信任根的样本。当前能识别 `sudo` 权限提升，
+但漏掉系统信任配置修改。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应覆盖静态 `HISTFILE=/dev/null`、
-`HISTSIZE/HISTFILESIZE=0`、`HISTIGNORE='*'` 和 history cache 清除；正常历史路径、
-非零大小、有限忽略列表、读取变量、动态值、帮助、注释和文本应作为 hard-negative。
+`maximum.forbiddenFindingCount` 为 0。下一轮应覆盖 macOS
+`security add-trusted-cert` 与 Linux `update-ca-certificates`/trust-store 更新；
+证书查询、用户 Keychain 导入、验证和帮助命令应作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-131 个单元测试或当前小规模公开语料外推生产环境准确率。
+132 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
