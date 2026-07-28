@@ -203,6 +203,49 @@ function staticBashWords(text: string): string[] {
     .map((match) => match[0]!.replace(/^(["'])(.*)\1$/, "$2"));
 }
 
+function staticConcatenatedBashWords(text: string): string[] | undefined {
+  const words: string[] = [];
+  let current = "";
+  let quote: "'" | "\"" | undefined;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index]!;
+    if (character === "\\") {
+      const next = text[index + 1];
+      if (!next) return undefined;
+      current += next;
+      index += 1;
+      continue;
+    }
+    if (quote) {
+      if (character === quote) {
+        quote = undefined;
+        continue;
+      }
+      if (character === "$" || character === "`") return undefined;
+      current += character;
+      continue;
+    }
+    if (character === "'" || character === "\"") {
+      quote = character;
+      continue;
+    }
+    if (character === "$" || character === "`" || /[;|&<>]/.test(character)) {
+      return undefined;
+    }
+    if (/\s/.test(character)) {
+      if (current) {
+        words.push(current);
+        current = "";
+      }
+      continue;
+    }
+    current += character;
+  }
+  if (quote) return undefined;
+  if (current) words.push(current);
+  return words;
+}
+
 function isRsyncRemoteOperand(value: string): boolean {
   if (
     !value
@@ -816,6 +859,23 @@ function bashStagesKeychainFile(text: string): boolean {
     .test(source)
     && destination !== source
     && destination !== "/dev/null";
+}
+
+function bashStagesMacChromeLoginData(text: string): boolean {
+  const words = staticConcatenatedBashWords(text);
+  if (!words || !/^(?:\/(?:usr\/)?bin\/)?cp$/.test(words[0] ?? "")) {
+    return false;
+  }
+  const operands = words.slice(1).filter((word) => !word.startsWith("-"));
+  if (operands.length !== 2) return false;
+  const [source, destination] = operands;
+  if (
+    !source
+    || !destination
+    || !/^(?:~|\/Users\/[^/]+)\/Library\/Application Support\/Google\/Chrome\/(?:Default|Profile [^/]+)\/Login Data(?: For Account)?$/.test(source)
+  ) return false;
+  return destination !== source
+    && !/^(?:\/dev\/(?:null|stdout|stderr)|\/proc\/self\/fd\/[012])$/.test(destination);
 }
 
 function bashSearchesBroadTreeForCredentials(text: string): boolean {
@@ -2324,6 +2384,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     source.includes("Library/Keychains")
     && source.includes(">")
     && /[.]keychain(?:-db)?\b/.test(source);
+  const hasMacChromeLoginDataCandidate =
+    source.includes("Application Support/Google/Chrome")
+    && source.includes("Login Data");
   const hasBroadCredentialSearchCandidate =
     /\b(?:password|passwd|secret|token|api[_-]?key)\b/i.test(source)
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*grep(?:\s|$)/m
@@ -2925,6 +2988,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Reads a static Keychain database and redirects its contents to a static staging file.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasMacChromeLoginDataCandidate) {
+      const directCp = /^\s*["']?cp["']?(?:\s|$)/.test(statement.text);
+      if (
+        !(directCp && definedFunctions.has("cp"))
+        && variants.some((variant) => bashStagesMacChromeLoginData(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.chrome-login-data-stage",
+          category: "credential_access",
+          title: "Stages a macOS Chrome credential database",
+          severity: "high",
+          confidence: "high",
+          message: "Copies a static Chrome Login Data credential database from a macOS user profile.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

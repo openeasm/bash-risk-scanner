@@ -1,7 +1,8 @@
 # bash-risk-scanner
 
 基于 Tree-sitter 的 Node.js 静态风险扫描器，统一支持 Bash、Python 和
-Node.js/JavaScript。它按语法树提取调用并检测单调用特征与行为链，而不是扫描
+Node.js/JavaScript。当前真实世界规则建设优先覆盖 macOS，以及从 Bash 启动的
+Windows/PowerShell 行为。它按语法树提取调用并检测单调用特征与行为链，而不是扫描
 注释中的普通字符串。扫描完全离线，不执行传入代码。
 
 支持的类别包括：下载执行、动态执行、持久化、凭据访问、系统修改、权限提升、防御规避、网络外联、数据外传、破坏行为、解释器逃逸和二阶段载荷。
@@ -131,6 +132,13 @@ cat script.sh | bash-risk-scan
 载荷。行为链属于启发式关联，适合客户端预检，不应替代沙箱、来源信誉和运行期
 监控。
 
+macOS 已有 Keychain、Safari Cookie、Chrome Login Data、LaunchAgent、emond 和
+Time Machine 等公开样本回归。Windows 当前能识别 Bash 中对
+`powershell`/`pwsh` 的调用和静态内嵌 Python/Node.js 载荷，但尚未解析原生
+PowerShell AST；因此不能把它当作完整的 `.ps1` 扫描器。后续 Windows 覆盖应接入
+PowerShell AST 或独立解析器，并以 AMSI 绕过、Defender 配置、注册表启动项、
+计划任务、凭据访问和下载执行的公开样本建立同样的正反例门禁。
+
 ## 开发与发布检查
 
 ```bash
@@ -174,11 +182,11 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 凭据目录发现、私有 SSH 密钥发现后暂存、Safari Cookie 搜索、macOS
 login.keychain 文件暂存、LaunchAgent plist 安装加载、广泛文件树密码模式搜索、
 AWS credentials、Azure token cache 和 GCP 凭据数据库发现均已进入
-validation；rsync、FreeBSD `gcp` 私钥暂存、私钥位置清单生成和
+validation；Chrome `Login Data`/`Login Data For Account` 复制暂存、rsync、
+FreeBSD `gcp` 私钥暂存、私钥位置清单生成和
 `auditctl -e 0` 审计禁用、SCP/SFTP 传输和停止 `systemd-journald` 也已修复，
 当前冻结 test 为把 `journald.conf` 的 `Storage` 改为 `none`。
-本轮不针对
-新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
+该 Linux 缺口按当前平台优先级暂缓；报告会如实保留 FP、FN 及 finding 约束错误。
 
 导入器默认复核已有本地文件的 SHA-256，只下载缺失或不匹配的快照；使用
 `npm run evaluate:import-public:refresh` 可强制从固定 commit 重新获取全部文件。
