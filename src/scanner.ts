@@ -265,9 +265,9 @@ function isScpRemoteOperand(value: string): boolean {
     .test(value);
 }
 
-function bashScpPushesLocalPath(text: string): boolean {
+function staticScpOperands(text: string): string[] | undefined {
   const words = staticBashWords(text);
-  if (words[0]?.toLowerCase() !== "scp") return false;
+  if (words[0]?.toLowerCase() !== "scp") return undefined;
 
   const operands: string[] = [];
   const optionsWithValue = new Set([
@@ -286,13 +286,28 @@ function bashScpPushesLocalPath(text: string): boolean {
     }
     operands.push(word);
   }
+  return operands;
+}
 
+function bashScpPushesLocalPath(text: string): boolean {
+  const operands = staticScpOperands(text);
+  if (!operands) return false;
   if (operands.length < 2 || !isScpRemoteOperand(operands.at(-1)!)) return false;
   return operands.slice(0, -1).every((source) =>
     source.length > 0
     && !/[$`;&|<>]/.test(source)
     && !isScpRemoteOperand(source)
   );
+}
+
+function bashScpPullsRemotePath(text: string): boolean {
+  const operands = staticScpOperands(text);
+  if (!operands || operands.length < 2) return false;
+  const destination = operands.at(-1)!;
+  return destination.length > 0
+    && !/[$`;&|<>]/.test(destination)
+    && !isScpRemoteOperand(destination)
+    && operands.slice(0, -1).every((source) => isScpRemoteOperand(source));
 }
 
 function bashSystemdRunSchedulesTimer(text: string): boolean {
@@ -2419,7 +2434,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         language: "bash",
       });
     }
-    if (variants.some((variant) => bashScpPushesLocalPath(variant))) {
+    const directScp = /^\s*["']?scp["']?(?:\s|$)/.test(statement.text);
+    if (
+      !(directScp && definedFunctions.has("scp"))
+      && variants.some((variant) => bashScpPushesLocalPath(variant))
+    ) {
       findings.push({
         ruleId: "exfil.scp-push",
         category: "data_exfiltration",
@@ -2427,6 +2446,22 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "high",
         confidence: "high",
         message: "Transfers one or more static local paths to a remote SCP destination.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    if (
+      !(directScp && definedFunctions.has("scp"))
+      && variants.some((variant) => bashScpPullsRemotePath(variant))
+    ) {
+      findings.push({
+        ruleId: "network.scp-pull",
+        category: "network_egress",
+        title: "Downloads remote data with SCP",
+        severity: "medium",
+        confidence: "high",
+        message: "Transfers one or more static remote SCP sources into a static local destination.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",

@@ -3079,7 +3079,7 @@
     },
     {
       "id": "holdout-atomic-scp-remote-pull-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/scp-remote-pull.sh.txt",
@@ -3100,6 +3100,34 @@
         "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
         "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
         "upstreamId": "b9d22b9a-9778-4426-abf0-568ea64e9c33",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic remote and local path inputs with inert static defaults and copied the single executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-sftp-remote-pull-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/sftp-remote-pull.sh.txt",
+      "sha256": "d0b61277f340e8bd4d078c6811b9ea33ab668c59a5b2c30f2a73abddefdb0cf4",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.sftp-pull",
+          "evidencePattern": "sftp\\s+adversary@adversary-host:/tmp/adversary-sftp\\s+/tmp/victim-files/"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "0139dba1-f391-405e-a4f5-f3989f2c88ef",
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic remote and local path inputs with inert static defaults and copied the single executor command; the evaluation harness never executes it."

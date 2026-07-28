@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 116 条离线语料：115 条完全匹配，类别级 precision、recall 和
+当前基线为 117 条离线语料：116 条完全匹配，类别级 precision、recall 和
 F1 均为 100%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -373,6 +373,9 @@ validation 回归：
 - Atomic Red Team T1685.004 的 `auditctl -e 0` 现在作为独立高置信度语义；
   `-e 1` 启用、`-e 2` 不可变锁定、状态查询、其他参数、帮助、文本和函数遮蔽
   均不命中，并保留显式 `command`/`sudo` 绕过同名函数的真实调用。
+- Atomic Red Team T1105 的 SCP 拉取现在要求一个或多个静态远端源和静态本地
+  目标；上传、远端到远端、本地复制、动态参数、选项值、帮助、文本和函数遮蔽
+  均不命中，并继续与 SCP 上传外传规则互斥。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
@@ -384,15 +387,15 @@ validation；Atomic T1548.003 的 `timestamp_timeout=-1` 也已转入 validation
 `Defaults !tty_tickets`、`sudo vim /etc/sudoers`、`.gnupg` 目录发现、私钥暂存、
 Safari Cookie 搜索、Keychain 文件暂存、LaunchAgent 安装加载、广泛密码搜索、
 AWS credentials、Azure token cache、GCP 凭据数据库发现、rsync 和 gcp 私钥
-暂存、私钥位置清单及 `auditctl -e 0` 也已转入 validation。当前冻结样本改为
-Atomic T1105 的 SCP 远端到本地拉取；扫描器能识别网络外联类别，但尚未识别
-`network.scp-pull` 的传输方向。发布门禁继续要求整体
+暂存、私钥位置清单、`auditctl -e 0` 及 SCP 远端拉取也已转入 validation。
+当前冻结样本改为 Atomic T1105 的 SFTP 远端到本地拉取；扫描器能识别网络外联
+类别，但尚未识别 `network.sftp-pull` 的传输方向。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分远端源和本地目标与 SCP
-上传、远端到远端复制、动态参数、选项值、帮助、文本和函数遮蔽。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分 SFTP 的远端路径操作数与
+交互式/batch 上传、动态参数、选项值、帮助、文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-159 个单元测试或当前小规模公开语料外推生产环境准确率。
+160 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

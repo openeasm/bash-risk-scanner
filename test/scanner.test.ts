@@ -155,6 +155,50 @@ describe("scan", () => {
     )).toBe(true);
   });
 
+  it("detects only static remote-to-local SCP pulls as directional network transfer", () => {
+    const pulls = [
+      "scp analyst@example.test:/srv/report.txt /tmp/report.txt",
+      "sudo scp -P 2222 -i /tmp/test-key user@[2001:db8::10]:/one user@example.test:/two ./downloads/",
+      "command scp -- scp://user@example.test/tmp/archive.tgz ./archive.tgz",
+    ];
+    for (const source of pulls) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "network.scp-pull",
+          category: "network_egress",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "scp /tmp/report.txt analyst@example.test:/srv/report.txt",
+      "scp user@one.example:/a user@two.example:/b",
+      "scp /tmp/one.txt /tmp/two.txt",
+      "scp \"$source\" /tmp/report.txt",
+      "scp analyst@example.test:/srv/report.txt \"$destination\"",
+      "scp --help",
+      "echo 'scp analyst@example.test:/srv/report.txt /tmp/report.txt'",
+      "# scp analyst@example.test:/srv/report.txt /tmp/report.txt",
+      `scp() { echo "project helper"; }
+       scp analyst@example.test:/srv/report.txt /tmp/report.txt`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "network.scp-pull"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      scp() { echo "project helper"; }
+      command scp analyst@example.test:/one /tmp/one
+      sudo scp analyst@example.test:/two /tmp/two
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "network.scp-pull"
+    )).toHaveLength(2);
+  });
+
   it("tracks Python interpreters selected only from trusted discovery candidates", () => {
     const result = scan(`
       which_python=$(which python || which python3 || command -v python3.12)
