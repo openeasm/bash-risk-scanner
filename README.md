@@ -173,7 +173,8 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 无限 sudo 缓存、`!tty_tickets`、sudoers 编辑器和 T1552.004 的 `.gnupg`
 凭据目录发现、私有 SSH 密钥发现后暂存、Safari Cookie 搜索、macOS
 login.keychain 文件暂存和 LaunchAgent plist 安装加载均已进入 validation；
-当前冻结 test 为在广泛文件树中递归搜索密码模式。
+广泛文件树密码模式搜索也已修复，当前冻结 test 为使用 `find` 定位 AWS
+credentials 文件。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

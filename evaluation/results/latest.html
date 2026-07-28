@@ -13,16 +13,16 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">107/108</div>样本通过</div>
+<div class="card"><div class="big">108/109</div>样本通过</div>
 <div class="card"><div class="big">100.0%</div>Precision</div>
 <div class="card"><div class="big">99.5%</div>Recall</div>
 <div class="card"><div class="big">99.8%</div>F1</div>
-<div class="card"><div class="big">90.88 ms</div>P95</div>
+<div class="card"><div class="big">89.85 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>137</td><td>0</td><td>1</td>
+    <td>bash</td><td>138</td><td>0</td><td>1</td>
     <td>100.0%</td><td>99.3%</td><td>99.6%</td>
   </tr>
 <tr>
@@ -36,7 +36,7 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>public-derived</td><td>96</td><td>0</td><td>1</td>
+    <td>public-derived</td><td>97</td><td>0</td><td>1</td>
     <td>100.0%</td><td>99.0%</td><td>99.5%</td>
   </tr>
 <tr>
@@ -58,14 +58,14 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>93.3%</td><td>96.6%</td>
   </tr>
 <tr>
-    <td>validation</td><td>177</td><td>0</td><td>0</td>
+    <td>validation</td><td>178</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>credential_access</td><td>21</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>95.5%</td><td>97.7%</td>
+    <td>credential_access</td><td>22</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>95.7%</td><td>97.8%</td>
   </tr>
 <tr>
     <td>data_exfiltration</td><td>18</td><td>0</td><td>0</td>
@@ -113,11 +113,11 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>缺少指定 finding</th><th>禁止 finding</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-atomic-search-password-pattern-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/search-password-pattern.sh.txt</span></td>
+<tr><td><code>holdout-atomic-find-aws-credentials-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/find-aws-credentials.sh.txt</span></td>
 <td>credential_access</td><td>无</td>
 <td class="fail">credential_access</td>
-<td class="fail">credential.password-pattern-search</td>
+<td class="fail">credential.aws-credentials-discovery</td>
 <td class="pass">无</td>
 <td>无</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T21:20:15.903Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<p class="muted">生成时间：2026-07-28T21:24:29.061Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

@@ -651,6 +651,76 @@ function bashStagesKeychainFile(text: string): boolean {
     && destination !== "/dev/null";
 }
 
+function bashSearchesBroadTreeForCredentials(text: string): boolean {
+  if (!/^\s*grep(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  if (words[0] !== "grep" || words.some((word) =>
+    /^(?:--help|--version|-f|--file)$/.test(word)
+  )) return false;
+
+  let recursive = false;
+  const patterns: string[] = [];
+  const targets: string[] = [];
+  const optionsWithValue = new Set([
+    "-A", "--after-context", "-B", "--before-context", "-C", "--context",
+    "-m", "--max-count", "--binary-files", "--color", "--devices",
+    "--directories", "--exclude", "--exclude-from", "--exclude-dir",
+    "--include", "--label",
+  ]);
+  let positionalPattern = true;
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (word === "--") {
+      for (const operand of words.slice(index + 1)) {
+        if (positionalPattern && patterns.length === 0) {
+          patterns.push(operand);
+          positionalPattern = false;
+        } else {
+          targets.push(operand);
+        }
+      }
+      break;
+    }
+    if (word === "-e" || word === "--regexp") {
+      const pattern = words[index + 1];
+      if (!pattern) return false;
+      patterns.push(pattern);
+      positionalPattern = false;
+      index += 1;
+      continue;
+    }
+    if (word.startsWith("--regexp=")) {
+      patterns.push(word.slice("--regexp=".length));
+      positionalPattern = false;
+      continue;
+    }
+    if (word === "--recursive" || /^-[^-]*[rR]/.test(word)) {
+      recursive = true;
+    }
+    const option = word.split("=", 1)[0]!;
+    if (optionsWithValue.has(option)) {
+      if (!word.includes("=")) index += 1;
+      continue;
+    }
+    if (word.startsWith("-")) continue;
+    if (positionalPattern && patterns.length === 0) {
+      patterns.push(word);
+      positionalPattern = false;
+    } else {
+      targets.push(word);
+    }
+  }
+  const credentialPattern = patterns.some((pattern) =>
+    !/[$`;&|<>]/.test(pattern)
+    && /^(?:password|passwd|secret|token|api[_-]?key|access[_-]?token)$/i.test(pattern)
+  );
+  const broadTarget = targets.some((target) =>
+    !/[$`;&|<>]/.test(target)
+    && /^(?:\/|\/home\/?|\/Users\/?|\/root\/?|~\/?)$/.test(target)
+  );
+  return recursive && credentialPattern && broadTarget;
+}
+
 function isStaticLaunchAgentPath(value: string): boolean {
   return !/[$`;&|<>]/.test(value)
     && /^(?:(?:~|\/Users\/[^/]+)\/Library\/LaunchAgents|\/Library\/LaunchAgents)\/[^/]+[.]plist$/
@@ -1974,6 +2044,10 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     source.includes("Library/Keychains")
     && source.includes(">")
     && /[.]keychain(?:-db)?\b/.test(source);
+  const hasBroadCredentialSearchCandidate =
+    /\b(?:password|passwd|secret|token|api[_-]?key)\b/i.test(source)
+    && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*grep(?:\s|$)/m
+      .test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -2424,6 +2498,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Reads a static Keychain database and redirects its contents to a static staging file.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasBroadCredentialSearchCandidate) {
+      const directGrep = /^\s*["']?grep["']?(?:\s|$)/.test(statement.text);
+      if (
+        !(directGrep && definedFunctions.has("grep"))
+        && variants.some((variant) => bashSearchesBroadTreeForCredentials(variant))
+      ) {
+        findings.push({
+          ruleId: "credential.password-pattern-search",
+          category: "credential_access",
+          title: "Recursively searches a broad file tree for credentials",
+          severity: "high",
+          confidence: "high",
+          message: "Recursively searches a broad user or system root for a static credential-related term.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

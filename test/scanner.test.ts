@@ -1507,6 +1507,46 @@ describe("scan", () => {
     }
   });
 
+  it("detects recursive credential-term searches over broad roots without matching project grep", () => {
+    const searches = [
+      "grep -ri password /",
+      "sudo grep -Rni secret /home",
+      "command grep --recursive --ignore-case -e token /Users",
+      "grep -r --regexp=passwd /root/",
+      "grep -R -- api_key ~",
+    ];
+    for (const source of searches) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.password-pattern-search",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "grep -R password .",
+      "grep -R password ./src",
+      "grep password /",
+      "grep -ri username /",
+      `grep -ri "$term" /`,
+      `grep -ri password "$search_root"`,
+      "grep -ri password /tmp",
+      "grep -f patterns.txt -R /",
+      "grep --help password /",
+      `echo "grep -ri password /"`,
+      "# grep -ri password /",
+      `grep() { echo "project helper"; }
+       grep -ri password /`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.password-pattern-search"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",
