@@ -97,6 +97,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:cat|head|tail|less|more|cp|grep)\b[^;\n]*(?:^|\/)\.netrc(?:["']?\s|$)/i,
   },
   {
+    id: "credential.shadow-read",
+    category: "credential_access",
+    title: "Reads system password hashes",
+    severity: "critical",
+    confidence: "high",
+    message: "Reads a Unix password-hash database or queries its shadow entries.",
+    pattern: /^\s*(?:(?![^;\n]*<\s*["']?\/etc\/(?:shadow|master[.]passwd)\b)(?:cat|head|tail|less|more|cp|grep|awk|sed|cut|sort|uniq|strings)\b[^;\n]*(?:^|\s)["']?\/etc\/(?:shadow|master[.]passwd)["']?(?:\s|$)|find\b(?=[^;\n]*(?:^|\s)["']?\/etc(?:\/shadow)?["']?(?:\s|$))(?=[^;\n]*(?:\/shadow(?:["']?\s|$)|-(?:i?name)\s+["']?shadow["']?(?:\s|$)))[^;\n]*$|getent\b(?:\s+(?:-[A-Za-z]+|--[\w-]+(?:=\S+)?))*\s+(?:shadow|gshadow)(?:\s|$))/i,
+  },
+  {
     id: "credential.oci-session-token",
     category: "credential_access",
     title: "Accesses an OCI session token",

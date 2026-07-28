@@ -2212,7 +2212,7 @@
     },
     {
       "id": "holdout-atomic-read-shadow-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/read-shadow.sh.txt",
@@ -2241,6 +2241,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced the output argument with an inert /tmp path while preserving both executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-history-to-dev-null-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/history-to-dev-null.sh.txt",
+      "sha256": "bfd63309de490a84d16ceb26cbd2bee46885da234467866ce7d01c6b7116633f",
+      "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.history-disable",
+          "evidencePattern": "export\\s+HISTFILE=\"/dev/null\""
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1690/T1690.yaml",
+        "upstreamFile": "public/atomic-red-team/T1690.yaml.txt",
+        "upstreamSha256": "6bd93610dfa9acafce883916096f6b0bab929c28b85c667efb20bfaa9dcb4c6e",
+        "upstreamId": "b3dacb6c-a9e3-44ec-bf87-38db60c5cad1",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor assignment that redirects shell history to /dev/null; the evaluation harness never executes it."
       }
     }
   ]

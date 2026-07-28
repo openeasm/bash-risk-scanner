@@ -1549,6 +1549,23 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
     if (node.type !== "redirected_statement") return;
     const text = source.slice(node.startIndex, node.endIndex);
+    const readsPasswordHashes = node.namedChildren.some((child) =>
+      child.type === "file_redirect"
+      && /^\s*\d*<\s*["']?\/etc\/(?:shadow|master[.]passwd)["']?\s*$/i.test(child.text)
+    );
+    if (readsPasswordHashes) {
+      findings.push({
+        ruleId: "credential.shadow-read",
+        category: "credential_access",
+        title: "Reads system password hashes",
+        severity: "critical",
+        confidence: "high",
+        message: "Uses a system password-hash database as command input.",
+        evidence: evidence(text, maxEvidence),
+        range: rangeOf(node),
+        language: "bash",
+      });
+    }
     const targetVariable = text.match(/>>?\s*["']?\$(?:\{)?([A-Za-z_]\w*)\}?["']?\s*$/)?.[1];
     const writesStartupPath = targetVariable !== undefined
       && shellStartupVariables.has(targetVariable);

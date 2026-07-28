@@ -539,6 +539,56 @@ describe("scan", () => {
     expect(result.summary.byCategory.credential_access).toBe(1);
   });
 
+  it("detects Unix password-hash reads without matching ordinary account files or writes", () => {
+    const credentialReads = [
+      "sudo cat /etc/shadow > /tmp/shadow-copy",
+      "grep '^root:' /etc/shadow",
+      "awk -F: '$2 != \"!\" {print $1}' /etc/shadow",
+      "cp /etc/master.passwd /tmp/master-passwd-copy",
+      "getent shadow root",
+      "getent --service=files gshadow",
+      "find /etc -type f -name shadow",
+      "while read line; do printf '%s\\n' \"$line\"; done < /etc/shadow",
+      "exec 3< /etc/master.passwd",
+    ];
+    for (const source of credentialReads) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.shadow-read",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "cat /etc/passwd",
+      "cat /etc/group",
+      "cat /tmp/etc/shadow",
+      "cat /etc/shadow.bak",
+      "cat /etc/shadow.d/account",
+      "cat \"$credential_path\"",
+      "echo disabled > /etc/shadow",
+      "tee /etc/shadow < /tmp/replacement",
+      "rm -f /etc/shadow",
+      "touch /etc/shadow",
+      "chmod 600 /etc/shadow",
+      "stat /etc/shadow",
+      "ls -l /etc/shadow",
+      "find /tmp -name shadow",
+      "find /etc -name shadow-copy",
+      "getent passwd root",
+      "cat --help",
+      "echo 'cat /etc/shadow'",
+      "# getent shadow root",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.shadow-read"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects OCI session-token access without matching ordinary OCI or token files", () => {
     const credentialAccesses = [
       "find /home/alice/.oci/sessions -name token -type f",
