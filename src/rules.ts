@@ -105,6 +105,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*security\s+(?:dump-keychain\b|find-(?:generic|internet)-password\b(?=[^;\n]*\s-w(?:\s|$)))/i,
   },
   {
+    id: "credential.lazagne-browser",
+    category: "credential_access",
+    title: "Dumps browser credentials with LaZagne",
+    severity: "critical",
+    confidence: "high",
+    message: "Runs LaZagne's browser password module against Firefox or all supported browsers.",
+    pattern: /^\s*python\d*\s+["']?[^"'\s;]*\/[^/"'\s;]*lazagne\/(?:linux\/)?lazagne\.py["']?\s+browsers\s+(?:-firefox|all)(?:\s|$)/i,
+  },
+  {
     id: "system.sensitive-config",
     category: "system_modification",
     title: "Modifies sensitive system configuration",

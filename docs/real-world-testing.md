@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 73 条离线语料：72 条完全匹配，precision 100%、recall 99.4%、
-F1 99.7%。前二十九轮冻结集暴露的缺口均已转为带具体
+当前基线为 74 条离线语料：73 条完全匹配，precision 100%、recall 99.4%、
+F1 99.7%。前三十轮冻结集暴露的缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -224,18 +224,21 @@ validation 回归：
 - Atomic Red Team T1490 `tmutil disable` 现在同时报告系统配置变更和备份恢复
   能力破坏；状态、备份列表、目的地信息、启用、帮助、文本及被同名 Bash 函数
   遮蔽的裸调用均不命中，`command`、`sudo` 和绝对路径显式绕过函数时仍会命中。
+- Atomic Red Team T1555.003 只有在 Python 实际执行 LaZagne 工具目录中的
+  `laZagne.py`，并指定 `browsers -firefox` 或 `browsers all` 时才报告凭据访问；
+  普通项目同名脚本、工具内其他脚本、其他模块、帮助、缺少模块参数和文本均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-新冻结的 Atomic Red Team T1555.003 test 样本通过 Python 运行 LaZagne 的
-`browsers -firefox` 模块并把结果写入文件。当前只命中解释器逃逸，未命中凭据访问，
-因此 test recall 基线为 50%；整体门槛仍保持 precision 95%、recall 90%，
-`maximum.forbiddenFindingCount` 为 0。下一轮应结合脚本名称和明确的浏览器凭据
-模块参数识别，而不是只匹配 `python` 或输出文件名；普通同名脚本、其他模块、
-帮助命令、注释和文本内容应作为 hard-negative。
+新冻结的 Atomic Red Team T1105 test 样本用 `curl -sO` 下载脚本，随后
+`chmod +x` 并交给 Bash 执行。当前已命中下载执行和网络外联，但未命中二阶段载荷，
+因此 test recall 基线为 66.7%；整体门槛仍保持 precision 95%、recall 90%，
+`maximum.forbiddenFindingCount` 为 0。下一轮应证明下载输出名与授权/执行脚本相同，
+并用只下载、只授权、执行不同文件、同名文件来自本地以及文本内容作为
+hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-117 个单元测试或当前小规模公开语料外推生产环境准确率。
+118 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

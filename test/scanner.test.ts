@@ -562,6 +562,39 @@ describe("scan", () => {
     }
   });
 
+  it("detects LaZagne browser credential modules without matching ordinary scripts", () => {
+    const credentialDumps = [
+      "python3 /tmp/atomic-LaZagne/laZagne.py browsers -firefox",
+      "python /opt/LaZagne/Linux/laZagne.py browsers all",
+      "sudo python3 /var/tmp/LaZagne/Linux/laZagne.py browsers -firefox",
+    ];
+    for (const source of credentialDumps) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.lazagne-browser",
+          category: "credential_access",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "python3 /tmp/project/laZagne.py browsers -firefox",
+      "python3 /tmp/LaZagne/Linux/helper.py browsers -firefox",
+      "python3 /tmp/LaZagne/Linux/laZagne.py sysadmin",
+      "python3 /tmp/LaZagne/Linux/laZagne.py browsers --help",
+      "python3 /tmp/LaZagne/Linux/laZagne.py --help",
+      "python3 /tmp/LaZagne/Linux/laZagne.py browsers",
+      "python3 /tmp/lazagne-report.py browsers -firefox",
+      "echo 'python3 /tmp/LaZagne/Linux/laZagne.py browsers -firefox'",
+      "# python3 /tmp/LaZagne/Linux/laZagne.py browsers all",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.lazagne-browser"
+      )).toBe(false);
+    }
+  });
+
   it("allows download-execute from an explicitly trusted exact host", () => {
     const result = scan("curl https://artifacts.corp.example/a.sh | sh", {
       allowedDownloadHosts: ["artifacts.corp.example"],
