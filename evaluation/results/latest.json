@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T14:10:31.139Z",
+  "generatedAt": "2026-07-28T14:26:06.266Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -17,6 +17,15 @@
       "precision": 0.95,
       "recall": 0.9
     },
+    "minimumBySplit": {
+      "test": {
+        "precision": 0.8,
+        "recall": 0.25
+      }
+    },
+    "requiredPerfectSplits": [
+      "regression"
+    ],
     "maximum": {
       "parseErrorRate": 0.05,
       "p95Milliseconds": 100
@@ -28,23 +37,25 @@
     "recall": true,
     "parseErrorRate": true,
     "p95Milliseconds": true,
-    "samples": true
+    "split:regression:samples": true,
+    "split:test:precision": true,
+    "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 26,
-    "passedSamples": 26,
-    "failedSamples": 0,
-    "tp": 37,
+    "sampleCount": 30,
+    "passedSamples": 28,
+    "failedSamples": 2,
+    "tp": 46,
     "fp": 0,
-    "fn": 0,
+    "fn": 5,
     "precision": 1,
-    "recall": 1,
-    "f1": 1,
-    "parseErrorRate": 0.038461538461538464,
+    "recall": 0.9019607843137255,
+    "f1": 0.9484536082474228,
+    "parseErrorRate": 0.03333333333333333,
     "performance": {
-      "p50Milliseconds": 0.9477120000000099,
-      "p95Milliseconds": 68.17780400000001,
-      "maximumMilliseconds": 97.885978
+      "p50Milliseconds": 1.2367670000000004,
+      "p95Milliseconds": 73.74796,
+      "maximumMilliseconds": 102.65759800000001
     }
   },
   "languages": {
@@ -57,20 +68,20 @@
       "f1": 1
     },
     "python": {
-      "tp": 8,
+      "tp": 11,
       "fp": 0,
-      "fn": 0,
+      "fn": 4,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.7333333333333333,
+      "f1": 0.846153846153846
     },
     "node": {
-      "tp": 10,
+      "tp": 16,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.9411764705882353,
+      "f1": 0.9696969696969697
     }
   },
   "provenanceGroups": {
@@ -83,12 +94,12 @@
       "f1": 1
     },
     "public-snapshot": {
-      "tp": 6,
+      "tp": 15,
       "fp": 0,
-      "fn": 0,
+      "fn": 5,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.75,
+      "f1": 0.8571428571428571
     },
     "synthetic-realistic": {
       "tp": 25,
@@ -108,8 +119,16 @@
       "recall": 1,
       "f1": 1
     },
+    "test": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 5,
+      "precision": 1,
+      "recall": 0.2857142857142857,
+      "f1": 0.4444444444444445
+    },
     "validation": {
-      "tp": 12,
+      "tp": 19,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -129,10 +148,10 @@
     "data_exfiltration": {
       "tp": 4,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.8,
+      "f1": 0.888888888888889
     },
     "defense_evasion": {
       "tp": 1,
@@ -143,7 +162,7 @@
       "f1": 1
     },
     "destructive_behavior": {
-      "tp": 2,
+      "tp": 4,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -159,28 +178,28 @@
       "f1": 1
     },
     "dynamic_execution": {
-      "tp": 2,
-      "fp": 0,
-      "fn": 0,
-      "precision": 1,
-      "recall": 1,
-      "f1": 1
-    },
-    "interpreter_escape": {
       "tp": 3,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.75,
+      "f1": 0.8571428571428571
+    },
+    "interpreter_escape": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.8,
+      "f1": 0.888888888888889
     },
     "network_egress": {
-      "tp": 12,
+      "tp": 14,
       "fp": 0,
-      "fn": 0,
+      "fn": 2,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.875,
+      "f1": 0.9333333333333333
     },
     "persistence": {
       "tp": 3,
@@ -192,6 +211,14 @@
     },
     "privilege_escalation": {
       "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "second_stage_payload": {
+      "tp": 3,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -251,7 +278,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 15.26028199999999,
+      "durationMilliseconds": 15.880436000000003,
       "passed": true
     },
     {
@@ -310,7 +337,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.0428310000000067,
+      "durationMilliseconds": 1.0052809999999965,
       "passed": true
     },
     {
@@ -348,7 +375,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6499760000000094,
+      "durationMilliseconds": 0.7177910000000054,
       "passed": true
     },
     {
@@ -386,7 +413,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1078530000000057,
+      "durationMilliseconds": 1.2014400000000052,
       "passed": true
     },
     {
@@ -412,7 +439,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3541319999999928,
+      "durationMilliseconds": 0.38244899999999404,
       "passed": true
     },
     {
@@ -438,7 +465,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1411450000000087,
+      "durationMilliseconds": 1.2367670000000004,
       "passed": true
     },
     {
@@ -476,7 +503,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.175480000000007,
+      "durationMilliseconds": 5.716213999999994,
       "passed": true
     },
     {
@@ -522,7 +549,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.4808599999999927,
+      "durationMilliseconds": 1.5859030000000018,
       "passed": true
     },
     {
@@ -560,7 +587,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9477120000000099,
+      "durationMilliseconds": 1.1192059999999913,
       "passed": true
     },
     {
@@ -619,7 +646,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.2679119999999955,
+      "durationMilliseconds": 2.3507820000000095,
       "passed": true
     },
     {
@@ -657,7 +684,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.645347000000001,
+      "durationMilliseconds": 0.8116569999999967,
       "passed": true
     },
     {
@@ -683,7 +710,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9304500000000075,
+      "durationMilliseconds": 1.2172199999999975,
       "passed": true
     },
     {
@@ -709,7 +736,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.19746000000000663,
+      "durationMilliseconds": 0.22342999999997915,
       "passed": true
     },
     {
@@ -755,7 +782,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.4573970000000145,
+      "durationMilliseconds": 4.741821000000016,
       "passed": true
     },
     {
@@ -793,7 +820,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2665290000000198,
+      "durationMilliseconds": 1.5614470000000154,
       "passed": true
     },
     {
@@ -847,7 +874,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1483879999999829,
+      "durationMilliseconds": 1.5221639999999752,
       "passed": true
     },
     {
@@ -901,7 +928,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.862212999999997,
+      "durationMilliseconds": 1.2668930000000103,
       "passed": true
     },
     {
@@ -939,7 +966,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.38982999999998924,
+      "durationMilliseconds": 0.5193569999999852,
       "passed": true
     },
     {
@@ -965,7 +992,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.5480550000000051,
+      "durationMilliseconds": 0.7262059999999906,
       "passed": true
     },
     {
@@ -991,7 +1018,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.17107999999998924,
+      "durationMilliseconds": 0.23280800000000568,
       "passed": true
     },
     {
@@ -1059,7 +1086,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 68.17780400000001,
+      "durationMilliseconds": 73.74796,
       "passed": true
     },
     {
@@ -1263,7 +1290,7 @@
       "findingCount": 32,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 97.885978,
+      "durationMilliseconds": 102.65759800000001,
       "passed": true
     },
     {
@@ -1313,7 +1340,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.3601840000000038,
+      "durationMilliseconds": 1.430812000000003,
       "passed": true
     },
     {
@@ -1355,7 +1382,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.20779899999996587,
+      "durationMilliseconds": 0.28405499999996664,
       "passed": true
     },
     {
@@ -1397,7 +1424,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3272119999999745,
+      "durationMilliseconds": 0.43456800000001294,
       "passed": true
     },
     {
@@ -1447,8 +1474,238 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4123210000000199,
+      "durationMilliseconds": 0.5560770000000161,
       "passed": true
+    },
+    {
+      "id": "public-pipx-standalone-python-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/pipx/standalone_python.py.txt",
+      "sha256": "68866dc10a2667777049eefcf5b9d5280ecfca436be6f233b26eac9e7df32028",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pypa/pipx",
+        "commit": "d57b062260b62dee083117c7b15c36d15450ed47",
+        "sourceUrl": "https://github.com/pypa/pipx/blob/d57b062260b62dee083117c7b15c36d15450ed47/src/pipx/standalone_python.py",
+        "license": "MIT",
+        "licenseFile": "public/pipx/LICENSE"
+      },
+      "expectedCategories": [
+        "destructive_behavior",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "actualCategories": [
+        "destructive_behavior",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "python.destructive",
+          "category": "destructive_behavior",
+          "evidence": "shutil.rmtree(install_dir)"
+        },
+        {
+          "ruleId": "python.destructive",
+          "category": "destructive_behavior",
+          "evidence": "shutil.rmtree(leftover)"
+        },
+        {
+          "ruleId": "python.destructive",
+          "category": "destructive_behavior",
+          "evidence": "shutil.rmtree(backup_dir, ignore_errors=True)"
+        },
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "urlopen(url, timeout=_URL_OPEN_TIMEOUT)"
+        },
+        {
+          "ruleId": "python.second-stage",
+          "category": "second_stage_payload",
+          "evidence": "tarfile.open(archive, mode=\"r:gz\")"
+        },
+        {
+          "ruleId": "python.network",
+          "category": "network_egress",
+          "evidence": "urlopen(GITHUB_API_URL, timeout=_URL_OPEN_TIMEOUT)"
+        }
+      ],
+      "truePositives": [
+        "destructive_behavior",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 6,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 24.03542699999997,
+      "passed": true
+    },
+    {
+      "id": "public-pnpm-self-installer-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/pnpm-self-installer/installTo.js.txt",
+      "sha256": "168c44087c82f6a76c34359f655a0887fd9d82ebdcccfdfbd5b8ea18cab04f7c",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pnpm/self-installer",
+        "commit": "9c3348754cfd49b24df846bffb44a90244f1c2dd",
+        "sourceUrl": "https://github.com/pnpm/self-installer/blob/9c3348754cfd49b24df846bffb44a90244f1c2dd/src/installTo.js",
+        "license": "MIT",
+        "licenseFile": "public/pnpm-self-installer/LICENSE"
+      },
+      "expectedCategories": [
+        "dynamic_execution",
+        "interpreter_escape",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "actualCategories": [
+        "dynamic_execution",
+        "interpreter_escape",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.network",
+          "category": "network_egress",
+          "evidence": "got.stream(tarball)"
+        },
+        {
+          "ruleId": "javascript.second-stage",
+          "category": "second_stage_payload",
+          "evidence": "unpackStream.remote(stream, dest)"
+        },
+        {
+          "ruleId": "javascript.dynamic-code",
+          "category": "dynamic_execution",
+          "evidence": "spawnSync('node', [npmBin, 'rebuild', 'drivelist'], {cwd: dest, stdio: 'inherit'})"
+        },
+        {
+          "ruleId": "javascript.interpreter-escape",
+          "category": "interpreter_escape",
+          "evidence": "spawnSync('node', [npmBin, 'rebuild', 'drivelist'], {cwd: dest, stdio: 'inherit'})"
+        }
+      ],
+      "truePositives": [
+        "dynamic_execution",
+        "interpreter_escape",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "findingCount": 4,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 7.424827999999991,
+      "passed": true
+    },
+    {
+      "id": "holdout-atomic-telnet-client-001",
+      "split": "test",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/client.py.txt",
+      "sha256": "432f729fe9111b2f2ac195332b7e77f76a0216948952c6deb459a0ff8d1d9c11",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1071/src/client.py",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "upstreamId": "T1071 telnet client source"
+      },
+      "expectedCategories": [
+        "data_exfiltration",
+        "dynamic_execution",
+        "interpreter_escape",
+        "network_egress"
+      ],
+      "actualCategories": [],
+      "actualFindings": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [
+        "data_exfiltration",
+        "dynamic_execution",
+        "interpreter_escape",
+        "network_egress"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 2.461450999999954,
+      "passed": false
+    },
+    {
+      "id": "holdout-node-gyp-install-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/node-gyp/install.js.txt",
+      "sha256": "f0a0017fec48692a8eb8922b6eaff8d12f4a4eb1af4e42f23efa3e8797dff2c3",
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "nodejs/node-gyp",
+        "commit": "42367da5a2683115ff538b92caed5c32c322005f",
+        "sourceUrl": "https://github.com/nodejs/node-gyp/blob/42367da5a2683115ff538b92caed5c32c322005f/lib/install.js",
+        "license": "MIT",
+        "licenseFile": "public/node-gyp/LICENSE"
+      },
+      "expectedCategories": [
+        "destructive_behavior",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "actualCategories": [
+        "destructive_behavior",
+        "second_stage_payload"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "javascript.second-stage",
+          "category": "second_stage_payload",
+          "evidence": "tar.extract({ file: tarPath, strip: 1, filter: isValid, onwarn, cwd: tarExtractDir })"
+        },
+        {
+          "ruleId": "javascript.second-stage",
+          "category": "second_stage_payload",
+          "evidence": "tar.extract({ strip: 1, cwd: tarExtractDir, filter: isValid, onwarn })"
+        },
+        {
+          "ruleId": "javascript.destructive",
+          "category": "destructive_behavior",
+          "evidence": "fs.rm(tarExtractDir, { recursive: true, maxRetries: 3 })"
+        }
+      ],
+      "truePositives": [
+        "destructive_behavior",
+        "second_stage_payload"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        "network_egress"
+      ],
+      "missingExpectedFindings": [],
+      "findingCount": 3,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 17.92830799999996,
+      "passed": false
     }
   ]
 }

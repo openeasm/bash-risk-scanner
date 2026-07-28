@@ -27,14 +27,68 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/Homebrew/install/ca0130bd52235f2fcb2bf23cfdda004bc5d250c1/LICENSE.txt",
     sha256: "f80329e58613ad669c0e73cb132d8060b9b2c55e339c73848068e4d1567f4627",
   },
+  {
+    target: "pipx/standalone_python.py.txt",
+    url: "https://raw.githubusercontent.com/pypa/pipx/d57b062260b62dee083117c7b15c36d15450ed47/src/pipx/standalone_python.py",
+    sha256: "68866dc10a2667777049eefcf5b9d5280ecfca436be6f233b26eac9e7df32028",
+  },
+  {
+    target: "pipx/LICENSE",
+    url: "https://raw.githubusercontent.com/pypa/pipx/d57b062260b62dee083117c7b15c36d15450ed47/LICENSE",
+    sha256: "2e142cbef6acf436d47d8fe1412439c442eeb6c48d5ef73d6b91fffbbf1cdf89",
+  },
+  {
+    target: "pnpm-self-installer/installTo.js.txt",
+    url: "https://raw.githubusercontent.com/pnpm/self-installer/9c3348754cfd49b24df846bffb44a90244f1c2dd/src/installTo.js",
+    sha256: "168c44087c82f6a76c34359f655a0887fd9d82ebdcccfdfbd5b8ea18cab04f7c",
+  },
+  {
+    target: "pnpm-self-installer/LICENSE",
+    url: "https://raw.githubusercontent.com/pnpm/self-installer/9c3348754cfd49b24df846bffb44a90244f1c2dd/LICENSE",
+    sha256: "de1835a8b19015964f1ceeb31f66876eb0590fc8742816da3ba39171666d2859",
+  },
+  {
+    target: "atomic-red-team/client.py.txt",
+    url: "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1071/src/client.py",
+    sha256: "432f729fe9111b2f2ac195332b7e77f76a0216948952c6deb459a0ff8d1d9c11",
+  },
+  {
+    target: "atomic-red-team/LICENSE.txt",
+    url: "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/LICENSE.txt",
+    sha256: "65af6027045d23175366eab50e460ab3ee7790e591cb84cc32c78ac63a4c90e1",
+  },
+  {
+    target: "node-gyp/install.js.txt",
+    url: "https://raw.githubusercontent.com/nodejs/node-gyp/42367da5a2683115ff538b92caed5c32c322005f/lib/install.js",
+    sha256: "f0a0017fec48692a8eb8922b6eaff8d12f4a4eb1af4e42f23efa3e8797dff2c3",
+  },
+  {
+    target: "node-gyp/LICENSE",
+    url: "https://raw.githubusercontent.com/nodejs/node-gyp/42367da5a2683115ff538b92caed5c32c322005f/LICENSE",
+    sha256: "662a1b0115251cfb29c6aed0f221f8847bc49c6365d1c53a62c9f4bccc2489c3",
+  },
 ];
 
+async function download(url) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: { "user-agent": "bash-risk-scanner-corpus-importer" },
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return Buffer.from(await response.arrayBuffer());
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) await new Promise((resolveRetry) => setTimeout(resolveRetry, 500 * attempt));
+    }
+  }
+  throw new Error(`Failed to download ${url}: ${lastError instanceof Error ? lastError.message : lastError}`);
+}
+
 for (const snapshot of snapshots) {
-  const response = await fetch(snapshot.url, {
-    headers: { "user-agent": "bash-risk-scanner-corpus-importer" },
-  });
-  if (!response.ok) throw new Error(`Failed to download ${snapshot.url}: HTTP ${response.status}`);
-  const content = Buffer.from(await response.arrayBuffer());
+  const content = await download(snapshot.url);
   const actualSha256 = createHash("sha256").update(content).digest("hex");
   if (actualSha256 !== snapshot.sha256) {
     throw new Error(`SHA-256 mismatch for ${snapshot.target}: ${actualSha256}`);

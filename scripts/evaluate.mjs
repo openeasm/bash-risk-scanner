@@ -170,8 +170,17 @@ const gates = {
   recall: summary.recall >= config.minimum.recall,
   parseErrorRate: summary.parseErrorRate <= config.maximum.parseErrorRate,
   p95Milliseconds: summary.performance.p95Milliseconds <= config.maximum.p95Milliseconds,
-  samples: summary.failedSamples === 0,
 };
+for (const split of config.requiredPerfectSplits ?? []) {
+  gates[`split:${split}:samples`] = sampleResults
+    .filter((sample) => sample.split === split)
+    .every((sample) => sample.passed);
+}
+for (const [split, minimum] of Object.entries(config.minimumBySplit ?? {})) {
+  const metrics = datasetSplits[split] ?? metricFromCounts(emptyCounts());
+  gates[`split:${split}:precision`] = metrics.precision >= minimum.precision;
+  gates[`split:${split}:recall`] = metrics.recall >= minimum.recall;
+}
 const passed = Object.values(gates).every(Boolean);
 const report = {
   schemaVersion: 1,
@@ -225,6 +234,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 </style></head><body>
 <h1>真实世界种子语料评测</h1>
 <p class="${passed ? "pass" : "fail"}"><strong>${passed ? "门禁通过" : "门禁失败"}</strong></p>
+<p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
+而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
 <div class="card"><div class="big">${summary.passedSamples}/${summary.sampleCount}</div>样本通过</div>
 <div class="card"><div class="big">${percent(summary.precision)}</div>Precision</div>
@@ -245,10 +256,11 @@ ${metricRows(Object.entries(datasetSplits))}</tbody></table>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 ${metricRows(Object.entries(categories))}</tbody></table>
 <h2>失败样本</h2>
-${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID</th><th>FP</th><th>FN</th><th>证据约束缺失</th><th>解析错误</th></tr></thead><tbody>
-${failures.map((sample) => `<tr><td>${escapeHtml(sample.id)}</td><td>${escapeHtml(sample.falsePositives.join(", "))}</td>
-<td>${escapeHtml(sample.falseNegatives.join(", "))}</td><td>${escapeHtml(sample.missingExpectedFindings.map((finding) => `${finding.ruleId ?? finding.category}:${finding.evidencePattern ?? "*"}`).join(", "))}</td>
-<td>${sample.parseErrorCount}</td></tr>`).join("\n")}</tbody></table>`}
+${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>实际证据</th></tr></thead><tbody>
+${failures.map((sample) => `<tr><td><code>${escapeHtml(sample.id)}</code><br>${escapeHtml(sample.provenance.repository ?? sample.provenance.type)}<br><span class="muted">${escapeHtml(sample.sourceFile)}</span></td>
+<td>${escapeHtml(sample.expectedCategories.join(", "))}</td><td>${escapeHtml(sample.actualCategories.join(", ") || "无")}</td>
+<td class="${sample.falseNegatives.length ? "fail" : "pass"}">${escapeHtml(sample.falseNegatives.join(", ") || "无")}</td>
+<td>${sample.actualFindings.length === 0 ? "无" : sample.actualFindings.map((finding) => `<code>${escapeHtml(finding.ruleId)}</code>: ${escapeHtml(finding.evidence)}`).join("<br>")}</td></tr>`).join("\n")}</tbody></table>`}
 <p class="muted">生成时间：${escapeHtml(report.generatedAt)}。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>`;
 

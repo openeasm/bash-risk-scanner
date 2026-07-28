@@ -126,6 +126,26 @@ describe("Node.js scanning", () => {
     );
     expect(esm.findings.some((finding) => finding.category === "destructive_behavior")).toBe(true);
   });
+
+  it("resolves CommonJS member aliases and installer download APIs", () => {
+    const source = `
+      const spawnSync = require('child_process').spawnSync;
+      const got = require('got');
+      const unpackStream = require('unpack-stream');
+      const stream = got.stream(tarball);
+      unpackStream.remote(stream, destination);
+      spawnSync('node', ['installer.js']);
+    `;
+    const result = scanJavaScript(source);
+    for (const category of [
+      "network_egress",
+      "second_stage_payload",
+      "dynamic_execution",
+      "interpreter_escape",
+    ] as const) {
+      expect(result.findings.some((finding) => finding.category === category)).toBe(true);
+    }
+  });
 });
 
 describe("embedded interpreter payloads", () => {

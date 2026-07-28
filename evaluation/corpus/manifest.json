@@ -293,6 +293,114 @@
         "license": "MIT",
         "transformation": "Substituted overwrite_source and file_to_overwrite placeholders with upstream defaults."
       }
+    },
+    {
+      "id": "public-pipx-standalone-python-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/pipx/standalone_python.py.txt",
+      "sha256": "68866dc10a2667777049eefcf5b9d5280ecfca436be6f233b26eac9e7df32028",
+      "expectedCategories": ["network_egress", "second_stage_payload", "destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "urlopen"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "python.second-stage",
+          "evidencePattern": "tarfile[.]open"
+        },
+        {
+          "category": "destructive_behavior",
+          "ruleId": "python.destructive",
+          "evidencePattern": "shutil[.]rmtree"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pypa/pipx",
+        "commit": "d57b062260b62dee083117c7b15c36d15450ed47",
+        "sourceUrl": "https://github.com/pypa/pipx/blob/d57b062260b62dee083117c7b15c36d15450ed47/src/pipx/standalone_python.py",
+        "license": "MIT",
+        "licenseFile": "public/pipx/LICENSE"
+      }
+    },
+    {
+      "id": "public-pnpm-self-installer-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/pnpm-self-installer/installTo.js.txt",
+      "sha256": "168c44087c82f6a76c34359f655a0887fd9d82ebdcccfdfbd5b8ea18cab04f7c",
+      "expectedCategories": ["network_egress", "second_stage_payload", "dynamic_execution", "interpreter_escape"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "got[.]stream"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "javascript.second-stage",
+          "evidencePattern": "unpackStream[.]remote"
+        },
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "spawnSync"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "javascript.interpreter-escape",
+          "evidencePattern": "spawnSync[(]'node'"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pnpm/self-installer",
+        "commit": "9c3348754cfd49b24df846bffb44a90244f1c2dd",
+        "sourceUrl": "https://github.com/pnpm/self-installer/blob/9c3348754cfd49b24df846bffb44a90244f1c2dd/src/installTo.js",
+        "license": "MIT",
+        "licenseFile": "public/pnpm-self-installer/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-atomic-telnet-client-001",
+      "split": "test",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/client.py.txt",
+      "sha256": "432f729fe9111b2f2ac195332b7e77f76a0216948952c6deb459a0ff8d1d9c11",
+      "expectedCategories": ["network_egress", "dynamic_execution", "interpreter_escape", "data_exfiltration"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1071/src/client.py",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "upstreamId": "T1071 telnet client source"
+      }
+    },
+    {
+      "id": "holdout-node-gyp-install-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/node-gyp/install.js.txt",
+      "sha256": "f0a0017fec48692a8eb8922b6eaff8d12f4a4eb1af4e42f23efa3e8797dff2c3",
+      "expectedCategories": ["network_egress", "second_stage_payload", "destructive_behavior"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "nodejs/node-gyp",
+        "commit": "42367da5a2683115ff538b92caed5c32c322005f",
+        "sourceUrl": "https://github.com/nodejs/node-gyp/blob/42367da5a2683115ff538b92caed5c32c322005f/lib/install.js",
+        "license": "MIT",
+        "licenseFile": "public/node-gyp/LICENSE"
+      }
     }
   ]
 }

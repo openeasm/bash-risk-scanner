@@ -45,10 +45,10 @@
   </header>
 
   <div class="cards">
-    <div class="card"><div class="metric">65 / 65</div><div>测试通过</div></div>
+    <div class="card"><div class="metric">66 / 66</div><div>单元测试通过</div></div>
     <div class="card"><div class="metric">2 / 2</div><div>测试文件通过</div></div>
-    <div class="card"><div class="metric">12 × 3</div><div>风险类别 × 语言</div></div>
-    <div class="card"><div class="metric">0</div><div>生产依赖漏洞</div></div>
+    <div class="card"><div class="metric">28 / 30</div><div>语料完全匹配</div></div>
+    <div class="card"><div class="metric">90.2%</div><div>冻结语料总体召回率</div></div>
   </div>
 
   <section>
@@ -56,7 +56,7 @@
     <p class="pass">通过：Bash、Python 和 Node.js 均能在精选样例中检出全部 12 类风险。</p>
     <p>额外测试覆盖行为链、可信下载域名、私网 IP、源码位置、语法错误、
       Bash 内嵌 Python/Node.js、静态管道、heredoc、扫描限制和已知误报边界。</p>
-    <p class="muted">报告基线：2 个测试文件、65 个测试。详细断言和耗时见
+    <p class="muted">报告基线：2 个测试文件、66 个测试。详细断言和耗时见
       <a href="./test-report.html">Vitest HTML 报告</a>。</p>
   </section>
 
@@ -109,9 +109,10 @@
 
   <section class="warning">
     <h2>当前结论边界</h2>
-    <p>本报告证明精选样例的功能覆盖，不代表真实世界准确率。当前用例不能给出
-      precision、recall、F1，也没有充分覆盖别名导入、包装函数、复杂数据流、
-      编码/混淆、超大脚本和不同操作系统工具变体。</p>
+    <p>30 条离线语料得到 precision 100%、recall 90.2%、F1 94.8%，但样本规模仍小，
+      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。冻结 test 集保留了
+      5 个 FN：Python telnet/异步子进程/写流关联，以及 Node.js 跨文件下载包装函数。
+      这些缺口没有在本轮针对测试集调参。</p>
   </section>
 
   <section>

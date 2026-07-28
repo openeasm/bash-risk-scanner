@@ -203,11 +203,11 @@ const CALLEE_BY_CATEGORY: Record<
     system_modification: /(?:^|\.)(?:writeFile|writeFileSync|appendFile|appendFileSync|copyFile|copyFileSync|rename|renameSync)$/,
     privilege_escalation: /(?:^|\.)(?:setuid|setgid|chmod|chmodSync|chown|chownSync|exec|execSync)$/,
     defense_evasion: /(?:^|\.)(?:rm|rmSync|unlink|unlinkSync|rmdir|rmdirSync|kill|exec|execSync|spawn|spawnSync)$/,
-    network_egress: /(?:^|\.)(?:fetch|get|request|connect|createConnection)$/,
+    network_egress: /^(?:(?:.*\.)?(?:fetch|get|request|connect|createConnection)|got\.stream)$/,
     data_exfiltration: /(?:^|\.)(?:fetch|post|put|patch|send|write|upload|putObject|sendCommand)$/,
     destructive_behavior: /(?:^|\.)(?:rm|rmSync|rmdir|rmdirSync|unlink|unlinkSync|writeFile|writeFileSync|open|openSync)$/,
     interpreter_escape: /(?:^|\.)(?:exec|execSync|spawn|spawnSync)$/,
-    second_stage_payload: /(?:^|\.)(?:fetch|get|extract|unzip|tar)$/,
+    second_stage_payload: /^(?:(?:.*\.)?(?:fetch|get|extract|unzip|tar)|unpack-stream\.remote)$/,
   },
 };
 
@@ -237,6 +237,11 @@ function collectAliases(source: string, language: "python" | "javascript"): Map<
     /(?:const|let|var)\s+(\w+)\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)/g,
   )) {
     aliases.set(match[1]!, moduleName(match[2]!));
+  }
+  for (const match of source.matchAll(
+    /(?:const|let|var)\s+(\w+)\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)\.(\w+)/g,
+  )) {
+    aliases.set(match[1]!, `${moduleName(match[2]!)}.${match[3]}`);
   }
   for (const match of source.matchAll(
     /(?:const|let|var)\s*\{([^}]+)\}\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)/g,
