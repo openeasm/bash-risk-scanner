@@ -931,6 +931,57 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects transient systemd timers without matching ordinary transient services", () => {
+    const timers = [
+      `systemd-run --user --unit=job --on-calendar '*:0/1' /bin/sh /tmp/job.sh`,
+      "sudo systemd-run --on-active=5m /usr/bin/id",
+      "systemd-run --on-boot 10min /opt/job",
+      "systemd-run --property=Type=oneshot --on-startup=30s /opt/job",
+      "systemd-run --on-unit-active 1h /opt/job",
+      "systemd-run --on-unit-inactive=1h /opt/job",
+      "systemd-run --on-clock-change=yes /opt/job",
+      "systemd-run --on-timezone-change yes /opt/job",
+    ];
+    for (const source of timers) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "persistence.systemd-transient-timer",
+          category: "persistence",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "systemd-run --unit=job --wait /usr/bin/id",
+      "systemd-run --user /opt/job",
+      "systemd-run --property=Type=oneshot /opt/job",
+      "systemd-run --help",
+      "systemctl list-timers",
+      "systemctl status job.timer",
+      `systemd-run echo "--on-calendar daily"`,
+      `systemd-run --on-calendar "$schedule" /opt/job`,
+      "echo \"systemd-run --on-active=5m /opt/job\"",
+      "# systemd-run --on-boot=10m /opt/job",
+      `systemd-run() { echo "project helper"; }
+       systemd-run --on-active=5m /opt/job`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.systemd-transient-timer"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      systemd-run() { echo "project helper"; }
+      command systemd-run --on-active=5m /opt/job
+      sudo systemd-run --on-active=5m /opt/job
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "persistence.systemd-transient-timer"
+    )).toHaveLength(2);
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",

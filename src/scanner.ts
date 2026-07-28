@@ -295,6 +295,29 @@ function bashScpPushesLocalPath(text: string): boolean {
   );
 }
 
+function bashSystemdRunSchedulesTimer(text: string): boolean {
+  if (!/^\s*systemd-run(?:\s|$)/i.test(text)) return false;
+  const words = staticBashWords(text);
+
+  const optionsWithValue = new Set([
+    "--description", "--gid", "--nice", "--property", "--slice", "--setenv",
+    "--uid", "--unit", "--working-directory",
+  ]);
+  const timerOption = /^--on-(?:active|boot|calendar|clock-change|startup|timezone-change|unit-active|unit-inactive)$/;
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (word === "--") return false;
+    if (!word.startsWith("-")) return false;
+    const [option, inlineValue] = word.split("=", 2);
+    if (timerOption.test(option!)) {
+      const value = inlineValue ?? words[index + 1];
+      return Boolean(value && !/[$`;|&<>]/.test(value));
+    }
+    if (!inlineValue && optionsWithValue.has(option!)) index += 1;
+  }
+  return false;
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1701,6 +1724,23 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "high",
         confidence: "high",
         message: "Transfers one or more static local paths to a remote rsync destination.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    const directSystemdRun = /^\s*["']?systemd-run["']?(?:\s|$)/.test(statement.text);
+    if (
+      !(directSystemdRun && definedFunctions.has("systemd-run"))
+      && variants.some((variant) => bashSystemdRunSchedulesTimer(variant))
+    ) {
+      findings.push({
+        ruleId: "persistence.systemd-transient-timer",
+        category: "persistence",
+        title: "Creates a transient systemd timer",
+        severity: "high",
+        confidence: "high",
+        message: "Schedules a command through a transient systemd timer unit.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",

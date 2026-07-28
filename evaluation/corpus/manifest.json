@@ -2306,7 +2306,7 @@
     },
     {
       "id": "holdout-atomic-systemd-transient-timer-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/systemd-transient-timer.sh.txt",
@@ -2330,6 +2330,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the user-level transient timer executor and changed only the inert /tmp log filename; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-memory-swap-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-memory-swap.sh.txt",
+      "sha256": "2c5405b60d71b0f7f098863e3f2ed37969605ed6d51c34d1fe342c0fd38572f8",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.swap-disable",
+          "evidencePattern": "swapoff\\s+-a"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "e74e4c63-6fde-4ad2-9ee8-21c3a1733114",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied and whitespace-normalized the four executor commands that disable memory swap; the evaluation harness never executes them."
       }
     }
   ]

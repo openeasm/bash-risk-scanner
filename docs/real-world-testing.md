@@ -116,7 +116,7 @@ P50/P95/maximum。这样保留 100 ms 门槛，同时降低单次调度、JIT �
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 90 条离线语料：89 条完全匹配，precision 100%、recall 99.5%、
+当前基线为 91 条离线语料：90 条完全匹配，precision 100%、recall 99.5%、
 F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
@@ -289,20 +289,23 @@ validation 回归：
   `update-ca-certificates`、RHEL `update-ca-trust` 和 p11-kit `trust anchor`
   现在识别系统信任存储修改；证书查询、验证、用户 Keychain 导入、帮助命令和
   被同名 shell 函数遮蔽的调用均不命中。
+- Atomic Red Team T1053.006 的 `systemd-run` 仅在带静态 `--on-calendar`、
+  `--on-active`、`--on-boot`、`--on-startup` 或相关 timer 触发参数时识别持久化；
+  普通瞬态服务、属性设置、timer 查询、动态触发值、帮助、注释、文本和同名 shell
+  函数均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
 test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI token、ASLR、SCP
-方向、awk shell escape、密码哈希访问控制和信任存储修改，并新增 Atomic
-T1053.006 使用 `systemd-run --on-calendar` 创建用户级瞬态定时任务的样本。
-当前完全漏掉该持久化语义。发布门禁继续要求整体
+方向、awk shell escape、密码哈希访问控制、信任存储修改和瞬态 systemd timer，
+并新增 Atomic T1685 使用 `swapoff -a` 禁用全部内存交换的样本。当前完全漏掉
+该破坏行为。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应区分带 `--on-calendar` 或
-`--on-active` 等定时参数的 `systemd-run` 与普通瞬态命令执行、状态查询、帮助、
-注释和文本。
+`maximum.forbiddenFindingCount` 为 0。下一轮应区分 `swapoff -a/--all` 与关闭
+单个管理员明确指定的 swap 设备、`swapon`、状态查询、帮助、注释和文本。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-133 个单元测试或当前小规模公开语料外推生产环境准确率。
+134 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
