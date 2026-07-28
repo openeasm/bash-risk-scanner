@@ -406,6 +406,67 @@ function bashEnablesSysvStartup(text: string): boolean {
     );
 }
 
+function bashCreatesLocalAccount(text: string): boolean {
+  if (!/^\s*(?:useradd|adduser|pw|dscl)(?:\s|$)/.test(text)) return false;
+  const words = staticBashWords(text);
+  const command = words[0];
+  if (command === "useradd") {
+    if (words.some((word) =>
+      /^(?:-D|--defaults|-h|--help|-V|--version)$/.test(word)
+    )) return false;
+    const optionsWithValue = new Set([
+      "-b", "--base-dir", "-c", "--comment", "-d", "--home-dir",
+      "-e", "--expiredate", "-f", "--inactive", "-g", "--gid",
+      "-G", "--groups", "-k", "--skel", "-K", "--key", "-p", "--password",
+      "-P", "--prefix", "-R", "--root", "-s", "--shell", "-u", "--uid",
+      "-Z", "--selinux-user",
+    ]);
+    const operands: string[] = [];
+    for (let index = 1; index < words.length; index += 1) {
+      const word = words[index]!;
+      if (optionsWithValue.has(word)) {
+        index += 1;
+      } else if (!word.startsWith("-")) {
+        operands.push(word);
+      }
+    }
+    return operands.length === 1 && !/[$`;&|<>/]/.test(operands[0]!);
+  }
+  if (command === "adduser") {
+    if (words.some((word) =>
+      /^(?:--group|--help|-h|--version|-v)$/.test(word)
+    )) return false;
+    const optionsWithValue = new Set([
+      "--conf", "--home", "--shell", "--uid", "--firstuid", "--lastuid",
+      "--ingroup", "--gid", "--gecos", "--stdoutmsglevel",
+      "--stderrmsglevel", "--logmsglevel",
+    ]);
+    const operands: string[] = [];
+    for (let index = 1; index < words.length; index += 1) {
+      const word = words[index]!;
+      if (optionsWithValue.has(word)) {
+        index += 1;
+      } else if (!word.startsWith("-")) {
+        operands.push(word);
+      }
+    }
+    return operands.length === 1 && !/[$`;&|<>/]/.test(operands[0]!);
+  }
+  if (command === "pw") {
+    const subcommandIndex = words.findIndex((word) => word === "useradd");
+    if (subcommandIndex < 1 || words.includes("-D")) return false;
+    const name = words[subcommandIndex + 1] === "-n"
+      ? words[subcommandIndex + 2]
+      : words[subcommandIndex + 1];
+    return Boolean(name && !name.startsWith("-") && !/[$`;&|<>/]/.test(name));
+  }
+  return command === "dscl"
+    && words.length === 4
+    && words[1] === "."
+    && words[2] === "-create"
+    && /^\/Users\/[^/$`;&|<>\s]+$/.test(words[3]!);
+}
+
 function awkStaticSystemCommand(program: string): string | undefined {
   let previousSignificant = "";
   for (let index = 0; index < program.length;) {
@@ -1657,6 +1718,9 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
   const hasSysvStartupCommand =
     /(?:^|\n)[\t ]*(?:(?:(?:sudo|doas|command|builtin|env)\b|\$(?:\{)?[A-Za-z_]\w*\}?)\s+)*(?:update-rc\.d|chkconfig|service|sysrc)(?:\s|$)/m
       .test(source);
+  const hasLocalAccountCommand =
+    /(?:^|\n)[\t ]*(?:(?:(?:sudo|doas|command|builtin|env)\b|\$(?:\{)?[A-Za-z_]\w*\}?)\s+)*(?:useradd|adduser|pw|dscl)(?:\s|$)/m
+      .test(source);
   const definedFunctions = new Set(
     tree.rootNode.descendantsOfType("function_definition")
       .map((node) => node.childForFieldName("name")?.text)
@@ -1888,6 +1952,27 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
           severity: "high",
           confidence: "high",
           message: "Registers or enables a service to run automatically during system startup.",
+          evidence: evidence(statement.text, maxEvidence),
+          range: statement.range,
+          language: "bash",
+        });
+      }
+    }
+    if (hasLocalAccountCommand) {
+      const directAccountCommand = statement.text.match(
+        /^\s*["']?(useradd|adduser|pw|dscl)["']?(?:\s|$)/,
+      )?.[1];
+      if (
+        !(directAccountCommand && definedFunctions.has(directAccountCommand))
+        && variants.some((variant) => bashCreatesLocalAccount(variant))
+      ) {
+        findings.push({
+          ruleId: "system.account-create",
+          category: "system_modification",
+          title: "Creates a local operating-system account",
+          severity: "high",
+          confidence: "high",
+          message: "Creates a persistent local user account in the operating-system account database.",
           evidence: evidence(statement.text, maxEvidence),
           range: statement.range,
           language: "bash",

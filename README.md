@@ -170,7 +170,8 @@ GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传�
 方向、awk shell escape、密码哈希访问控制、信任存储修改、瞬态 systemd timer、
 全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
 已修复的 T1685.004“删除全部 auditd 规则”和 T1543.002 SysV 启动持久化进入
-validation；当前新增 T1136.001 `useradd` 本地账户创建盲测。
+validation；已修复的 T1136.001 本地账户创建也进入 validation，当前新增
+T1556.003 恶意 PAM 认证规则盲测。
 本轮不针对
 新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
 

@@ -2540,7 +2540,7 @@
     },
     {
       "id": "holdout-atomic-create-local-account-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/create-local-account.sh.txt",
@@ -2564,6 +2564,39 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Substituted the Atomic input placeholder with its inert default username and copied only the useradd executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-malicious-pam-rule-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/insert-pam-bypass-rule.sh.txt",
+      "sha256": "429cfb3aa5a8f173ac5a7d373500acb0f77c96f2e822768d9e783adc75ca35d4",
+      "expectedCategories": ["privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.pam-bypass",
+          "evidencePattern": "pam_succeed_if[.]so\\s+uid\\s+>=\\s+0"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "/etc/pam[.]d/su-l"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1556.003/T1556.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1556.003.yaml.txt",
+        "upstreamSha256": "5189d4472933d71e720312bdba10e324e5ca568925e40f55f925defe1447dbf9",
+        "upstreamId": "4b9dde80-ae22-44b1-a82a-644bf009eb9c",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the sed executor command; the evaluation harness never executes it."
       }
     }
   ]

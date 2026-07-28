@@ -1043,6 +1043,72 @@ describe("scan", () => {
     )).toHaveLength(4);
   });
 
+  it("detects cross-platform local account creation without matching account administration", () => {
+    const creations = [
+      "useradd -M -N -r -s /bin/bash -c evil_account evil_user",
+      "sudo useradd --system --shell /usr/sbin/nologin agent",
+      "adduser --disabled-password --gecos '' analyst",
+      "adduser --system --no-create-home daemon-helper",
+      "pw useradd evil_user -s /usr/sbin/nologin -d /nonexistent",
+      "pw -R /mnt useradd -n staged_user -s /bin/sh",
+      "sudo dscl . -create /Users/evil_user",
+    ];
+    for (const source of creations) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "system.account-create",
+          category: "system_modification",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "useradd -D",
+      "useradd -D -s /bin/bash",
+      "useradd --help",
+      "useradd --version",
+      "useradd -s /bin/bash",
+      "userdel evil_user",
+      "usermod -aG wheel existing_user",
+      "adduser existing_user existing_group",
+      "adduser --group project",
+      "adduser --help",
+      "pw usershow evil_user",
+      "pw usermod evil_user -s /bin/sh",
+      "pw userdel evil_user",
+      "pw useradd -D -s /bin/sh",
+      "dscl . -read /Users/evil_user",
+      "dscl . -delete /Users/evil_user",
+      "dscl . -create /Users/evil_user UserShell /bin/zsh",
+      `dscl . -create "/Users/$username"`,
+      "kubectl run helper --image=alpine -- sh -lc 'adduser -D evil_user'",
+      "echo 'useradd evil_user'",
+      "# pw useradd evil_user",
+      `useradd() { echo "project helper"; }
+       useradd evil_user`,
+      `dscl() { echo "directory helper"; }
+       dscl . -create /Users/evil_user`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.account-create"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      useradd() { echo "project helper"; }
+      dscl() { echo "directory helper"; }
+      command useradd evil_user
+      sudo useradd --system daemon-helper
+      command dscl . -create /Users/evil_user
+      sudo dscl . -create /Users/admin-helper
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "system.account-create"
+    )).toHaveLength(4);
+  });
+
   it("detects disabling all swap without matching scoped swap administration", () => {
     const globalDisables = [
       "swapoff -a",
