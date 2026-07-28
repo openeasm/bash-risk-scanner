@@ -30,6 +30,41 @@ describe("scan", () => {
     expect(result.findings.some((f) => f.category === "network_egress")).toBe(true);
   });
 
+  it("detects rsync only when an operand is a remote endpoint", () => {
+    const remoteTransfers = [
+      "rsync -r atomic@example.test:/srv/source /tmp/destination",
+      "rsync -az /tmp/source backup.example.test:/srv/destination",
+      "rsync rsync://mirror.example.test/module/file /tmp/file",
+      "rsync -av mirror.example.test::module /tmp/module",
+      "rsync -e ssh '[2001:db8::1]:/srv/source' /tmp/destination",
+    ];
+    for (const source of remoteTransfers) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "network.rsync-remote",
+          category: "network_egress",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "rsync -a /tmp/source /tmp/destination",
+      "rsync -a ./report:2026.txt /tmp/archive/",
+      "rsync -a ../report:2026.txt /tmp/archive/",
+      "rsync --exclude=mirror.example.test:/cache /tmp/source /tmp/destination",
+      "rsync -e 'ssh -p 2222' /tmp/source /tmp/destination",
+      "rsync --help",
+      "rsync --version",
+      "echo 'rsync user@example.test:/source /tmp/destination'",
+      "# rsync rsync://mirror.example.test/module /tmp/module",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "network.rsync-remote"
+      )).toBe(false);
+    }
+  });
+
   it("tracks Python interpreters selected only from trusted discovery candidates", () => {
     const result = scan(`
       which_python=$(which python || which python3 || command -v python3.12)

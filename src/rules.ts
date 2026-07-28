@@ -231,6 +231,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^(?:\s*(?:nc|ncat|netcat|socat|ssh|scp|sftp|curl|wget|dig|nslookup)(?:\s|$)|\s*git\s+(?:clone|fetch|pull|ls-remote)(?:\s|$)|\s*(?:execute|retry)\b[^;\n]*(?:\$\{?(?:USABLE_)?(?:GIT|CURL)\}?)[^;\n]*(?:["'](?:clone|fetch|pull|ls-remote)["']))/i,
   },
   {
+    id: "network.rsync-remote",
+    category: "network_egress",
+    title: "Transfers files with a remote rsync endpoint",
+    severity: "medium",
+    confidence: "high",
+    message: "Uses rsync with an SSH-style, daemon-style, or rsync URL remote endpoint.",
+    pattern: /^\s*rsync\b(?![^;\n]*(?:^|\s)(?:--help|--version)(?:\s|$))(?=[^;\n]*(?:rsync:\/\/[^"'$\s;|&<>]+|(?:^|\s)["']?(?!\.{0,2}\/)(?![A-Za-z]:[\\/])(?:[A-Za-z_][\w.-]*@)?(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:]+\]):{1,2}[^"'$\s;|&<>]+))/i,
+  },
+  {
     id: "network.cloud-storage-cli",
     category: "network_egress",
     title: "Uses a cloud storage CLI",

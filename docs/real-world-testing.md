@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 75 条离线语料：74 条完全匹配，precision 100%、recall 99.4%、
-F1 99.7%。前三十一轮冻结集暴露的缺口均已转为带具体
+当前基线为 76 条离线语料：75 条完全匹配，precision 100%、recall 99.4%、
+F1 99.7%。前三十二轮冻结集暴露的缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -230,18 +230,21 @@ validation 回归：
 - Atomic Red Team T1105 下载脚本只有在静态下载输出名与后续授权、Shell 执行
   路径相同时才报告二阶段载荷；只下载、只授权、不同文件、纯本地文件、跨函数
   作用域和文本内容均不命中。
+- Atomic Red Team T1105 rsync 拉取现在识别 SSH 风格、daemon 双冒号、
+  `rsync://` 和 IPv6 远程端点；纯本地复制、显式 `./`/`../` 冒号文件、
+  exclude 参数、仅远程 shell 配置、帮助、版本和文本均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-新冻结的 Atomic Red Team T1105 test 样本用 `rsync` 从
-`user@example.invalid:/path` 拉取远程文件。当前没有命中网络外联，因此 test
-recall 基线为 0%；整体门槛仍保持 precision 95%、recall 90%，
-`maximum.forbiddenFindingCount` 为 0。下一轮应识别 rsync 的
-`host:path`、`user@host:path` 与 `rsync://` 远程端点，同时排除纯本地复制、
-本地冒号文件、帮助/版本、仅远程 shell 配置和文本内容。
+新冻结的 Atomic Red Team T1105 test 样本用 `rsync` 把本地目录推送到
+`user@example.invalid:/path`。当前已命中网络外联，但未命中数据外传，因此 test
+recall 基线为 50%；整体门槛仍保持 precision 95%、recall 90%，
+`maximum.forbiddenFindingCount` 为 0。下一轮应解析 rsync 的非选项操作数，只在
+远程端点位于目标位置且至少有一个静态本地源时报告外传，并排除远程拉取、
+远端到远端（rsync 本身不支持）、纯本地同步、dry-run 和文本内容。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-119 个单元测试或当前小规模公开语料外推生产环境准确率。
+120 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

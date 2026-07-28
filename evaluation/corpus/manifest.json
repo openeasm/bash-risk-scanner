@@ -1826,7 +1826,7 @@
     },
     {
       "id": "holdout-atomic-rsync-remote-pull-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/rsync-remote-pull.sh.txt",
@@ -1850,6 +1850,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced username, remote host, and paths with inert atomic/example.invalid values; retained rsync pull structure."
+      }
+    },
+    {
+      "id": "holdout-atomic-rsync-remote-push-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/rsync-remote-push.sh.txt",
+      "sha256": "90b88fd1dea0a160b0d9deca8773e4ffdb4480439c369d3bc580073329d2ee57",
+      "expectedCategories": ["data_exfiltration", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "data_exfiltration",
+          "ruleId": "exfil.rsync-push",
+          "evidencePattern": "rsync[\\s\\S]*/tmp/atomic-source[\\s\\S]*atomic@example[.]invalid:"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "0fc6e977-cb12-44f6-b263-2824ba917409",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced username, remote host, and paths with inert atomic/example.invalid values; retained rsync push structure."
       }
     }
   ]
