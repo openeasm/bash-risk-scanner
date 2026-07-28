@@ -199,6 +199,52 @@ describe("scan", () => {
     )).toHaveLength(2);
   });
 
+  it("detects only static remote-to-local SFTP pulls as directional network transfer", () => {
+    const pulls = [
+      "sftp analyst@example.test:/srv/report.txt /tmp/report.txt",
+      "sudo sftp -P 2222 -i /tmp/test-key user@[2001:db8::10]:/archive ./downloads/",
+      "command sftp -- sftp://user@example.test/tmp/archive.tgz ./archive.tgz",
+    ];
+    for (const source of pulls) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "network.sftp-pull",
+          category: "network_egress",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "sftp analyst@example.test",
+      "sftp /tmp/report.txt analyst@example.test:/srv/report.txt",
+      "sftp user@one.example:/a user@two.example:/b",
+      "sftp \"$source\" /tmp/report.txt",
+      "sftp analyst@example.test:/srv/report.txt \"$destination\"",
+      "sftp user@example.test:/upload <<< $'put /tmp/report.txt'",
+      "sftp -b /tmp/batch user@example.test",
+      "sftp --help",
+      "echo 'sftp analyst@example.test:/srv/report.txt /tmp/report.txt'",
+      "# sftp analyst@example.test:/srv/report.txt /tmp/report.txt",
+      `sftp() { echo "project helper"; }
+       sftp analyst@example.test:/srv/report.txt /tmp/report.txt`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "network.sftp-pull"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      sftp() { echo "project helper"; }
+      command sftp analyst@example.test:/one /tmp/one
+      sudo sftp analyst@example.test:/two /tmp/two
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "network.sftp-pull"
+    )).toHaveLength(2);
+  });
+
   it("tracks Python interpreters selected only from trusted discovery candidates", () => {
     const result = scan(`
       which_python=$(which python || which python3 || command -v python3.12)

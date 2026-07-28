@@ -310,6 +310,43 @@ function bashScpPullsRemotePath(text: string): boolean {
     && operands.slice(0, -1).every((source) => isScpRemoteOperand(source));
 }
 
+function isSftpRemoteOperand(value: string): boolean {
+  if (!value || /[$`;&|<>]/.test(value)) return false;
+  if (/^sftp:\/\/(?:[^/@\s]+@)?[^/\s]+\/\S+$/i.test(value)) return true;
+  return /^(?:(?:[A-Za-z_][\w.-]*)@)?(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:]+\]):\S+$/
+    .test(value);
+}
+
+function bashSftpPullsRemotePath(text: string): boolean {
+  const words = staticBashWords(text);
+  if (words[0]?.toLowerCase() !== "sftp") return false;
+
+  const operands: string[] = [];
+  const optionsWithValue = new Set([
+    "-B", "-b", "-c", "-D", "-F", "-i", "-J", "-l", "-o", "-P", "-R",
+    "-S", "-X",
+  ]);
+  let optionsEnded = false;
+  for (let index = 1; index < words.length; index += 1) {
+    const word = words[index]!;
+    if (!optionsEnded && word === "--") {
+      optionsEnded = true;
+      continue;
+    }
+    if (!optionsEnded && /^-[^-]/.test(word)) {
+      if (optionsWithValue.has(word)) index += 1;
+      continue;
+    }
+    operands.push(word);
+  }
+
+  if (operands.length !== 2 || !isSftpRemoteOperand(operands[0]!)) return false;
+  const destination = operands[1]!;
+  return destination.length > 0
+    && !/[$`;&|<>]/.test(destination)
+    && !isSftpRemoteOperand(destination);
+}
+
 function bashSystemdRunSchedulesTimer(text: string): boolean {
   if (!/^\s*systemd-run(?:\s|$)/i.test(text)) return false;
   const words = staticBashWords(text);
@@ -2210,6 +2247,8 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     && /(?:^|\n)[\t ]*(?:(?:sudo|doas|command|builtin|env)\s+)*(?:vi|vim|nvim|nano|emacs|ee)(?:\s|$)/m
       .test(source);
   const hasGnuPgDirectoryCandidate = source.toLowerCase().includes(".gnupg");
+  const hasScpCandidate = source.includes("scp");
+  const hasSftpCandidate = source.includes("sftp");
   const hasPrivateSshKeyCandidate =
     /(?:id_rsa|id_ed25519|id_ecdsa|id_dsa)/.test(source)
     && (source.includes("-exec") || source.includes(">"));
@@ -2434,9 +2473,11 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         language: "bash",
       });
     }
-    const directScp = /^\s*["']?scp["']?(?:\s|$)/.test(statement.text);
+    const directScp = hasScpCandidate
+      && /^\s*["']?scp["']?(?:\s|$)/.test(statement.text);
     if (
-      !(directScp && definedFunctions.has("scp"))
+      hasScpCandidate
+      && !(directScp && definedFunctions.has("scp"))
       && variants.some((variant) => bashScpPushesLocalPath(variant))
     ) {
       findings.push({
@@ -2452,7 +2493,8 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
       });
     }
     if (
-      !(directScp && definedFunctions.has("scp"))
+      hasScpCandidate
+      && !(directScp && definedFunctions.has("scp"))
       && variants.some((variant) => bashScpPullsRemotePath(variant))
     ) {
       findings.push({
@@ -2462,6 +2504,25 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "medium",
         confidence: "high",
         message: "Transfers one or more static remote SCP sources into a static local destination.",
+        evidence: evidence(statement.text, maxEvidence),
+        range: statement.range,
+        language: "bash",
+      });
+    }
+    const directSftp = hasSftpCandidate
+      && /^\s*["']?sftp["']?(?:\s|$)/.test(statement.text);
+    if (
+      hasSftpCandidate
+      && !(directSftp && definedFunctions.has("sftp"))
+      && variants.some((variant) => bashSftpPullsRemotePath(variant))
+    ) {
+      findings.push({
+        ruleId: "network.sftp-pull",
+        category: "network_egress",
+        title: "Downloads remote data with SFTP",
+        severity: "medium",
+        confidence: "high",
+        message: "Transfers a static remote SFTP path into a static local destination.",
         evidence: evidence(statement.text, maxEvidence),
         range: statement.range,
         language: "bash",
