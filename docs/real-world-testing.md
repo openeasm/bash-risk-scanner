@@ -23,6 +23,20 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 
 禁止把秘密、有效 token、可访问的恶意基础设施地址或无法确认来源的代码提交到仓库。
 
+仓库当前包含一组 `synthetic-realistic` 种子语料，用于验证评测器和固定已知回归。
+它覆盖真实代码中常见的导入别名、CommonJS 解构、ESM 重命名、pathlib 调用链、
+命令参数歧义和文档字符串，但并非从生产流量随机抽样，因此不能用其分数宣称真实
+世界准确率。
+
+运行方式：
+
+```bash
+npm run evaluate
+```
+
+结果位于 `evaluation/results/latest.json` 和 `evaluation/results/latest.html`；
+CI 会执行门禁并上传这两个文件。
+
 ## 建议的样本清单格式
 
 ```json

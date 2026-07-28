@@ -66,7 +66,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "medium",
     confidence: "medium",
     message: "Environment variables can contain tokens and credentials.",
-    pattern: new RegExp(`${cmd}(?:env|printenv|set)${arg}`, "i"),
+    pattern: /^(?:\s*(?:env|printenv)(?:\s|$)|\s*set\s*$)/i,
   },
   {
     id: "system.sensitive-config",
@@ -129,7 +129,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "high",
     confidence: "medium",
     message: "Uses an upload or POST option that may transmit local data.",
-    pattern: /^\s*(?:curl\b[^;\n]*(?:-F|--form|-T|--upload-file|--data-binary\s+@|--data\s+@|-X\s*POST)|aws\s+s3\s+cp|gsutil\s+cp|rclone\s+(?:copy|sync)|scp\s+)/i,
+    pattern: /^\s*(?:curl\b[^;\n]*(?:(?:^|\s)(?:-F|-T)(?:\s|$)|--(?:form|upload-file)(?:=|\s)|--data(?:-binary)?\s+@|-X\s*POST\b)|aws\s+s3\s+cp\b|gsutil\s+cp\b|rclone\s+(?:copy|sync)\b|scp\s+)/,
   },
   {
     id: "exfil.reverse-shell",
@@ -179,9 +179,9 @@ export const COMMAND_RULES: Rule[] = [
 ];
 
 export const DOWNLOAD = /\b(?:curl|wget|fetch|aria2c)\b/i;
-export const EXECUTE = /\b(?:bash|sh|source|\.)\b|\bchmod\s+\+x\b|\bexec\b/i;
+export const EXECUTE = /(?:^|[\s;|&()])(?:bash|sh|source|\.)(?:\s|$)|\bchmod\s+\+x\b|\bexec\b/i;
 export const ARCHIVE_DOWNLOAD = /\b(?:curl|wget|fetch|aria2c)\b[^;\n]*(?:\.tar(?:\.\w+)?|\.tgz|\.zip|\.gz|\.bz2|\.xz)\b/i;
 export const EXTRACT = /\b(?:tar|unzip|gunzip|7z)\b/i;
 export const INSTALL_OR_BINARY = /\b(?:\.\/)?(?:install(?:\.sh)?|setup(?:\.sh)?|run(?:\.sh)?)\b|\bchmod\s+\+x\b/i;
 export const FILE_READ = /\b(?:cat|head|tail|sed|awk|grep|tar|zip|find)\b/i;
-export const UPLOAD = /\b(?:curl\b[^;\n]*(?:-F|--form|-T|--upload-file|--data(?:-binary)?\s+@)|scp|sftp|aws\s+s3\s+cp|gsutil\s+cp|rclone\s+(?:copy|sync))\b/i;
+export const UPLOAD = /\b(?:curl\b[^;\n]*(?:(?:^|\s)(?:-F|-T)(?=\s|$)|--(?:form|upload-file)(?:=|\s)|--data(?:-binary)?\s+@)|scp\b|sftp\b|aws\s+s3\s+cp\b|gsutil\s+cp\b|rclone\s+(?:copy|sync)\b)/;

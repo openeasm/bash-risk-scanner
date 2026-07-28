@@ -192,6 +192,65 @@ function calleeOf(node: SyntaxNode): string {
     ?? "";
 }
 
+function moduleName(value: string): string {
+  return value.replace(/^node:/, "").replace(/^["']|["']$/g, "");
+}
+
+function collectAliases(source: string, language: "python" | "javascript"): Map<string, string> {
+  const aliases = new Map<string, string>();
+  if (language === "python") {
+    for (const match of source.matchAll(/^\s*import\s+([\w.]+)\s+as\s+(\w+)/gm)) {
+      aliases.set(match[2]!, match[1]!);
+    }
+    for (const match of source.matchAll(/^\s*from\s+([\w.]+)\s+import\s+(\w+)(?:\s+as\s+(\w+))?/gm)) {
+      aliases.set(match[3] ?? match[2]!, `${match[1]}.${match[2]}`);
+    }
+    return aliases;
+  }
+
+  for (const match of source.matchAll(
+    /(?:const|let|var)\s+(\w+)\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)/g,
+  )) {
+    aliases.set(match[1]!, moduleName(match[2]!));
+  }
+  for (const match of source.matchAll(
+    /(?:const|let|var)\s*\{([^}]+)\}\s*=\s*require\s*\(\s*(["'](?:node:)?[\w./-]+["'])\s*\)/g,
+  )) {
+    const module = moduleName(match[2]!);
+    for (const binding of match[1]!.split(",")) {
+      const [imported, local] = binding.trim().split(/\s*:\s*/);
+      if (imported) aliases.set(local ?? imported, `${module}.${imported}`);
+    }
+  }
+  for (const match of source.matchAll(
+    /import\s+\*\s+as\s+(\w+)\s+from\s+(["'](?:node:)?[\w./-]+["'])/g,
+  )) {
+    aliases.set(match[1]!, moduleName(match[2]!));
+  }
+  for (const match of source.matchAll(
+    /import\s+(\w+)\s+from\s+(["'](?:node:)?[\w./-]+["'])/g,
+  )) {
+    aliases.set(match[1]!, moduleName(match[2]!));
+  }
+  for (const match of source.matchAll(
+    /import\s*\{([^}]+)\}\s*from\s*(["'](?:node:)?[\w./-]+["'])/g,
+  )) {
+    const module = moduleName(match[2]!);
+    for (const binding of match[1]!.split(",")) {
+      const parts = binding.trim().split(/\s+as\s+/);
+      if (parts[0]) aliases.set(parts[1] ?? parts[0], `${module}.${parts[0]}`);
+    }
+  }
+  return aliases;
+}
+
+function canonicalizeCallee(callee: string, aliases: Map<string, string>): string {
+  const identifier = callee.match(/^[A-Za-z_$][\w$]*/)?.[0];
+  if (!identifier) return callee;
+  const replacement = aliases.get(identifier);
+  return replacement ? `${replacement}${callee.slice(identifier.length)}` : callee;
+}
+
 function scanAstLanguage(
   source: string,
   language: "python" | "javascript",
@@ -204,6 +263,7 @@ function scanAstLanguage(
   const findings: Finding[] = [];
   const parseErrors: SourceRange[] = [];
   const interestingNodes: SyntaxNode[] = [];
+  const aliases = collectAliases(source, language);
 
   walk(tree.rootNode, (node) => {
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
@@ -215,14 +275,18 @@ function scanAstLanguage(
 
   for (const node of interestingNodes) {
     const text = source.slice(node.startIndex, node.endIndex);
-    const callee = calleeOf(node);
+    const originalCallee = calleeOf(node);
+    const callee = canonicalizeCallee(originalCallee, aliases);
+    const analysisText = text.startsWith(originalCallee)
+      ? `${callee}${text.slice(originalCallee.length)}`
+      : text;
     for (const rule of rules as LanguageRule[]) {
       if (!rule.nodeTypes.includes(node.type)) continue;
       const calleePattern = CALLEE_BY_CATEGORY[language][rule.category];
       if (!calleePattern?.test(callee)) continue;
       rule.pattern.lastIndex = 0;
-      if (!rule.pattern.test(text)) continue;
-      if (rule.category === "download_execution" && isAllowedDownload(text, options)) continue;
+      if (!rule.pattern.test(analysisText)) continue;
+      if (rule.category === "download_execution" && isAllowedDownload(analysisText, options)) continue;
       if (rule.confidence === "low" && options.includeLowConfidence === false) continue;
       findings.push({
         ruleId: rule.id,
@@ -322,7 +386,10 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
 
   // Same command/pipeline, e.g. curl URL | bash.
   walk(tree.rootNode, (node) => {
-    if (!["pipeline", "list", "redirected_statement", "command"].includes(node.type)) return;
+    // Compound syntax nodes represent real shell control flow. Scanning a
+    // single command's raw text here would treat pipes inside quoted
+    // documentation as executable pipelines.
+    if (!["pipeline", "list"].includes(node.type)) return;
     const text = source.slice(node.startIndex, node.endIndex);
     if (DOWNLOAD.test(text) && EXECUTE.test(text) && !isAllowedDownload(text, options)) {
       addChainFinding(findings, { node, text, range: rangeOf(node) }, { node, text, range: rangeOf(node) }, {

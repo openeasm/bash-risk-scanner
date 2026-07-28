@@ -1,0 +1,561 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-28T13:58:04.424Z",
+  "corpus": {
+    "manifest": "evaluation/corpus/manifest.json",
+    "schemaVersion": 1,
+    "description": "Non-executable seed corpus for category-level scanner evaluation",
+    "provenance": {
+      "type": "synthetic-realistic",
+      "license": "repository-test-data",
+      "containsLiveIndicators": false,
+      "executableByHarness": false
+    }
+  },
+  "thresholds": {
+    "minimum": {
+      "precision": 0.95,
+      "recall": 0.9
+    },
+    "maximum": {
+      "parseErrorRate": 0,
+      "p95Milliseconds": 100
+    }
+  },
+  "passed": true,
+  "gates": {
+    "precision": true,
+    "recall": true,
+    "parseErrorRate": true,
+    "p95Milliseconds": true,
+    "samples": true
+  },
+  "summary": {
+    "sampleCount": 20,
+    "passedSamples": 20,
+    "failedSamples": 0,
+    "tp": 25,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "parseErrorRate": 0,
+    "performance": {
+      "p50Milliseconds": 1.050545999999997,
+      "p95Milliseconds": 4.775546000000006,
+      "maximumMilliseconds": 10.068404999999998
+    }
+  },
+  "languages": {
+    "bash": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "python": {
+      "tp": 8,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "node": {
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    }
+  },
+  "categories": {
+    "credential_access": {
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "data_exfiltration": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "destructive_behavior": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "download_execution": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "dynamic_execution": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "interpreter_escape": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "network_egress": {
+      "tp": 9,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "persistence": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    }
+  },
+  "samples": [
+    {
+      "id": "bash-download-execute-001",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "bash/download-execute.sh.txt",
+      "expectedCategories": [
+        "download_execution",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "download_execution",
+        "network_egress"
+      ],
+      "truePositives": [
+        "download_execution",
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 2,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 10.068404999999998,
+      "passed": true
+    },
+    {
+      "id": "bash-read-upload-001",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "bash/read-upload.sh.txt",
+      "expectedCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "truePositives": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 4,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.8841569999999876,
+      "passed": true
+    },
+    {
+      "id": "bash-persistence-001",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "bash/persistence.sh.txt",
+      "expectedCategories": [
+        "persistence"
+      ],
+      "actualCategories": [
+        "persistence"
+      ],
+      "truePositives": [
+        "persistence"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.5608339999999998,
+      "passed": true
+    },
+    {
+      "id": "bash-download-only-001",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "bash/download-only.sh.txt",
+      "expectedCategories": [
+        "network_egress"
+      ],
+      "actualCategories": [
+        "network_egress"
+      ],
+      "truePositives": [
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.1556929999999994,
+      "passed": true
+    },
+    {
+      "id": "bash-documentation-001",
+      "language": "bash",
+      "kind": "hard-negative",
+      "sourceFile": "bash/documentation.sh.txt",
+      "expectedCategories": [],
+      "actualCategories": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.3307060000000064,
+      "passed": true
+    },
+    {
+      "id": "bash-temp-cleanup-001",
+      "language": "bash",
+      "kind": "hard-negative",
+      "sourceFile": "bash/temp-cleanup.sh.txt",
+      "expectedCategories": [],
+      "actualCategories": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.0348880000000094,
+      "passed": true
+    },
+    {
+      "id": "python-alias-network-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/alias-network.py.txt",
+      "expectedCategories": [
+        "network_egress"
+      ],
+      "actualCategories": [
+        "network_egress"
+      ],
+      "truePositives": [
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 4.744557,
+      "passed": true
+    },
+    {
+      "id": "python-alias-shell-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/alias-shell.py.txt",
+      "expectedCategories": [
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "actualCategories": [
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "truePositives": [
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 2,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.4103369999999984,
+      "passed": true
+    },
+    {
+      "id": "python-path-credential-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/path-credential.py.txt",
+      "expectedCategories": [
+        "credential_access"
+      ],
+      "actualCategories": [
+        "credential_access"
+      ],
+      "truePositives": [
+        "credential_access"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.050545999999997,
+      "passed": true
+    },
+    {
+      "id": "python-read-upload-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/read-upload.py.txt",
+      "expectedCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "truePositives": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 4,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.979237000000012,
+      "passed": true
+    },
+    {
+      "id": "python-http-get-001",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "python/http-get.py.txt",
+      "expectedCategories": [
+        "network_egress"
+      ],
+      "actualCategories": [
+        "network_egress"
+      ],
+      "truePositives": [
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.7675789999999978,
+      "passed": true
+    },
+    {
+      "id": "python-local-file-001",
+      "language": "python",
+      "kind": "hard-negative",
+      "sourceFile": "python/local-file.py.txt",
+      "expectedCategories": [],
+      "actualCategories": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.146214999999998,
+      "passed": true
+    },
+    {
+      "id": "python-documentation-001",
+      "language": "python",
+      "kind": "hard-negative",
+      "sourceFile": "python/documentation.py.txt",
+      "expectedCategories": [],
+      "actualCategories": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.24258199999999874,
+      "passed": true
+    },
+    {
+      "id": "node-cjs-shell-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/cjs-shell.js.txt",
+      "expectedCategories": [
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "actualCategories": [
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "truePositives": [
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 2,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 4.775546000000006,
+      "passed": true
+    },
+    {
+      "id": "node-esm-delete-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/esm-delete.js.txt",
+      "expectedCategories": [
+        "destructive_behavior"
+      ],
+      "actualCategories": [
+        "destructive_behavior"
+      ],
+      "truePositives": [
+        "destructive_behavior"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.4509219999999914,
+      "passed": true
+    },
+    {
+      "id": "node-read-upload-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/read-upload.js.txt",
+      "expectedCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "truePositives": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 3,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.2951219999999921,
+      "passed": true
+    },
+    {
+      "id": "node-environment-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/environment.js.txt",
+      "expectedCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "actualCategories": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "truePositives": [
+        "credential_access",
+        "data_exfiltration",
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 3,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 1.1187639999999988,
+      "passed": true
+    },
+    {
+      "id": "node-http-get-001",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "node/http-get.js.txt",
+      "expectedCategories": [
+        "network_egress"
+      ],
+      "actualCategories": [
+        "network_egress"
+      ],
+      "truePositives": [
+        "network_egress"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 1,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.5052909999999997,
+      "passed": true
+    },
+    {
+      "id": "node-local-file-001",
+      "language": "node",
+      "kind": "hard-negative",
+      "sourceFile": "node/local-file.js.txt",
+      "expectedCategories": [],
+      "actualCategories": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.8007920000000013,
+      "passed": true
+    },
+    {
+      "id": "node-documentation-001",
+      "language": "node",
+      "kind": "hard-negative",
+      "sourceFile": "node/documentation.js.txt",
+      "expectedCategories": [],
+      "actualCategories": [],
+      "truePositives": [],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "findingCount": 0,
+      "parseErrorCount": 0,
+      "durationMilliseconds": 0.21190500000000156,
+      "passed": true
+    }
+  ]
+}

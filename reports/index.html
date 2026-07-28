@@ -39,12 +39,13 @@
     <div>Tree-sitter Bash、Python、Node.js 静态风险检测</div>
     <div class="actions">
       <a class="button" href="./test-report.html">打开 Vitest 用例明细</a>
+      <a class="button" href="./evaluation.html">打开种子语料评测</a>
       <a href="https://github.com/openeasm/bash-risk-scanner">GitHub 仓库</a>
     </div>
   </header>
 
   <div class="cards">
-    <div class="card"><div class="metric">56 / 56</div><div>测试通过</div></div>
+    <div class="card"><div class="metric">59 / 59</div><div>测试通过</div></div>
     <div class="card"><div class="metric">2 / 2</div><div>测试文件通过</div></div>
     <div class="card"><div class="metric">12 × 3</div><div>风险类别 × 语言</div></div>
     <div class="card"><div class="metric">0</div><div>生产依赖漏洞</div></div>
@@ -55,7 +56,7 @@
     <p class="pass">通过：Bash、Python 和 Node.js 均能在精选样例中检出全部 12 类风险。</p>
     <p>额外测试覆盖行为链、可信下载域名、私网 IP、源码位置、语法错误、
       Bash 内嵌 Python/Node.js、静态管道、heredoc、扫描限制和已知误报边界。</p>
-    <p class="muted">报告基线：2 个测试文件、56 个测试。详细断言和耗时见
+    <p class="muted">报告基线：2 个测试文件、59 个测试。详细断言和耗时见
       <a href="./test-report.html">Vitest HTML 报告</a>。</p>
   </section>
 

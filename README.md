@@ -136,6 +136,8 @@ cat script.sh | bash-risk-scan
 ```bash
 npm test
 npm run test:report
+npm run evaluate
+npm run check
 npm run lint
 npm run build
 npm pack --dry-run
@@ -145,3 +147,9 @@ npm pack --dry-run
 入口为 `reports/index.html`，用例明细入口为 `reports/test-report.html`。查看时
 需要保留同目录的资源文件。命令仍在终端输出
 默认测试结果，并在任一测试失败时返回非零状态。
+
+`npm run evaluate` 会构建包并运行 `evaluation/corpus/manifest.json` 中的非执行
+种子语料，按语言和风险类别计算 TP、FP、FN、precision、recall、F1、解析错误率
+及扫描耗时。门禁阈值位于 `evaluation/config.json`，结果写入
+`evaluation/results/`，同时生成 `reports/evaluation.html`。种子语料只用于建立
+评测机制和防止已知回归，其分数不能代表未经抽样的真实世界总体准确率。

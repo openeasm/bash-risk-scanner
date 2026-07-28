@@ -1,0 +1,4 @@
+from pathlib import Path
+
+readme = Path("README.md").read_text(encoding="utf-8")
+print(len(readme))

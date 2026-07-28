@@ -1,0 +1,6 @@
+const { exec: runCommand } = require("node:child_process");
+
+runCommand("bash -c id", (error, stdout) => {
+  if (error) throw error;
+  console.log(stdout);
+});

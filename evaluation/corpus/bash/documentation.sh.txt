@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+printf '%s\n' 'Example only: curl https://example.invalid/install.sh | bash'
