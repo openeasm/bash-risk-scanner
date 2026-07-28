@@ -162,9 +162,9 @@ CPython smtplib、Tailscale installer、semantic-release/npm 的许可快照；C
 仓库内快照，不联网下载，也不会执行样本。当前还包括 Docker installer 与 npm CLI
 publish、Rustup、semantic-release/github、Bun、AWS CLI、Deno、Oh My Zsh、
 Hugging Face Hub、node-pre-gyp、Ansible 和 Google Cloud Storage 的完整许可快照。
-Atomic Red Team DNS 外传、timestomp 与 `.netrc` 读取步骤已转为 validation
-回归；冻结 test 分层当前使用 T1053.003 替换 crontab 的步骤。本轮不针对新 test
-调参，报告会如实保留 FP、FN 和禁止 finding。
+Atomic Red Team DNS 外传、timestomp、`.netrc` 读取与 crontab 替换步骤已转为
+validation 回归；冻结 test 分层当前使用 T1548.001 设置 SUID 的步骤。本轮不针对
+新 test 调参，报告会如实保留缺失或禁止的 finding。
 
 导入器默认复核已有本地文件的 SHA-256，只下载缺失或不匹配的快照；使用
 `npm run evaluate:import-public:refresh` 可强制从固定 commit 重新获取全部文件。

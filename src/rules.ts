@@ -39,7 +39,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "high",
     confidence: "high",
     message: "May establish execution that survives the current session.",
-    pattern: /^\s*(?:crontab|systemctl\s+(?:enable|daemon-reload)|launchctl\s+(?:load|bootstrap)|schtasks)\b|(?:>>?|tee|install|cp|mv)[^;\n]*\/(?:etc\/cron|Library\/LaunchAgents|Library\/LaunchDaemons)\b/i,
+    pattern: /^\s*(?:crontab(?:\s+(?:-u|--user)\s+\S+)?\s+(?:-(?=\s|$)|"[^"]*"|'[^']*'|[^-\s]\S*)\s*$|systemctl\s+(?:enable|daemon-reload)\b|launchctl\s+(?:load|bootstrap)\b|schtasks\b)|(?:>>?|tee|install|cp|mv)[^;\n]*\/(?:etc\/cron|Library\/LaunchAgents|Library\/LaunchDaemons)\b/i,
   },
   {
     id: "persistence.shell-rc",

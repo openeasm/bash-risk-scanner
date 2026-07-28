@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 62 条离线语料：61 条完全匹配，类别级 precision、recall 和 F1 均为
-100%，但仍有 1 条禁止 finding。前十八轮冻结集暴露的缺口均已转为带具体
+当前基线为 63 条离线语料：62 条完全匹配，类别级 precision、recall 和 F1 均为
+100%，但仍缺少 1 条指定 finding。前十九轮冻结集暴露的缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -185,27 +185,33 @@ validation 回归：
 - Atomic Red Team `.netrc`：直接读取与 `find` 结果在同一 `for` AST 内进入
   `cat/head/tail/less/more` 分开识别；只查找、只打印、读取普通隐藏文件、读取
   不同变量和仅在文本中提及命令均不命中。
+- Atomic Red Team crontab：只有文件、标准输入或指定用户的任务表替换识别为
+  持久化；`crontab -l/-e/-r`、组合删除选项和无参数调用均不命中。
 
 本轮重新冻结的公开恶意样本尚未用于调参：
 
-- Atomic Red Team T1053.003 的 Linux/macOS 步骤先用 `crontab -l` 备份当前任务，
-  再用文件替换 crontab。替换行为正确命中 `persistence`，但只读的 `crontab -l`
-  也被同一宽规则误报，作为下一轮待修复的禁止 finding。
+- Atomic Red Team T1548.001 的 Linux/macOS 步骤使用
+  `sudo chmod u+xs /tmp/atomic-setuid` 设置 SUID。`sudo` 已使类别级
+  `privilege_escalation` 命中，但具体的 `privilege.suid-capability` finding 缺失，
+  作为下一轮待修复项，避免类别级 TP 掩盖行为规则缺口。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   `/tmp/atomic-*` 下的惰性路径，评测器不会执行命令。
 
 新 test 分层的类别级 precision/recall 基线均为 100%；整体门槛仍保持 precision
-95%、recall 90%。`maximum.forbiddenFindingCount` 暂时固定为实际值 1，使 CI
-能够保留并展示 finding 级已知缺口，未配置时默认仍为 0。下一轮应排除
-`crontab -l/-e` 等查询/交互操作，同时保留文件安装与标准输入替换等写入形式；
-修复后立即把禁止 finding 门槛恢复为 0。
+95%、recall 90%，`maximum.forbiddenFindingCount` 已恢复为 0。下一轮应覆盖
+`chmod u+xs/g+xs` 及分离的符号模式，同时用普通 `u+x/g+x`、读取 SUID 位和
+仅 `chown root` 等 hard-negative 限制误报。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-105 个单元测试或当前小规模公开语料外推生产环境准确率。
+106 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
 降至 82–94 ms；门槛仍保持 100 ms。
+
+加入第 63 条样本后，最近邻 P95 一度落到 Rustup 样本的 99.24 ms。将 `.netrc`
+与 DNS 的两个 Bash `for` 全树遍历合并后，连续两次复测降至 83.75/84.82 ms，
+没有通过放宽性能门槛掩盖退化。
 
 类别集合之外，manifest 现在可声明 `forbiddenFindings`，按 category、ruleId 和
 evidencePattern 禁止具体 finding。禁止 finding 数量进入 JSON/HTML 和显式 gate，

@@ -1407,7 +1407,7 @@
     },
     {
       "id": "holdout-atomic-crontab-replace-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/replace-crontab.sh.txt",
@@ -1438,6 +1438,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced command, temporary crontab, and backup paths with inert /tmp/atomic-* paths."
+      }
+    },
+    {
+      "id": "holdout-atomic-setuid-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/setuid-file.sh.txt",
+      "sha256": "c49c9683259e09065c55c8b5405f36fdf7fc6562b0ceccc29640871ea58742f6",
+      "expectedCategories": ["privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.suid-capability",
+          "evidencePattern": "chmod\\s+u\\+xs"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1548.001/T1548.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1548.001.yaml.txt",
+        "upstreamSha256": "292386dac7ae7745958e1c4997c0b54dae3041cc924c94d594d837712cbfecba",
+        "upstreamId": "759055b3-3885-4582-a8ec-c00c9d64dd79",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced file_to_setuid with /tmp/atomic-setuid and omitted cleanup."
       }
     }
   ]

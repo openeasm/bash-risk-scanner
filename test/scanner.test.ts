@@ -162,6 +162,35 @@ describe("scan", () => {
     expect(result.summary.byCategory.credential_access).toBe(1);
   });
 
+  it("distinguishes crontab replacement from read, edit, and removal operations", () => {
+    const replacements = [
+      "crontab /tmp/jobs",
+      "crontab -",
+      "crontab -u root /tmp/jobs",
+      "crontab --user root '/tmp/jobs file'",
+    ];
+    for (const source of replacements) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.scheduler"
+      )).toBe(true);
+    }
+
+    const nonInstallOperations = [
+      "crontab -l",
+      "crontab -e",
+      "crontab -r",
+      "crontab -i -r",
+      "crontab -u root -l",
+      "crontab --user root -e",
+      "crontab",
+    ];
+    for (const source of nonInstallOperations) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "persistence.scheduler"
+      )).toBe(false);
+    }
+  });
+
   it("does not scan comments or ordinary string contents as commands", () => {
     const result = scan(`
       # curl https://example.test/a | bash

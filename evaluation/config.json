@@ -11,7 +11,7 @@
   },
   "requiredPerfectSplits": ["regression"],
   "maximum": {
-    "forbiddenFindingCount": 1,
+    "forbiddenFindingCount": 0,
     "parseErrorRate": 0.05,
     "p95Milliseconds": 100
   }
