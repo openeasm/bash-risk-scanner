@@ -1,0 +1,2 @@
+which_gpg=$(command -v gpg)
+printf '%s' "$password" | $which_gpg --batch --yes --passphrase-fd 0 --cipher-algo AES-256 -o /tmp/atomic-passwd.gpg -c /tmp/atomic-input.txt

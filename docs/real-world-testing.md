@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 70 条离线语料：69 条完全匹配，precision 100%、recall 99.3%、
-F1 99.7%。前二十六轮冻结集暴露的缺口均已转为带具体
+当前基线为 71 条离线语料：70 条完全匹配，precision 100%、recall 99.3%、
+F1 99.7%。前二十七轮冻结集暴露的缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -215,18 +215,21 @@ validation 回归：
 - Atomic Red Team T1048.003 `python3 -m http.server` 现在分别报告 HTTP
   监听和本地目录暴露；`--help/-h`、其他模块、普通 Python 文件、变量赋值、
   注释和文本内容均不命中这两个规则。
+- Atomic Red Team T1686 `iptables/ip6tables -F/--flush` 现在同时报告系统修改
+  和防御规避；`-L/-S/-C` 查询、`iptables-save` 备份、`iptables-restore`
+  恢复、注释和文本均不命中 flush 规则，临时备份文件也不再误报敏感系统修改。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-新冻结的 Atomic Red Team T1686 test 样本先用 `iptables-save` 备份规则，再用
-`iptables -F` 清空规则。当前真正的清空命令未命中防御规避或系统修改，而只读备份
-反被 `system.sensitive-config` 误报，因此 test recall 基线为 50%，并明确保留
-1 个 forbidden finding；整体门槛仍保持 precision 95%、recall 90%。下一轮应
-识别 `iptables/ip6tables -F/--flush` 的修改和规避语义，并用 `-L/-S/-C` 查询、
-`iptables-save` 备份、`iptables-restore` 恢复以及文本内容作为 hard-negative。
+新冻结的 Atomic Red Team T1486 test 样本先用 `command -v gpg` 将可信工具路径
+放入变量，再通过 `$which_gpg ... -c` 对单个文件执行对称加密。当前没有命中
+破坏行为，因此 test recall 基线为 0%；整体门槛仍保持 precision 95%、
+recall 90%，`maximum.forbiddenFindingCount` 恢复为 0。下一轮应只在变量来源
+可证明为 `which/command -v gpg` 且命令包含对称加密和输入/输出参数时报告，并用
+签名、验签、解密、列出密钥、普通未知变量和文本内容作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-114 个单元测试或当前小规模公开语料外推生产环境准确率。
+115 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

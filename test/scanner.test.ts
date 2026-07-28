@@ -315,6 +315,49 @@ describe("scan", () => {
     }
   });
 
+  it("distinguishes iptables flushes from inspection, backup, and restore operations", () => {
+    const flushes = [
+      "iptables -F",
+      "sudo ip6tables --flush",
+      "iptables -t filter -F INPUT",
+      "iptables-nft -w 5 --flush OUTPUT",
+      "ip6tables-legacy --table filter -F",
+    ];
+    for (const source of flushes) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "system.firewall-flush",
+          category: "system_modification",
+        }),
+        expect.objectContaining({
+          ruleId: "defense.firewall-flush",
+          category: "defense_evasion",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "iptables -L -n",
+      "iptables -S",
+      "iptables -C INPUT -p tcp --dport 22 -j ACCEPT",
+      "iptables-save > /tmp/iptables.rules",
+      "iptables-restore < /tmp/iptables.rules",
+      "ip6tables-save --counters",
+      "echo 'iptables -F'",
+      "# iptables --flush",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.firewall-flush"
+        || finding.ruleId === "defense.firewall-flush"
+        || (
+          source.startsWith("iptables-save")
+          && finding.ruleId === "system.sensitive-config"
+        )
+      )).toBe(false);
+    }
+  });
+
   it("does not scan comments or ordinary string contents as commands", () => {
     const result = scan(`
       # curl https://example.test/a | bash

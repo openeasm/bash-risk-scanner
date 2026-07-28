@@ -1669,7 +1669,7 @@
     },
     {
       "id": "holdout-atomic-iptables-flush-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/flush-iptables.sh.txt",
@@ -1705,6 +1705,34 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Replaced the iptables-save backup path with an inert /tmp/atomic-* path; retained the flush command."
+      }
+    },
+    {
+      "id": "holdout-atomic-gpg-encryption-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/gpg-encrypt-file.sh.txt",
+      "sha256": "219ca9a594962386b56b06d130921866e8ba9df54893900d8d2b125c59dd688f",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.discovered-gpg-encryption",
+          "evidencePattern": "[$]which_gpg[^\\n]*(?:-c|--symmetric)"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1486/T1486.yaml",
+        "upstreamFile": "public/atomic-red-team/T1486.yaml.txt",
+        "upstreamSha256": "86b6bd3a3c6a53e8e124e86296feea9d1f19f13cc4578cf726f3b26083043b95",
+        "upstreamId": "7b8ce084-3922-4618-8d22-95f996173765",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Used command -v for inert GPG discovery, replaced input/output/password values, and retained the symmetric encryption flags."
       }
     }
   ]

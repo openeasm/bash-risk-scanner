@@ -111,7 +111,16 @@ export const COMMAND_RULES: Rule[] = [
     severity: "critical",
     confidence: "high",
     message: "Writes sensitive OS, network, proxy, firewall, or trust configuration.",
-    pattern: /^\s*(?:(?:tee(?:\s+-a)?|sed\s+-i|install|cp|mv)\b[^;\n]*(?:\/etc\/(?:sudoers|hosts|resolv\.conf|ssh|pam\.d)|\/etc\/|iptables|nftables|firewall|proxy|certificates?)|[^;\n]*>>?\s*["']?(?:\/etc\/|[^;\n]*(?:sudoers|resolv\.conf|iptables|nftables|certificates?)))/i,
+    pattern: /^\s*(?:(?:tee(?:\s+-a)?|sed\s+-i|install|cp|mv)\b[^;\n]*\/etc\/|[^;\n]*>>?\s*["']?\/etc\/)/i,
+  },
+  {
+    id: "system.firewall-flush",
+    category: "system_modification",
+    title: "Flushes Linux firewall rules",
+    severity: "critical",
+    confidence: "high",
+    message: "Flushes an iptables ruleset and changes host network enforcement.",
+    pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:^|\s)(?:-F|--flush)(?:\s|$))/i,
   },
   {
     id: "system.login-shell",
@@ -175,6 +184,15 @@ export const COMMAND_RULES: Rule[] = [
     confidence: "medium",
     message: "Stops, kills, or changes security monitoring/auditing.",
     pattern: /^\s*(?:auditctl\s+-e\s+0\b|ufw\s+(?:disable\b|logging\s+off\b)|pfctl\s+-d\b|systemctl\s+(?:stop|disable)\s+(?:\S*(?:audit|edr|defender|falcon|sentinel|security|antivirus)\S*|ufw|firewalld|iptables|nftables)(?:\.service)?\b|service\s+(?:\S*(?:audit|edr|defender|falcon|sentinel|security|antivirus)\S*|ufw|firewalld|iptables|nftables|pf)\s+(?:stop|disable)\b|(?:pkill|killall)\b[^;\n]*(?:audit|edr|defender|falcon|sentinel|security|antivirus))/i,
+  },
+  {
+    id: "defense.firewall-flush",
+    category: "defense_evasion",
+    title: "Flushes Linux firewall protections",
+    severity: "critical",
+    confidence: "high",
+    message: "Removes iptables rules and may disable firewall protections.",
+    pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:^|\s)(?:-F|--flush)(?:\s|$))/i,
   },
   {
     id: "defense.timestomp",
