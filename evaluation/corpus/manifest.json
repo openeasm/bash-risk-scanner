@@ -2082,6 +2082,34 @@
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the single executor command without its prerequisite setup and cleanup commands."
       }
+    },
+    {
+      "id": "holdout-atomic-find-oci-session-token-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-oci-session-token.sh.txt",
+      "sha256": "ee5593b96a971675ef21a9b99efa15c15800936b597cf761e60a1e61b8f4a402",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.oci-session-token",
+          "evidencePattern": "find[\\s\\S]*[.]oci/sessions[\\s\\S]*-name\\s+token"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "9d9c22c9-fa97-4008-a204-478cf68c40af",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the search root with an inert /tmp/atomic-home path and retained the .oci/sessions token filename search."
+      }
     }
   ]
 }

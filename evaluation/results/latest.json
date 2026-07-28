@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T18:50:04.728Z",
+  "generatedAt": "2026-07-28T18:54:42.739Z",
   "corpus": {
     "manifest": "evaluation/corpus/manifest.json",
     "schemaVersion": 1,
@@ -44,31 +44,31 @@
     "split:test:recall": true
   },
   "summary": {
-    "sampleCount": 82,
-    "passedSamples": 81,
+    "sampleCount": 83,
+    "passedSamples": 82,
     "failedSamples": 1,
     "forbiddenFindingCount": 0,
-    "tp": 175,
+    "tp": 177,
     "fp": 0,
-    "fn": 2,
+    "fn": 1,
     "precision": 1,
-    "recall": 0.9887005649717514,
-    "f1": 0.9943181818181819,
-    "parseErrorRate": 0.024390243902439025,
+    "recall": 0.9943820224719101,
+    "f1": 0.9971830985915493,
+    "parseErrorRate": 0.024096385542168676,
     "performance": {
-      "p50Milliseconds": 1.9730089999999905,
-      "p95Milliseconds": 82.18270899999993,
-      "maximumMilliseconds": 136.84965999999997
+      "p50Milliseconds": 1.88073600000007,
+      "p95Milliseconds": 79.01330900000005,
+      "maximumMilliseconds": 141.498908
     }
   },
   "languages": {
     "bash": {
-      "tp": 96,
+      "tp": 98,
       "fp": 0,
-      "fn": 2,
+      "fn": 1,
       "precision": 1,
-      "recall": 0.9795918367346939,
-      "f1": 0.9896907216494846
+      "recall": 0.98989898989899,
+      "f1": 0.9949238578680203
     },
     "python": {
       "tp": 38,
@@ -89,12 +89,12 @@
   },
   "provenanceGroups": {
     "public-derived": {
-      "tp": 55,
+      "tp": 57,
       "fp": 0,
-      "fn": 2,
+      "fn": 1,
       "precision": 1,
-      "recall": 0.9649122807017544,
-      "f1": 0.9821428571428572
+      "recall": 0.9827586206896551,
+      "f1": 0.9913043478260869
     },
     "public-snapshot": {
       "tp": 95,
@@ -123,12 +123,12 @@
       "f1": 1
     },
     "test": {
-      "tp": 12,
+      "tp": 14,
       "fp": 0,
-      "fn": 2,
+      "fn": 1,
       "precision": 1,
-      "recall": 0.8571428571428571,
-      "f1": 0.923076923076923
+      "recall": 0.9333333333333333,
+      "f1": 0.9655172413793104
     },
     "validation": {
       "tp": 138,
@@ -143,10 +143,10 @@
     "credential_access": {
       "tp": 14,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "precision": 1,
-      "recall": 1,
-      "f1": 1
+      "recall": 0.9333333333333333,
+      "f1": 0.9655172413793104
     },
     "data_exfiltration": {
       "tp": 17,
@@ -157,12 +157,12 @@
       "f1": 1
     },
     "defense_evasion": {
-      "tp": 6,
+      "tp": 7,
       "fp": 0,
-      "fn": 1,
+      "fn": 0,
       "precision": 1,
-      "recall": 0.8571428571428571,
-      "f1": 0.923076923076923
+      "recall": 1,
+      "f1": 1
     },
     "destructive_behavior": {
       "tp": 11,
@@ -229,12 +229,12 @@
       "f1": 1
     },
     "system_modification": {
-      "tp": 11,
+      "tp": 12,
       "fp": 0,
-      "fn": 1,
+      "fn": 0,
       "precision": 1,
-      "recall": 0.9166666666666666,
-      "f1": 0.9565217391304348
+      "recall": 1,
+      "f1": 1
     }
   },
   "samples": [
@@ -282,7 +282,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 24.241201999999987,
+      "durationMilliseconds": 24.061867000000007,
       "passed": true
     },
     {
@@ -342,7 +342,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.774786000000006,
+      "durationMilliseconds": 1.6471569999999929,
       "passed": true
     },
     {
@@ -381,7 +381,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1382999999999868,
+      "durationMilliseconds": 1.066656000000009,
       "passed": true
     },
     {
@@ -420,7 +420,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6167489999999987,
+      "durationMilliseconds": 1.6096869999999939,
       "passed": true
     },
     {
@@ -447,7 +447,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6080530000000124,
+      "durationMilliseconds": 0.5634799999999984,
       "passed": true
     },
     {
@@ -474,7 +474,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.9730089999999905,
+      "durationMilliseconds": 1.686612000000025,
       "passed": true
     },
     {
@@ -513,7 +513,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.759697000000017,
+      "durationMilliseconds": 6.425774000000018,
       "passed": true
     },
     {
@@ -560,7 +560,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.1506430000000023,
+      "durationMilliseconds": 1.9187780000000032,
       "passed": true
     },
     {
@@ -599,7 +599,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.5014129999999852,
+      "durationMilliseconds": 1.2628850000000114,
       "passed": true
     },
     {
@@ -659,7 +659,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.7287100000000066,
+      "durationMilliseconds": 2.2945550000000026,
       "passed": true
     },
     {
@@ -698,7 +698,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.9335049999999967,
+      "durationMilliseconds": 0.9559270000000026,
       "passed": true
     },
     {
@@ -725,7 +725,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.5513260000000173,
+      "durationMilliseconds": 1.3155529999999942,
       "passed": true
     },
     {
@@ -752,7 +752,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3209940000000131,
+      "durationMilliseconds": 0.2721909999999923,
       "passed": true
     },
     {
@@ -799,7 +799,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.506142000000011,
+      "durationMilliseconds": 4.950959999999981,
       "passed": true
     },
     {
@@ -838,7 +838,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.311425999999983,
+      "durationMilliseconds": 1.280177000000009,
       "passed": true
     },
     {
@@ -898,7 +898,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.5604439999999897,
+      "durationMilliseconds": 1.4297779999999989,
       "passed": true
     },
     {
@@ -953,7 +953,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.1207670000000007,
+      "durationMilliseconds": 1.139443,
       "passed": true
     },
     {
@@ -992,7 +992,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.7499300000000062,
+      "durationMilliseconds": 0.7747970000000066,
       "passed": true
     },
     {
@@ -1019,7 +1019,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.5555540000000008,
+      "durationMilliseconds": 0.5631089999999972,
       "passed": true
     },
     {
@@ -1046,7 +1046,7 @@
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.27405600000000163,
+      "durationMilliseconds": 0.2660199999999975,
       "passed": true
     },
     {
@@ -1115,7 +1115,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 91.156059,
+      "durationMilliseconds": 89.397906,
       "passed": true
     },
     {
@@ -1328,7 +1328,7 @@
       "findingCount": 33,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 136.84965999999997,
+      "durationMilliseconds": 141.498908,
       "passed": true
     },
     {
@@ -1379,7 +1379,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2352319999999963,
+      "durationMilliseconds": 1.221666999999968,
       "passed": true
     },
     {
@@ -1422,7 +1422,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3384360000000015,
+      "durationMilliseconds": 0.3294590000000426,
       "passed": true
     },
     {
@@ -1465,7 +1465,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4980769999999666,
+      "durationMilliseconds": 0.5066530000000284,
       "passed": true
     },
     {
@@ -1516,7 +1516,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6458540000000426,
+      "durationMilliseconds": 0.6477279999999723,
       "passed": true
     },
     {
@@ -1588,7 +1588,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 42.22460999999993,
+      "durationMilliseconds": 39.43900199999996,
       "passed": true
     },
     {
@@ -1653,7 +1653,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 11.76771199999996,
+      "durationMilliseconds": 11.46774499999998,
       "passed": true
     },
     {
@@ -1719,7 +1719,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.2274170000000595,
+      "durationMilliseconds": 4.0090490000000045,
       "passed": true
     },
     {
@@ -1791,7 +1791,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 32.27771100000007,
+      "durationMilliseconds": 31.767596999999967,
       "passed": true
     },
     {
@@ -1832,7 +1832,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.9258909999999787,
+      "durationMilliseconds": 3.923368000000039,
       "passed": true
     },
     {
@@ -1873,7 +1873,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 6.302909,
+      "durationMilliseconds": 7.424271000000033,
       "passed": true
     },
     {
@@ -1922,7 +1922,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.6037750000000415,
+      "durationMilliseconds": 1.6652310000000057,
       "passed": true
     },
     {
@@ -1963,7 +1963,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6979220000000623,
+      "durationMilliseconds": 0.7010479999999575,
       "passed": true
     },
     {
@@ -2025,7 +2025,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 21.8277149999999,
+      "durationMilliseconds": 20.96392099999997,
       "passed": true
     },
     {
@@ -2066,7 +2066,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 5.948863999999958,
+      "durationMilliseconds": 5.660284000000047,
       "passed": true
     },
     {
@@ -2199,7 +2199,7 @@
       "findingCount": 17,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 17.841030000000046,
+      "durationMilliseconds": 17.20120499999996,
       "passed": true
     },
     {
@@ -2240,7 +2240,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 41.0336309999999,
+      "durationMilliseconds": 42.58174199999996,
       "passed": true
     },
     {
@@ -2289,7 +2289,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.8527129999999943,
+      "durationMilliseconds": 1.7649189999999635,
       "passed": true
     },
     {
@@ -2366,7 +2366,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 12.415079999999989,
+      "durationMilliseconds": 10.645057999999949,
       "passed": true
     },
     {
@@ -2407,7 +2407,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.396145000000047,
+      "durationMilliseconds": 3.669550000000072,
       "passed": true
     },
     {
@@ -2481,7 +2481,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 61.17758100000003,
+      "durationMilliseconds": 62.20959000000005,
       "passed": true
     },
     {
@@ -2677,7 +2677,7 @@
       "findingCount": 29,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 71.56181200000003,
+      "durationMilliseconds": 70.66953899999999,
       "passed": true
     },
     {
@@ -2736,7 +2736,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 70.78549399999997,
+      "durationMilliseconds": 70.02701100000002,
       "passed": true
     },
     {
@@ -3091,7 +3091,7 @@
       "findingCount": 62,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 75.16244200000006,
+      "durationMilliseconds": 74.603116,
       "passed": true
     },
     {
@@ -3148,7 +3148,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.665561000000025,
+      "durationMilliseconds": 3.274407999999994,
       "passed": true
     },
     {
@@ -3536,7 +3536,7 @@
       "findingCount": 68,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 82.18270899999993,
+      "durationMilliseconds": 79.01330900000005,
       "passed": true
     },
     {
@@ -3595,7 +3595,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 33.74119200000018,
+      "durationMilliseconds": 34.21512900000005,
       "passed": true
     },
     {
@@ -3712,7 +3712,7 @@
       "findingCount": 15,
       "parseErrorCount": 1,
       "maximumParseErrors": 1,
-      "durationMilliseconds": 101.997791,
+      "durationMilliseconds": 96.11265300000014,
       "passed": true
     },
     {
@@ -3786,7 +3786,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 10.666611999999986,
+      "durationMilliseconds": 10.508350000000064,
       "passed": true
     },
     {
@@ -3869,7 +3869,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 30.714541999999938,
+      "durationMilliseconds": 29.10687400000006,
       "passed": true
     },
     {
@@ -3918,7 +3918,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 12.874792999999954,
+      "durationMilliseconds": 13.301412000000028,
       "passed": true
     },
     {
@@ -4006,7 +4006,7 @@
       "findingCount": 8,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 11.217257999999902,
+      "durationMilliseconds": 12.07853299999988,
       "passed": true
     },
     {
@@ -4097,7 +4097,7 @@
       "findingCount": 8,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 67.65290400000004,
+      "durationMilliseconds": 64.76413400000001,
       "passed": true
     },
     {
@@ -4138,7 +4138,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 119.12650200000007,
+      "durationMilliseconds": 118.62963500000001,
       "passed": true
     },
     {
@@ -4215,7 +4215,7 @@
       "findingCount": 7,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 27.776898999999958,
+      "durationMilliseconds": 24.850069000000076,
       "passed": true
     },
     {
@@ -4256,7 +4256,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 35.10934299999985,
+      "durationMilliseconds": 36.58404399999995,
       "passed": true
     },
     {
@@ -4305,7 +4305,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.2612209999999777,
+      "durationMilliseconds": 2.6640199999999368,
       "passed": true
     },
     {
@@ -4358,7 +4358,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.5695009999999456,
+      "durationMilliseconds": 1.88073600000007,
       "passed": true
     },
     {
@@ -4403,7 +4403,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.30595500000003995,
+      "durationMilliseconds": 0.7478869999999915,
       "passed": true
     },
     {
@@ -4448,7 +4448,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.206698999999844,
+      "durationMilliseconds": 1.3960050000000592,
       "passed": true
     },
     {
@@ -4493,7 +4493,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6766319999999268,
+      "durationMilliseconds": 0.6550919999999678,
       "passed": true
     },
     {
@@ -4553,7 +4553,7 @@
       "findingCount": 4,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.598404999999957,
+      "durationMilliseconds": 0.5672460000000683,
       "passed": true
     },
     {
@@ -4606,7 +4606,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.2533669999997983,
+      "durationMilliseconds": 0.24886800000012954,
       "passed": true
     },
     {
@@ -4659,7 +4659,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.2958459999999832,
+      "durationMilliseconds": 0.29118799999992007,
       "passed": true
     },
     {
@@ -4712,7 +4712,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.0989759999999933,
+      "durationMilliseconds": 2.252124999999978,
       "passed": true
     },
     {
@@ -4765,7 +4765,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.39639499999998407,
+      "durationMilliseconds": 0.3154429999999593,
       "passed": true
     },
     {
@@ -4836,7 +4836,7 @@
       "findingCount": 5,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.47453200000018114,
+      "durationMilliseconds": 0.44921499999986736,
       "passed": true
     },
     {
@@ -4897,7 +4897,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.7262249999998858,
+      "durationMilliseconds": 1.8171669999999267,
       "passed": true
     },
     {
@@ -4950,7 +4950,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.5887269999998352,
+      "durationMilliseconds": 0.4964030000001003,
       "passed": true
     },
     {
@@ -4995,7 +4995,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.3353199999999106,
+      "durationMilliseconds": 1.4064649999997982,
       "passed": true
     },
     {
@@ -5056,7 +5056,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.30990299999984927,
+      "durationMilliseconds": 0.32610300000010284,
       "passed": true
     },
     {
@@ -5109,7 +5109,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4517799999998715,
+      "durationMilliseconds": 0.48490199999992,
       "passed": true
     },
     {
@@ -5170,7 +5170,7 @@
       "findingCount": 3,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 1.2617020000000139,
+      "durationMilliseconds": 1.3780120000001261,
       "passed": true
     },
     {
@@ -5215,7 +5215,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.6126520000000255,
+      "durationMilliseconds": 0.5676670000000286,
       "passed": true
     },
     {
@@ -5268,7 +5268,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.5499140000001717,
+      "durationMilliseconds": 0.616689999999835,
       "passed": true
     },
     {
@@ -5313,7 +5313,7 @@
       "findingCount": 1,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.218409999999949,
+      "durationMilliseconds": 1.9631520000000364,
       "passed": true
     },
     {
@@ -5366,7 +5366,7 @@
       "findingCount": 2,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.3562289999999848,
+      "durationMilliseconds": 0.25515999999993255,
       "passed": true
     },
     {
@@ -5440,7 +5440,7 @@
       "findingCount": 5,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 2.6720229999998537,
+      "durationMilliseconds": 1.90051399999993,
       "passed": true
     },
     {
@@ -5514,7 +5514,7 @@
       "findingCount": 5,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 4.056446000000051,
+      "durationMilliseconds": 3.093898000000081,
       "passed": true
     },
     {
@@ -5593,7 +5593,7 @@
       "findingCount": 6,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 3.676341999999977,
+      "durationMilliseconds": 2.992717999999968,
       "passed": true
     },
     {
@@ -5619,31 +5619,77 @@
         "defense_evasion",
         "system_modification"
       ],
+      "actualCategories": [
+        "defense_evasion",
+        "system_modification"
+      ],
+      "actualFindings": [
+        {
+          "ruleId": "system.firewall-rule-delete",
+          "category": "system_modification",
+          "evidence": "iptables -D OUTPUT -p tcp --dport 21 -j DROP"
+        },
+        {
+          "ruleId": "defense.firewall-rule-delete",
+          "category": "defense_evasion",
+          "evidence": "iptables -D OUTPUT -p tcp --dport 21 -j DROP"
+        }
+      ],
+      "truePositives": [
+        "defense_evasion",
+        "system_modification"
+      ],
+      "falsePositives": [],
+      "falseNegatives": [],
+      "missingExpectedFindings": [],
+      "forbiddenFindings": [],
+      "findingCount": 2,
+      "parseErrorCount": 0,
+      "maximumParseErrors": 0,
+      "durationMilliseconds": 0.3609489999998914,
+      "passed": true
+    },
+    {
+      "id": "holdout-atomic-find-oci-session-token-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-oci-session-token.sh.txt",
+      "sha256": "ee5593b96a971675ef21a9b99efa15c15800936b597cf761e60a1e61b8f4a402",
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "9d9c22c9-fa97-4008-a204-478cf68c40af",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the search root with an inert /tmp/atomic-home path and retained the .oci/sessions token filename search."
+      },
+      "expectedCategories": [
+        "credential_access"
+      ],
       "actualCategories": [],
       "actualFindings": [],
       "truePositives": [],
       "falsePositives": [],
       "falseNegatives": [
-        "defense_evasion",
-        "system_modification"
+        "credential_access"
       ],
       "missingExpectedFindings": [
         {
-          "category": "defense_evasion",
-          "ruleId": "defense.firewall-rule-delete",
-          "evidencePattern": "iptables\\s+-D\\s+OUTPUT[\\s\\S]*-j\\s+DROP"
-        },
-        {
-          "category": "system_modification",
-          "ruleId": "system.firewall-rule-delete",
-          "evidencePattern": "iptables\\s+-D\\s+OUTPUT[\\s\\S]*-j\\s+DROP"
+          "category": "credential_access",
+          "ruleId": "credential.oci-session-token",
+          "evidencePattern": "find[\\s\\S]*[.]oci/sessions[\\s\\S]*-name\\s+token"
         }
       ],
       "forbiddenFindings": [],
       "findingCount": 0,
       "parseErrorCount": 0,
       "maximumParseErrors": 0,
-      "durationMilliseconds": 0.4389459999999872,
+      "durationMilliseconds": 0.3712479999999232,
       "passed": false
     }
   ]

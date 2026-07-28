@@ -545,6 +545,49 @@ describe("scan", () => {
     }
   });
 
+  it("detects deletion of static iptables deny rules without flagging administration", () => {
+    const deletions = [
+      "iptables -D OUTPUT -p tcp --dport 21 -j DROP",
+      "sudo ip6tables --delete INPUT -s 2001:db8::/32 --jump REJECT",
+      "iptables-nft -w 5 -t filter -D FORWARD -j DROP",
+      "ip6tables-legacy --table filter --delete OUTPUT --jump=REJECT",
+    ];
+    for (const source of deletions) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "system.firewall-rule-delete",
+          category: "system_modification",
+          confidence: "high",
+        }),
+        expect.objectContaining({
+          ruleId: "defense.firewall-rule-delete",
+          category: "defense_evasion",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "iptables -D OUTPUT -p tcp --dport 21 -j ACCEPT",
+      "iptables -D INPUT 1",
+      "iptables -A OUTPUT -p tcp --dport 21 -j DROP",
+      "iptables -I INPUT 1 -j REJECT",
+      "iptables -C OUTPUT -j DROP",
+      "iptables -L -n",
+      "iptables-save > /tmp/iptables.rules",
+      "iptables-restore < /tmp/iptables.rules",
+      "iptables --help",
+      "echo 'iptables -D OUTPUT -j DROP'",
+      "# iptables --delete OUTPUT --jump REJECT",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.firewall-rule-delete"
+        || finding.ruleId === "defense.firewall-rule-delete"
+      ), source).toBe(false);
+    }
+  });
+
   it("detects Time Machine disable while respecting Bash function shadowing", () => {
     const disables = [
       "tmutil disable",

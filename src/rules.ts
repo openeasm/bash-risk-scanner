@@ -132,6 +132,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:^|\s)(?:-F|--flush)(?:\s|$))/i,
   },
   {
+    id: "system.firewall-rule-delete",
+    category: "system_modification",
+    title: "Deletes a firewall deny rule",
+    severity: "critical",
+    confidence: "high",
+    message: "Deletes a static iptables DROP or REJECT rule and changes host network enforcement.",
+    pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:\s|^)(?:-D|--delete)(?:\s|$))(?=[^;\n]*(?:\s|^)(?:-j|--jump)(?:=|\s+)(?:DROP|REJECT)(?:\s|$))/i,
+  },
+  {
     id: "system.backup-disable",
     category: "system_modification",
     title: "Disables macOS Time Machine",
@@ -220,6 +229,15 @@ export const COMMAND_RULES: Rule[] = [
     confidence: "high",
     message: "Removes iptables rules and may disable firewall protections.",
     pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:^|\s)(?:-F|--flush)(?:\s|$))/i,
+  },
+  {
+    id: "defense.firewall-rule-delete",
+    category: "defense_evasion",
+    title: "Removes a firewall deny rule",
+    severity: "critical",
+    confidence: "high",
+    message: "Deletes a static DROP or REJECT rule that may have blocked adversary traffic.",
+    pattern: /^\s*(?:iptables|ip6tables)(?:-legacy|-nft)?\b(?=[^;\n]*(?:\s|^)(?:-D|--delete)(?:\s|$))(?=[^;\n]*(?:\s|^)(?:-j|--jump)(?:=|\s+)(?:DROP|REJECT)(?:\s|$))/i,
   },
   {
     id: "defense.timestomp",

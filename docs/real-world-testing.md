@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 82 条离线语料：81 条完全匹配，precision 100%、recall 98.9%、
-F1 99.4%。前面的冻结集缺口均已转为带具体
+当前基线为 83 条离线语料：82 条完全匹配，precision 100%、recall 99.4%、
+F1 99.7%。前面的冻结集缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -255,20 +255,24 @@ validation 回归：
   只有在输入对应本轮已重建文件、输出随后在同一 Bash 作用域由可信 Python
   变量执行时才传播源脚本 finding；别名导入受支持，动态路径、多编译调用、
   输入/执行错配、只编译、跨函数和编译后覆盖字节码均不传播。
+- Atomic Red Team T1686 只有在 iptables/ip6tables 命令同时包含删除动作和
+  静态 `DROP/REJECT` target 时，才同时报告系统修改和防御规避；删除 ACCEPT、
+  按编号删除未知规则、追加/插入拒绝规则、查询检查、save/restore、帮助和文本
+  均不命中。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-test 分层保留三条已经修复的 T1059.006 控制，并新增 Atomic T1686 删除
-`iptables OUTPUT` 链中 FTP `DROP` 规则的样本。当前完全漏掉防火墙系统修改和
-防御规避，四条 test 合计 recall 85.7%、precision 100%。发布门禁继续要求整体
+test 分层保留三条已经修复的 T1059.006 控制和 iptables 规则删除控制，并新增
+Atomic T1552.001 查找 OCI 会话令牌 `.oci/sessions/**/token` 的样本。当前完全漏掉
+凭据访问，五条 test 合计 recall 93.3%、precision 100%。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
-`maximum.forbiddenFindingCount` 为 0。下一轮应解析 iptables 操作、链与 target：
-只有 `-D/--delete` 删除静态 `DROP/REJECT` 规则时同时报告系统修改和防御规避；
-追加/插入拒绝规则、删除 ACCEPT 规则、查询、检查、列出、保存/恢复、dry-run
-等效测试、不同工具、帮助和文本应作为 hard-negative。
+`maximum.forbiddenFindingCount` 为 0。下一轮应要求文件访问/枚举命令同时包含
+`.oci/sessions` 路径和静态 token 文件名；普通 `.oci` 配置目录、其他 session
+文件、任意项目中的 token 名、动态路径、创建/删除操作、帮助、注释和文本应作为
+hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-125 个单元测试或当前小规模公开语料外推生产环境准确率。
+126 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
