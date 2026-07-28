@@ -470,6 +470,37 @@ describe("scan", () => {
     }
   });
 
+  it("detects SUID and SGID additions in combined symbolic chmod modes", () => {
+    const privilegedModes = [
+      "chmod u+xs /tmp/tool",
+      "chmod g+xs /tmp/tool",
+      "chmod u+x,g+s /tmp/tool",
+      "chmod -- a+rsx /tmp/tool",
+      "chmod 4755 /tmp/tool",
+      "chmod 2750 /tmp/tool",
+    ];
+    for (const source of privilegedModes) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "privilege.suid-capability"
+      )).toBe(true);
+    }
+
+    const hardNegatives = [
+      "chmod u+x /tmp/tool",
+      "chmod g+x /tmp/tool",
+      "chmod u-s /tmp/tool",
+      "chmod u+x,g-s /tmp/tool",
+      "chmod 0755 /tmp/tool",
+      "find /usr/bin -perm -4000",
+      "chown root /tmp/tool",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "privilege.suid-capability"
+      )).toBe(false);
+    }
+  });
+
   it("detects writes through profile path variables", () => {
     const result = scan(`command printf '%s' "$SOURCE" >> "$NVM_PROFILE"`);
     expect(result.findings.some((finding) => finding.category === "persistence")).toBe(true);

@@ -120,7 +120,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "critical",
     confidence: "high",
     message: "Sets SUID/SGID or Linux capabilities.",
-    pattern: /^\s*(?:chmod\s+(?:[ug+]*s|[2467][0-7]{3})|setcap\s+)/i,
+    pattern: /^\s*(?:chmod\s+(?:--\s+)?(?:(?:[ugoa]*[+=-][rwxXst]*,)*[ugoa]*[+=][rwxXst]*s[rwxXst]*(?:,[ugoa]*[+=-][rwxXst]*)*|[2467][0-7]{3})(?:\s|$)|setcap\s+)/i,
   },
   {
     id: "defense.logs",
