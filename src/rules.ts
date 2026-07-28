@@ -204,6 +204,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*gcloud\s+storage\s+(?:(?:buckets|objects)\s+(?:list|describe|create|update|delete)\b|(?:cp|mv|rsync|ls|rm)\b)/i,
   },
   {
+    id: "network.python-http-server",
+    category: "network_egress",
+    title: "Starts a Python HTTP file server",
+    severity: "high",
+    confidence: "high",
+    message: "Starts an HTTP listener that can expose files from the selected directory.",
+    pattern: /^(?![^;\n]*(?:^|\s)(?:-h|--help)(?:\s|$))\s*python\d*\s+-m\s+http\.server(?:\s|$)/i,
+  },
+  {
     id: "exfil.upload",
     category: "data_exfiltration",
     title: "Uploads local data",
@@ -211,6 +220,15 @@ export const COMMAND_RULES: Rule[] = [
     confidence: "medium",
     message: "Uses an upload or POST option that may transmit local data.",
     pattern: /^\s*(?:curl\b[^;\n]*(?:(?:^|\s)(?:-F|-T)(?:\s|$)|--(?:form|upload-file)(?:=|\s)|--data(?:-binary)?\s+@|-X\s*POST\b)|aws\s+s3\s+cp\b|gsutil\s+cp\b|rclone\s+(?:copy|sync)\b|scp\s+)/,
+  },
+  {
+    id: "exfil.python-http-server",
+    category: "data_exfiltration",
+    title: "Exposes a local directory over HTTP",
+    severity: "high",
+    confidence: "high",
+    message: "Python's static HTTP server makes files in the working or selected directory remotely retrievable.",
+    pattern: /^(?![^;\n]*(?:^|\s)(?:-h|--help)(?:\s|$))\s*python\d*\s+-m\s+http\.server(?:\s|$)/i,
   },
   {
     id: "exfil.reverse-shell",

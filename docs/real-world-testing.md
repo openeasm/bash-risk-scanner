@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 69 条离线语料：68 条完全匹配，precision 100%、recall 98.6%、
-F1 99.3%。前二十五轮冻结集暴露的缺口均已转为带具体
+当前基线为 70 条离线语料：69 条完全匹配，precision 100%、recall 99.3%、
+F1 99.7%。前二十六轮冻结集暴露的缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -212,18 +212,21 @@ validation 回归：
   `/private/var/db/emondClients` 触发文件。现在会识别为 emond 持久化，同时保留
   系统修改和提权；读取/列目录、删除规则或触发文件、普通 `/tmp` plist，以及
   路径仅出现在注释或字符串中的情况均作为 hard-negative。
+- Atomic Red Team T1048.003 `python3 -m http.server` 现在分别报告 HTTP
+  监听和本地目录暴露；`--help/-h`、其他模块、普通 Python 文件、变量赋值、
+  注释和文本内容均不命中这两个规则。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
-新冻结的 Atomic Red Team T1048.003 test 样本用 `python3 -m http.server` 暴露
-本地目录。当前只命中解释器逃逸，数据外传和网络外联仍为 FN，因此 test recall
-基线为 33.3%；整体门槛仍保持 precision 95%、recall 90%，
-`maximum.forbiddenFindingCount` 保持 0。下一轮应识别 Python 静态文件服务器的
-监听与目录暴露语义，并用模块帮助、非服务器模块、仅文档文本及未实际执行的命令
-作为 hard-negative。
+新冻结的 Atomic Red Team T1686 test 样本先用 `iptables-save` 备份规则，再用
+`iptables -F` 清空规则。当前真正的清空命令未命中防御规避或系统修改，而只读备份
+反被 `system.sensitive-config` 误报，因此 test recall 基线为 50%，并明确保留
+1 个 forbidden finding；整体门槛仍保持 precision 95%、recall 90%。下一轮应
+识别 `iptables/ip6tables -F/--flush` 的修改和规避语义，并用 `-L/-S/-C` 查询、
+`iptables-save` 备份、`iptables-restore` 恢复以及文本内容作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-113 个单元测试或当前小规模公开语料外推生产环境准确率。
+114 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
