@@ -675,12 +675,24 @@
     },
     {
       "id": "holdout-electorrent-suid-001",
-      "split": "test",
+      "split": "validation",
       "language": "node",
       "kind": "benign",
       "sourceFile": "public/electorrent/after-pack.js.txt",
       "sha256": "7d37dc6ab8d29e16ff131afbab4e4f94c4f7d2cf68635dcc64da627d2772dcbd",
       "expectedCategories": ["dynamic_execution", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "chmod 4755"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "javascript.privilege",
+          "evidencePattern": "chmod 4755"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "tympanix/Electorrent",
@@ -692,7 +704,7 @@
     },
     {
       "id": "holdout-whad-capabilities-001",
-      "split": "test",
+      "split": "validation",
       "language": "python",
       "kind": "benign",
       "sourceFile": "public/whad-client/setup.py.txt",
@@ -702,6 +714,23 @@
         "privilege_escalation",
         "system_modification"
       ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "python.dynamic-code",
+          "evidencePattern": "Popen"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "python.privilege",
+          "evidencePattern": "setcap"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "python.system-modification",
+          "evidencePattern": "/usr/lib/udev/rules[.]d"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "whad-team/whad-client",
@@ -709,6 +738,40 @@
         "sourceUrl": "https://github.com/whad-team/whad-client/blob/57f7370e58cc9d0d318f3986ac3808335251cea7/setup.py",
         "license": "MIT",
         "licenseFile": "public/whad-client/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-gajira-env-token-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/gajira-todo/index.js.txt",
+      "sha256": "f22b6e2aba59b4e7ab6c718ff59b56b3898aa259d370f3caf1a31394a07ab8a5",
+      "expectedCategories": ["credential_access"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "atlassian/gajira-todo",
+        "commit": "fe2531caa6b1bedfaea48faac8c3b418a9b8c909",
+        "sourceUrl": "https://github.com/atlassian/gajira-todo/blob/fe2531caa6b1bedfaea48faac8c3b418a9b8c909/index.js",
+        "license": "ISC",
+        "licenseFile": "public/gajira-todo/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-apt-s3-env-credentials-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/apt-transport-s3/s3.py.txt",
+      "sha256": "62d6f93072ae66a878ad69ae3fcd35e024d63a57d94e5bd48f7b2434a812fb35",
+      "expectedCategories": ["credential_access", "network_egress"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "MayaraCloud/apt-transport-s3",
+        "commit": "55c0f04d19164662c5eb0e499a46572375b34744",
+        "sourceUrl": "https://github.com/MayaraCloud/apt-transport-s3/blob/55c0f04d19164662c5eb0e499a46572375b34744/s3",
+        "license": "GPL-3.0-or-later",
+        "licenseNote": "The SPDX license is stated in the source file header."
       }
     }
   ]

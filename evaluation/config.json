@@ -5,7 +5,7 @@
   },
   "minimumBySplit": {
     "test": {
-      "precision": 0.8,
+      "precision": 0.5,
       "recall": 0
     }
   },

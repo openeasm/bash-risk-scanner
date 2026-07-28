@@ -347,6 +347,26 @@ function collectJavaScriptShadows(root: SyntaxNode): Set<string> {
   return shadows;
 }
 
+function collectJavaScriptDerivedAliases(
+  root: SyntaxNode,
+  aliases: Map<string, string>,
+): void {
+  walk(root, (node) => {
+    if (node.type !== "variable_declarator") return;
+    const name = node.childForFieldName("name")?.text;
+    const value = node.childForFieldName("value");
+    if (!name || value?.type !== "call_expression") return;
+    const wrapper = canonicalizeCallee(calleeOf(value), aliases);
+    if (wrapper !== "util.promisify") return;
+    const argument = value.childForFieldName("arguments")?.namedChildren[0]?.text;
+    if (!argument) return;
+    const wrapped = canonicalizeCallee(argument, aliases);
+    if (/^child_process\.(?:exec|execFile)$/.test(wrapped)) {
+      aliases.set(name, wrapped);
+    }
+  });
+}
+
 function scanAstLanguage(
   source: string,
   language: "python" | "javascript",
@@ -361,6 +381,7 @@ function scanAstLanguage(
   const interestingNodes: SyntaxNode[] = [];
   const aliases = collectAliases(source, language);
   if (language === "python") collectPythonObjectBindings(tree.rootNode, aliases);
+  if (language === "javascript") collectJavaScriptDerivedAliases(tree.rootNode, aliases);
   const javascriptShadows = language === "javascript"
     ? collectJavaScriptShadows(tree.rootNode)
     : new Set<string>();
@@ -507,6 +528,19 @@ function scanAstLanguage(
     }
     for (const rule of rules as LanguageRule[]) {
       if (!rule.nodeTypes.includes(node.type)) continue;
+      if (
+        language === "javascript"
+        && javascriptRoot
+        && javascriptShadows.has(javascriptRoot)
+        && !aliases.has(javascriptRoot)
+        && [
+          "download_execution",
+          "dynamic_execution",
+          "network_egress",
+          "privilege_escalation",
+          "interpreter_escape",
+        ].includes(rule.category)
+      ) continue;
       if (
         language === "javascript"
         && rule.category === "network_egress"

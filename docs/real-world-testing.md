@@ -30,8 +30,8 @@ Shell、Python、Node.js，也不访问样本中的 URL。
 
 公开来源语料还包括固定 commit 的完整 nvm、Homebrew、pipx、pnpm self-installer、
 node-gyp、aiohttp、pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
-Anaconda、Electorrent 和 WHAD client 代码，以及 Atomic Red Team 的 Bash 命令
-和 Python telnet client。
+Anaconda、Electorrent、WHAD client、Gajira TODO 和 apt-transport-s3 代码，以及
+Atomic Red Team 的 Bash 命令和 Python telnet client。
 每个样本记录来源 URL、commit、许可证、本地 SHA-256；派生样本额外记录上游 YAML
 哈希、Atomic GUID 和占位符替换说明。
 公开快照可通过以下命令复核：
@@ -109,8 +109,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 40 条离线语料：38 条完全匹配，precision 100%、recall 97.2%、
-F1 98.6%。前五轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 42 条离线语料：40 条完全匹配，precision 98.6%、recall 97.3%、
+F1 98.0%。前六轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -129,16 +129,22 @@ validation 回归：
 - Adafruit Retrogame：只有 `adafruit_shell.Shell` 来源绑定成立时，才摘要 wrapper
   内的下载、systemctl、系统路径写入/移动和删除行为。
 - Anaconda：`auditctl -e 0` 会检出防御规避，`auditctl -l/-s` 查询不会告警。
+- Electorrent：`promisify(child_process.exec)` 会传播执行器来源，`chmod 4755`
+  检出 SUID；普通 `0755` 不报权限提升。
+- WHAD client：复制到 `/usr/lib/udev/rules.d` 识别为系统配置修改。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Electorrent：可识别 promisified `exec()` 的动态执行，但字符串形式
-  `chmod 4755` 尚未关联为 SUID 权限提升。
-- WHAD client：可识别 subprocess 动态执行和 `setcap` 权限提升，但复制规则到
-  `/usr/lib/udev/rules.d` 尚未识别为系统修改。
+- Gajira TODO 的 `process.env.GITHUB_TOKEN` 尚未检出凭据访问。
+- apt-transport-s3 的 `os.environ.get("AWS_SECRET_ACCESS_KEY")` 尚未检出凭据访问。
+- apt-transport-s3 的 `self.send(...)` 是写回本地 APT method 协议，却被通用
+  `.send()` sink 误判为数据外传，并连带触发 read-upload chain。
+
+新 test 分层以实际 precision 50%、recall 33.3% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应先修复这个 FP 和两个 FN，再提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-79 个单元测试或当前小规模公开语料外推生产环境准确率。
+81 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 ## 提升闭环
 

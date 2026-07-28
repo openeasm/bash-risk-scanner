@@ -382,6 +382,46 @@ util.execWithRedirect("auditctl", ["-s"])
 `);
     expect(query.findings.some((finding) => finding.category === "defense_evasion")).toBe(false);
   });
+
+  it("tracks promisified child_process exec and distinguishes SUID modes", () => {
+    const result = scanJavaScript(`
+import { exec as execCallback } from 'child_process'
+import { promisify } from 'util'
+const exec = promisify(execCallback)
+await exec(\`chmod 4755 \${chromeSandbox}\`)
+`);
+    expect(result.findings.some((finding) => finding.category === "privilege_escalation")).toBe(true);
+
+    const ordinaryMode = scanJavaScript(`
+import { exec as execCallback } from 'child_process'
+import { promisify } from 'util'
+const exec = promisify(execCallback)
+await exec(\`chmod 0755 \${binary}\`)
+`);
+    expect(ordinaryMode.findings.some((finding) => finding.category === "privilege_escalation")).toBe(false);
+
+    const localPromisify = scanJavaScript(`
+const promisify = fn => fn
+const execCallback = value => value.trim()
+const exec = promisify(execCallback)
+exec("chmod 4755 documentation")
+`);
+    expect(localPromisify.findings.some((finding) => finding.category === "privilege_escalation")).toBe(false);
+  });
+
+  it("detects udev rule installation without flagging unrelated library copies", () => {
+    const result = scanPython(`
+from shutil import copy
+copy("device.rules", "/usr/lib/udev/rules.d/40-device.rules")
+`);
+    expect(result.findings.some((finding) => finding.category === "system_modification")).toBe(true);
+
+    const localLibrary = scanPython(`
+from shutil import copy
+copy("data.json", "/usr/lib/myapp/data.json")
+`);
+    expect(localLibrary.findings.some((finding) => finding.category === "system_modification")).toBe(false);
+  });
 });
 
 describe("embedded interpreter payloads", () => {

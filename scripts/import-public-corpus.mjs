@@ -167,6 +167,21 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/whad-team/whad-client/57f7370e58cc9d0d318f3986ac3808335251cea7/LICENSE",
     sha256: "376a52eab9ed060dd46ff77d74923de04e16a7b5e210128746f4f30673fe0296",
   },
+  {
+    target: "gajira-todo/index.js.txt",
+    url: "https://raw.githubusercontent.com/atlassian/gajira-todo/fe2531caa6b1bedfaea48faac8c3b418a9b8c909/index.js",
+    sha256: "f22b6e2aba59b4e7ab6c718ff59b56b3898aa259d370f3caf1a31394a07ab8a5",
+  },
+  {
+    target: "gajira-todo/LICENSE",
+    url: "https://raw.githubusercontent.com/atlassian/gajira-todo/fe2531caa6b1bedfaea48faac8c3b418a9b8c909/LICENSE",
+    sha256: "1831160311ccf945e9084f1157be7474dd8cf9ce3e1f33d52b56d7d3f9540da3",
+  },
+  {
+    target: "apt-transport-s3/s3.py.txt",
+    url: "https://raw.githubusercontent.com/MayaraCloud/apt-transport-s3/55c0f04d19164662c5eb0e499a46572375b34744/s3",
+    sha256: "62d6f93072ae66a878ad69ae3fcd35e024d63a57d94e5bd48f7b2434a812fb35",
+  },
 ];
 
 async function download(url) {
