@@ -93,7 +93,12 @@ function bashFunctionSummaries(source: string): {
   )) {
     const name = match[1]!;
     const body = match[2]!;
-    if (/(?:^|[\s;])["']?\$@["']?(?:[\s;]|$)/m.test(body)) transparent.add(name);
+    if (
+      /(?:^|\n)[ \t]*(?:(?:if|while|until)[ \t]+![ \t]+|![ \t]+)?["']?\$@["']?(?:[ \t;]|$)/m
+        .test(body)
+    ) {
+      transparent.add(name);
+    }
     if (/\b(?:curl|wget)\b/.test(body) && /\$1\b/.test(body) && /\$2\b/.test(body)) {
       downloaders.add(name);
     }
@@ -138,6 +143,19 @@ function bashInvokesVariable(text: string, variable: string): boolean {
   return new RegExp(
     `^\\s*(?:(?:[A-Za-z_]\\w*=\\S+|env)\\s+)*["']?\\$(?:\\{)?${escaped}\\}?["']?(?:\\s|$)`,
   ).test(text);
+}
+
+function bashVariableSubcommand(
+  text: string,
+  variable: string,
+): string | undefined {
+  const escaped = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return text.match(
+    new RegExp(
+      `^\\s*(?:(?:[A-Za-z_]\\w*=\\S+|env)\\s+)*["']?\\$(?:\\{)?${escaped}\\}?["']?\\s+(eval|run)(?:\\s|$)`,
+      "i",
+    ),
+  )?.[1]?.toLowerCase();
 }
 
 function bashCommandVariants(
@@ -427,64 +445,69 @@ function canonicalizeCallee(callee: string, aliases: Map<string, string>): strin
   return replacement ? `${replacement}${callee.slice(identifier.length)}` : callee;
 }
 
-function collectPythonObjectBindings(
+function collectPythonObjectBindingNode(
+  node: SyntaxNode,
+  aliases: Map<string, string>,
+): void {
+  if (node.type === "return_statement") {
+    const returnedCall = node.namedChildren.find((candidate) => candidate.type === "call");
+    const returnedCallee = returnedCall
+      ? canonicalizeCallee(calleeOf(returnedCall), aliases)
+      : "";
+    if (/^socket\.(?:socket|create_connection)$/.test(returnedCallee)) {
+      for (let current = node.parent; current; current = current.parent) {
+        if (current.type !== "function_definition") continue;
+        const name = current.childForFieldName("name")?.text;
+        if (name) aliases.set(`self.${name}`, "socket.socket");
+        break;
+      }
+    }
+    return;
+  }
+
+  let localName = "";
+  let value: SyntaxNode | null = null;
+  if (node.type === "assignment") {
+    localName = node.childForFieldName("left")?.text ?? "";
+    value = node.childForFieldName("right");
+  } else if (node.type === "as_pattern") {
+    localName = node.childForFieldName("alias")?.text
+      ?? node.namedChildren.find((child) => child.type === "as_pattern_target")?.text
+      ?? "";
+    value = node.childForFieldName("value")
+      ?? node.namedChildren.find((child) => child.type === "call")
+      ?? null;
+  }
+  if (!/^[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*$/.test(localName) || value?.type !== "call") return;
+  const constructor = canonicalizeCallee(calleeOf(value), aliases);
+  if (
+    constructor === "aiohttp.ClientSession"
+    || constructor === "httpx.Client"
+    || constructor === "httpx.AsyncClient"
+    || constructor === "requests.Session"
+    || constructor === "requests.session"
+    || constructor === "twine.utils.make_requests_session"
+    || constructor === "adafruit_shell.Shell"
+    || constructor === "socket.socket"
+    || constructor === "socket.create_connection"
+    || constructor === "s3transfer.S3Transfer"
+  ) {
+    aliases.set(
+      localName,
+      constructor === "twine.utils.make_requests_session"
+        ? "requests.Session"
+        : constructor,
+    );
+  }
+}
+
+function collectPythonSocketFactories(
   root: SyntaxNode,
   aliases: Map<string, string>,
 ): void {
-  walk(root, (node) => {
-    if (node.type !== "function_definition") return;
-    const name = node.childForFieldName("name")?.text;
-    const body = node.childForFieldName("body");
-    if (!name || !body) return;
-    let socketFactory = false;
-    walk(body, (child) => {
-      if (child.type !== "return_statement") return;
-      const returnedCall = child.namedChildren.find((candidate) => candidate.type === "call");
-      if (!returnedCall) return;
-      const returnedCallee = canonicalizeCallee(calleeOf(returnedCall), aliases);
-      if (/^socket\.(?:socket|create_connection)$/.test(returnedCallee)) {
-        socketFactory = true;
-      }
-    });
-    if (socketFactory) aliases.set(`self.${name}`, "socket.socket");
-  });
-
-  walk(root, (node) => {
-    let localName = "";
-    let value: SyntaxNode | null = null;
-    if (node.type === "assignment") {
-      localName = node.childForFieldName("left")?.text ?? "";
-      value = node.childForFieldName("right");
-    } else if (node.type === "as_pattern") {
-      localName = node.childForFieldName("alias")?.text
-        ?? node.namedChildren.find((child) => child.type === "as_pattern_target")?.text
-        ?? "";
-      value = node.childForFieldName("value")
-        ?? node.namedChildren.find((child) => child.type === "call")
-        ?? null;
-    }
-    if (!/^[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*$/.test(localName) || value?.type !== "call") return;
-    const constructor = canonicalizeCallee(calleeOf(value), aliases);
-    if (
-      constructor === "aiohttp.ClientSession"
-      || constructor === "httpx.Client"
-      || constructor === "httpx.AsyncClient"
-      || constructor === "requests.Session"
-      || constructor === "requests.session"
-      || constructor === "twine.utils.make_requests_session"
-      || constructor === "adafruit_shell.Shell"
-      || constructor === "socket.socket"
-      || constructor === "socket.create_connection"
-      || constructor === "s3transfer.S3Transfer"
-    ) {
-      aliases.set(
-        localName,
-        constructor === "twine.utils.make_requests_session"
-          ? "requests.Session"
-          : constructor,
-      );
-    }
-  });
+  for (const node of root.descendantsOfType("return_statement")) {
+    collectPythonObjectBindingNode(node, aliases);
+  }
 }
 
 const SENSITIVE_ENVIRONMENT_NAME = /(?:^|[_-])(?:TOKEN|SECRET|PASSWORD|PASSWD|API[_-]?KEY|ACCESS[_-]?KEY|PRIVATE[_-]?KEY|CREDENTIALS?)(?:$|[_-])/i;
@@ -501,20 +524,21 @@ function environmentCredentialFinding(
   javascriptShadows: Set<string>,
   maxEvidence: number,
 ): Finding | undefined {
-  const text = node.text;
+  let text = "";
   let variableName: string | undefined;
 
   if (language === "python") {
-    if (node.type === "subscript") {
-      const value = node.childForFieldName("value")?.text ?? "";
-      const canonicalValue = canonicalizeCallee(value, aliases);
-      if (canonicalValue !== "os.environ") return undefined;
-      const index = node.childForFieldName("subscript")?.text
-        ?? node.namedChildren.at(-1)?.text
-        ?? "";
-      variableName = quotedValue(index);
-    }
+    if (node.type !== "subscript") return undefined;
+    text = node.text;
+    const value = node.childForFieldName("value")?.text ?? "";
+    const canonicalValue = canonicalizeCallee(value, aliases);
+    if (canonicalValue !== "os.environ") return undefined;
+    const index = node.childForFieldName("subscript")?.text
+      ?? node.namedChildren.at(-1)?.text
+      ?? "";
+    variableName = quotedValue(index);
   } else if (node.type === "member_expression") {
+    text = node.text;
     if (javascriptShadows.has("process")) return undefined;
     const property = node.childForFieldName("property")?.text ?? "";
     if (/^process\.env\.[A-Za-z_$][\w$]*$/.test(text)) {
@@ -523,9 +547,12 @@ function environmentCredentialFinding(
       variableName = quotedValue(property);
     }
   } else if (node.type === "subscript_expression") {
+    text = node.text;
     if (javascriptShadows.has("process")) return undefined;
     if ((node.childForFieldName("object")?.text ?? "") !== "process.env") return undefined;
     variableName = quotedValue(node.childForFieldName("index")?.text ?? "");
+  } else {
+    return undefined;
   }
 
   if (!variableName || !SENSITIVE_ENVIRONMENT_NAME.test(variableName)) return undefined;
@@ -617,7 +644,7 @@ function scanAstLanguage(
   const interestingNodes: SyntaxNode[] = [];
   const aliases = collectAliases(source, language);
   const javascriptUploadObjects = new Set<string>();
-  if (language === "python") collectPythonObjectBindings(tree.rootNode, aliases);
+  if (language === "python") collectPythonSocketFactories(tree.rootNode, aliases);
   if (language === "javascript") {
     collectJavaScriptDerivedAliases(tree.rootNode, aliases, javascriptUploadObjects);
   }
@@ -626,6 +653,7 @@ function scanAstLanguage(
     : new Set<string>();
 
   walk(tree.rootNode, (node) => {
+    if (language === "python") collectPythonObjectBindingNode(node, aliases);
     if (node.isError || node.isMissing) parseErrors.push(rangeOf(node));
     const environmentFinding = environmentCredentialFinding(
       node,
@@ -1154,6 +1182,29 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
         severity: "critical",
         confidence: "high",
         message: "A downloaded archive is extracted and its variable-derived executable is invoked.",
+        language: "bash",
+      }, maxEvidence);
+    }
+    const dynamicSubcommand = execute?.variants
+      .map((variant) => bashVariableSubcommand(variant, archiveVariable))
+      .find((subcommand) => subcommand !== undefined);
+    if (extract && chmod && execute && dynamicSubcommand) {
+      addChainFinding(findings, download.statement, execute.statement, {
+        ruleId: "chain.downloaded-interpreter",
+        category: "interpreter_escape",
+        title: "Invokes a downloaded language runtime",
+        severity: "high",
+        confidence: "high",
+        message: `A downloaded executable is invoked with its ${dynamicSubcommand} subcommand.`,
+        language: "bash",
+      }, maxEvidence);
+      addChainFinding(findings, download.statement, execute.statement, {
+        ruleId: "chain.downloaded-dynamic-code",
+        category: "dynamic_execution",
+        title: "Executes code through a downloaded runtime",
+        severity: "high",
+        confidence: "high",
+        message: `A downloaded executable dynamically evaluates code with its ${dynamicSubcommand} subcommand.`,
         language: "bash",
       }, maxEvidence);
     }

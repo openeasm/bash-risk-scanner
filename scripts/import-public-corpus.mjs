@@ -307,6 +307,26 @@ const snapshots = [
     url: "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/7ea697fd8138550ddf7262456d412f0dcd1cbf84/LICENSE.txt",
     sha256: "6772e603fd19666902ab7541f49f3d9e92637539fb0840605615d8c6d18fc3f6",
   },
+  {
+    target: "huggingface-hub/file_download.py.txt",
+    url: "https://raw.githubusercontent.com/huggingface/huggingface_hub/bbdef5b34d166a622891775c03ab0a4755b88280/src/huggingface_hub/file_download.py",
+    sha256: "1a221b53b3fb9965b74c98cb7b183f61d276d91d7920ef4f8f0ca00725ca4b93",
+  },
+  {
+    target: "huggingface-hub/LICENSE",
+    url: "https://raw.githubusercontent.com/huggingface/huggingface_hub/bbdef5b34d166a622891775c03ab0a4755b88280/LICENSE",
+    sha256: "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+  },
+  {
+    target: "node-pre-gyp/install.js.txt",
+    url: "https://raw.githubusercontent.com/mapbox/node-pre-gyp/14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5/lib/install.js",
+    sha256: "c341364fb7a5a1989ec2e9841767e7de719fe06ea5f3c86a0075520f40713b01",
+  },
+  {
+    target: "node-pre-gyp/LICENSE",
+    url: "https://raw.githubusercontent.com/mapbox/node-pre-gyp/14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5/LICENSE",
+    sha256: "5e3b2b8138f20dbf2e7558d81b8bcad48d0f45b731eb276fa4de21b94f4447bd",
+  },
 ];
 
 function githubContentsFallback(url) {

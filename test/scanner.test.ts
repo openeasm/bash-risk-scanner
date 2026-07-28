@@ -71,6 +71,71 @@ describe("scan", () => {
     )).toBe(false);
   });
 
+  it("classifies eval or run only after proving a downloaded runtime", () => {
+    const result = scan(`
+      runtime=$HOME/.local/bin/deno
+      curl --output "$runtime.zip" "$runtime_url"
+      unzip "$runtime.zip" -d "$HOME/.local/bin"
+      chmod +x "$runtime"
+      $runtime eval "$code"
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "chain.downloaded-interpreter",
+        category: "interpreter_escape",
+      }),
+      expect.objectContaining({
+        ruleId: "chain.downloaded-dynamic-code",
+        category: "dynamic_execution",
+      }),
+    ]));
+
+    const unproven = scan(`
+      helper=$HOME/bin/project-helper
+      $helper run task
+      echo '$helper eval code'
+    `);
+    expect(unproven.findings.some((finding) =>
+      finding.ruleId === "chain.downloaded-interpreter"
+      || finding.ruleId === "chain.downloaded-dynamic-code"
+    )).toBe(false);
+  });
+
+  it("detects login-shell changes, zsh execution, and rc replacement with command boundaries", () => {
+    const result = scan(`
+      mv -f "$zdot/.zshrc-omztemp" "$zdot/.zshrc"
+      sudo chsh -s "$zsh" "$USER"
+      exec zsh -l
+    `);
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "persistence.shell-rc-replace",
+        category: "persistence",
+      }),
+      expect.objectContaining({
+        ruleId: "system.login-shell",
+        category: "system_modification",
+      }),
+      expect.objectContaining({
+        ruleId: "escape.interpreter",
+        category: "interpreter_escape",
+      }),
+    ]));
+
+    const hardNegative = scan(`
+      command_exists() { command -v "$@" >/dev/null 2>&1; }
+      command_exists zsh
+      mv "$zdot/.zshrc" "$backup_file"
+      chsh --help
+      echo "exec zsh -l"
+    `);
+    expect(hardNegative.findings.some((finding) =>
+      finding.ruleId === "persistence.shell-rc-replace"
+      || finding.ruleId === "system.login-shell"
+      || finding.ruleId === "escape.interpreter"
+    )).toBe(false);
+  });
+
   it("tracks startup-file variables used by compound redirects", () => {
     const result = scan(`
       zsh_config=$HOME/.zshrc

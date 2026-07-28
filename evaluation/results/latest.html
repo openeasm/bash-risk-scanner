@@ -13,25 +13,25 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">52/54</div>样本通过</div>
+<div class="card"><div class="big">54/56</div>样本通过</div>
 <div class="card"><div class="big">100.0%</div>Precision</div>
-<div class="card"><div class="big">95.8%</div>Recall</div>
-<div class="card"><div class="big">97.8%</div>F1</div>
-<div class="card"><div class="big">91.23 ms</div>P95</div>
+<div class="card"><div class="big">98.4%</div>Recall</div>
+<div class="card"><div class="big">99.2%</div>F1</div>
+<div class="card"><div class="big">82.08 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>41</td><td>0</td><td>5</td>
-    <td>100.0%</td><td>89.1%</td><td>94.3%</td>
-  </tr>
-<tr>
-    <td>python</td><td>36</td><td>0</td><td>0</td>
+    <td>bash</td><td>46</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>node</td><td>36</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>python</td><td>36</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>97.3%</td><td>98.6%</td>
+  </tr>
+<tr>
+    <td>node</td><td>38</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>97.4%</td><td>98.7%</td>
   </tr></tbody></table>
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
@@ -40,8 +40,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>public-snapshot</td><td>82</td><td>0</td><td>5</td>
-    <td>100.0%</td><td>94.3%</td><td>97.0%</td>
+    <td>public-snapshot</td><td>89</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>97.8%</td><td>98.9%</td>
   </tr>
 <tr>
     <td>synthetic-realistic</td><td>25</td><td>0</td><td>0</td>
@@ -54,17 +54,17 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>test</td><td>6</td><td>0</td><td>5</td>
-    <td>100.0%</td><td>54.5%</td><td>70.6%</td>
+    <td>test</td><td>2</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>50.0%</td><td>66.7%</td>
   </tr>
 <tr>
-    <td>validation</td><td>82</td><td>0</td><td>0</td>
+    <td>validation</td><td>93</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>credential_access</td><td>10</td><td>0</td><td>0</td>
+    <td>credential_access</td><td>11</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
@@ -84,42 +84,42 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>dynamic_execution</td><td>10</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>90.9%</td><td>95.2%</td>
-  </tr>
-<tr>
-    <td>interpreter_escape</td><td>6</td><td>0</td><td>2</td>
-    <td>100.0%</td><td>75.0%</td><td>85.7%</td>
-  </tr>
-<tr>
-    <td>network_egress</td><td>35</td><td>0</td><td>0</td>
+    <td>dynamic_execution</td><td>11</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>persistence</td><td>7</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>87.5%</td><td>93.3%</td>
+    <td>interpreter_escape</td><td>8</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+  </tr>
+<tr>
+    <td>network_egress</td><td>35</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>94.6%</td><td>97.2%</td>
+  </tr>
+<tr>
+    <td>persistence</td><td>8</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
     <td>privilege_escalation</td><td>6</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>second_stage_payload</td><td>6</td><td>0</td><td>0</td>
+    <td>second_stage_payload</td><td>7</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>system_modification</td><td>5</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>83.3%</td><td>90.9%</td>
+    <td>system_modification</td><td>6</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-deno-installer-001</code><br>denoland/deno_install<br><span class="muted">public/deno-install/install.sh.txt</span></td>
-<td>download_execution, dynamic_execution, interpreter_escape, network_egress, second_stage_payload</td><td>download_execution, network_egress, second_stage_payload</td>
-<td class="fail">dynamic_execution, interpreter_escape</td>
-<td><code>network.tool</code>: curl -s https://dl.deno.land/release-latest.txt<br><code>network.tool</code>: curl --fail --location --progress-bar --output &quot;$exe.zip&quot; &quot;$deno_uri&quot;<br><code>chain.archive-output-execute</code>: curl --fail --location --progress-bar --output &quot;$exe.zip&quot; &quot;$deno_uri&quot; … $exe eval 'const [major, minor] = Deno.version.deno.split(&quot;.&quot;).map(Number); if (major &lt; 2 || (major === 2 &amp;&amp; minor &lt; 6)) Deno.exit(1)'<br><code>chain.second-stage-variable-archive</code>: curl --fail --location --progress-bar --output &quot;$exe.zip&quot; &quot;$deno_uri&quot; … $exe eval 'const [major, minor] = Deno.version.deno.split(&quot;.&quot;).map(Number); if (major &lt; 2 || (major === 2 &amp;&amp; minor &lt; 6)) Deno.exit(1)'<br><code>chain.download-execute</code>: curl --fail --location --progress-bar --output &quot;$exe.zip&quot; &quot;$deno_uri&quot; … chmod +x &quot;$exe&quot;<br><code>chain.second-stage-archive</code>: curl --fail --location --progress-bar --output &quot;$exe.zip&quot; &quot;$deno_uri&quot; … chmod +x &quot;$exe&quot;</td></tr>
-<tr><td><code>holdout-ohmyzsh-installer-001</code><br>ohmyzsh/ohmyzsh<br><span class="muted">public/ohmyzsh/install.sh.txt</span></td>
-<td>dynamic_execution, interpreter_escape, network_egress, persistence, privilege_escalation, system_modification</td><td>dynamic_execution, network_egress, privilege_escalation</td>
-<td class="fail">interpreter_escape, persistence, system_modification</td>
-<td><code>dynamic.eval</code>: eval echo ~&quot;$USER&quot;<br><code>privilege.sudo</code>: command_exists sudo<br><code>network.tool</code>: git fetch --depth=1 origin<br><code>privilege.sudo</code>: sudo -k &gt;/dev/null 2&gt;&amp;1<br><code>privilege.sudo</code>: sudo chsh -s &quot;$zsh&quot; &quot;$USER&quot;</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T16:15:23.123Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<tr><td><code>holdout-huggingface-hub-download-001</code><br>huggingface/huggingface_hub<br><span class="muted">public/huggingface-hub/file_download.py.txt</span></td>
+<td>network_egress</td><td>无</td>
+<td class="fail">network_egress</td>
+<td>无</td></tr>
+<tr><td><code>holdout-node-pre-gyp-install-001</code><br>mapbox/node-pre-gyp<br><span class="muted">public/node-pre-gyp/install.js.txt</span></td>
+<td>credential_access, network_egress, second_stage_payload</td><td>credential_access, second_stage_payload</td>
+<td class="fail">network_egress</td>
+<td><code>javascript.environment-secret</code>: process.env.AWS_ACCESS_KEY_ID<br><code>javascript.environment-secret</code>: process.env.AWS_SECRET_ACCESS_KEY<br><code>javascript.second-stage</code>: extract(targetDir, countExtractions)<br><code>javascript.second-stage</code>: extract(targetDir, countExtractions)<br><code>javascript.second-stage</code>: tar.extract({ cwd: to, strip: 1, onentry })<br><code>javascript.second-stage</code>: extract(targetDir, countExtractions)</td></tr></tbody></table>
+<p class="muted">生成时间：2026-07-28T16:25:37.190Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

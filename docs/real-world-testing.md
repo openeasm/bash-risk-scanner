@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 54 条离线语料：52 条完全匹配，precision 100%、recall 95.8%、
-F1 97.8%。前十二轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
+当前基线为 56 条离线语料：54 条完全匹配，precision 100%、recall 98.4%、
+F1 99.2%。前十三轮冻结集暴露的缺口均已转为带具体 rule/evidence 约束的
 validation 回归：
 
 - Atomic Python telnet client：现在识别 `telnetlib3.open_connection`、
@@ -162,21 +162,28 @@ validation 回归：
   shell rc 数组传播到循环变量和复合重定向目标。
 - AWS CLI：只有来源绑定为 `s3transfer.S3Transfer` 的 `upload_file()` 才增加
   网络语义；单文件临时清理和写模式 ZipFile 不再误报破坏或二阶段行为。
+- Deno：只有归档下载、解压和 chmod 已证明变量是下载运行时时，后续
+  `$exe eval/run` 才识别动态执行与解释器逃逸。
+- Oh My Zsh：识别 shell rc 目标替换、`chsh -s` 和 `exec zsh`；`command -v "$@"`
+  这类命令发现 wrapper 不再被摘要为实际解释器执行。
 
 本轮重新冻结的两个独立公开样本尚未用于调参：
 
-- Deno installer 的变量归档链已命中下载执行、网络和二阶段载荷，但漏报
-  `$exe eval`/`$exe run` 的动态执行与解释器逃逸。
-- Oh My Zsh installer 的 Git fetch、sudo 和真实 `eval` 已命中；通过
-  `sed > temp && mv` 替换 `.zshrc`、`chsh` 修改登录 shell、`exec zsh`
-  尚未覆盖。
+- Hugging Face Hub 的真实下载路径使用相对导入的 `http_stream_backoff()` context
+  manager，目前漏报网络外联。
+- node-pre-gyp 的 `require("node-fetch")` 默认函数导入下载二进制 tarball；凭据访问
+  与解压已命中，但模块本身作为 callable 的来源规范化尚未覆盖网络外联。
 
-新 test 分层以实际 precision 100%、recall 54.5% 建立冻结基线；整体门槛仍保持
-precision 95%、recall 90%。下一轮应修复五个 FN，并用相似安全调用约束来源和
-参数语义后再提高 test 门槛。
+新 test 分层以实际 precision 100%、recall 50% 建立冻结基线；整体门槛仍保持
+precision 95%、recall 90%。下一轮应修复两个网络 FN，并用相似安全 wrapper/
+本地 callable 约束来源后再提高 test 门槛。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-96 个单元测试或当前小规模公开语料外推生产环境准确率。
+98 个单元测试或当前小规模公开语料外推生产环境准确率。
+
+加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
+Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95
+降至 91.74 ms；门槛仍保持 100 ms。
 
 ## 提升闭环
 

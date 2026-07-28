@@ -78,6 +78,24 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*(?:(?:tee(?:\s+-a)?|sed\s+-i|install|cp|mv)\b[^;\n]*(?:\/etc\/(?:sudoers|hosts|resolv\.conf|ssh|pam\.d)|\/etc\/|iptables|nftables|firewall|proxy|certificates?)|[^;\n]*>>?\s*["']?(?:\/etc\/|[^;\n]*(?:sudoers|resolv\.conf|iptables|nftables|certificates?)))/i,
   },
   {
+    id: "system.login-shell",
+    category: "system_modification",
+    title: "Changes an account login shell",
+    severity: "high",
+    confidence: "high",
+    message: "Uses chsh to modify the persistent login shell for an account.",
+    pattern: /^\s*chsh\b(?=[^;\n]*(?:^|\s)-s(?:\s|$))/i,
+  },
+  {
+    id: "persistence.shell-rc-replace",
+    category: "persistence",
+    title: "Replaces a shell startup file",
+    severity: "high",
+    confidence: "high",
+    message: "Moves, copies, or installs a file over a shell startup configuration.",
+    pattern: /^\s*(?:mv|cp|install)\b[^;\n]*\/\.(?:bashrc|bash_profile|profile|zshrc|zprofile)["']?\s*$/i,
+  },
+  {
     id: "privilege.sudo",
     category: "privilege_escalation",
     title: "Runs with elevated privileges",
@@ -174,7 +192,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "medium",
     confidence: "medium",
     message: "Transfers execution to another general-purpose interpreter.",
-    pattern: new RegExp(`${cmd}(?:python\\d*|perl|ruby|node|php|osascript|powershell|pwsh)(?:\\s|$)`, "i"),
+    pattern: new RegExp(`${cmd}(?:exec\\s+)?(?:python\\d*|perl|ruby|node|php|osascript|powershell|pwsh|zsh)(?:\\s|$)`, "i"),
   },
 ];
 

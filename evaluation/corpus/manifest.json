@@ -1135,7 +1135,7 @@
     },
     {
       "id": "holdout-deno-installer-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/deno-install/install.sh.txt",
@@ -1146,6 +1146,18 @@
         "dynamic_execution",
         "interpreter_escape",
         "second_stage_payload"
+      ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "chain.downloaded-dynamic-code",
+          "evidencePattern": "curl.*[$]exe eval"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "chain.downloaded-interpreter",
+          "evidencePattern": "curl.*[$]exe eval"
+        }
       ],
       "provenance": {
         "type": "public-snapshot",
@@ -1158,7 +1170,7 @@
     },
     {
       "id": "holdout-ohmyzsh-installer-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "public/ohmyzsh/install.sh.txt",
@@ -1171,6 +1183,23 @@
         "dynamic_execution",
         "interpreter_escape"
       ],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.shell-rc-replace",
+          "evidencePattern": "mv.*[.]zshrc"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.login-shell",
+          "evidencePattern": "chsh -s"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.interpreter",
+          "evidencePattern": "exec zsh"
+        }
+      ],
       "provenance": {
         "type": "public-snapshot",
         "repository": "ohmyzsh/ohmyzsh",
@@ -1178,6 +1207,44 @@
         "sourceUrl": "https://github.com/ohmyzsh/ohmyzsh/blob/7ea697fd8138550ddf7262456d412f0dcd1cbf84/tools/install.sh",
         "license": "MIT",
         "licenseFile": "public/ohmyzsh/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-huggingface-hub-download-001",
+      "split": "test",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/huggingface-hub/file_download.py.txt",
+      "sha256": "1a221b53b3fb9965b74c98cb7b183f61d276d91d7920ef4f8f0ca00725ca4b93",
+      "expectedCategories": ["network_egress"],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "huggingface/huggingface_hub",
+        "commit": "bbdef5b34d166a622891775c03ab0a4755b88280",
+        "sourceUrl": "https://github.com/huggingface/huggingface_hub/blob/bbdef5b34d166a622891775c03ab0a4755b88280/src/huggingface_hub/file_download.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/huggingface-hub/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-node-pre-gyp-install-001",
+      "split": "test",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/node-pre-gyp/install.js.txt",
+      "sha256": "c341364fb7a5a1989ec2e9841767e7de719fe06ea5f3c86a0075520f40713b01",
+      "expectedCategories": [
+        "credential_access",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "mapbox/node-pre-gyp",
+        "commit": "14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5",
+        "sourceUrl": "https://github.com/mapbox/node-pre-gyp/blob/14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5/lib/install.js",
+        "license": "BSD-3-Clause",
+        "licenseFile": "public/node-pre-gyp/LICENSE"
       }
     }
   ]
