@@ -46,7 +46,7 @@ export interface Finding {
   origin?: {
     language: "bash";
     interpreter: "python" | "node";
-    kind: "argument" | "heredoc" | "pipeline";
+    kind: "argument" | "heredoc" | "pipeline" | "generated-file" | "compiled-file";
   };
 }
 

@@ -1,0 +1,4 @@
+swapon -a
+sleep 2
+swapoff -a
+sync

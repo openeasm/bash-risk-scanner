@@ -1,0 +1,3236 @@
+{
+  "schemaVersion": 1,
+  "description": "Non-executable synthetic and pinned public corpus for category-level scanner evaluation",
+  "provenance": {
+    "type": "synthetic-realistic",
+    "license": "repository-test-data",
+    "containsLiveIndicators": false,
+    "executableByHarness": false
+  },
+  "defaultSplit": "regression",
+  "samples": [
+    {
+      "id": "bash-download-execute-001",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "bash/download-execute.sh.txt",
+      "expectedCategories": ["download_execution", "network_egress"]
+    },
+    {
+      "id": "bash-read-upload-001",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "bash/read-upload.sh.txt",
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+    },
+    {
+      "id": "bash-persistence-001",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "bash/persistence.sh.txt",
+      "expectedCategories": ["persistence"]
+    },
+    {
+      "id": "bash-download-only-001",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "bash/download-only.sh.txt",
+      "expectedCategories": ["network_egress"]
+    },
+    {
+      "id": "bash-documentation-001",
+      "language": "bash",
+      "kind": "hard-negative",
+      "sourceFile": "bash/documentation.sh.txt",
+      "expectedCategories": []
+    },
+    {
+      "id": "bash-temp-cleanup-001",
+      "language": "bash",
+      "kind": "hard-negative",
+      "sourceFile": "bash/temp-cleanup.sh.txt",
+      "expectedCategories": []
+    },
+    {
+      "id": "python-alias-network-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/alias-network.py.txt",
+      "expectedCategories": ["network_egress"]
+    },
+    {
+      "id": "python-alias-shell-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/alias-shell.py.txt",
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"]
+    },
+    {
+      "id": "python-path-credential-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/path-credential.py.txt",
+      "expectedCategories": ["credential_access"]
+    },
+    {
+      "id": "python-read-upload-001",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "python/read-upload.py.txt",
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+    },
+    {
+      "id": "python-http-get-001",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "python/http-get.py.txt",
+      "expectedCategories": ["network_egress"]
+    },
+    {
+      "id": "python-local-file-001",
+      "language": "python",
+      "kind": "hard-negative",
+      "sourceFile": "python/local-file.py.txt",
+      "expectedCategories": []
+    },
+    {
+      "id": "python-documentation-001",
+      "language": "python",
+      "kind": "hard-negative",
+      "sourceFile": "python/documentation.py.txt",
+      "expectedCategories": []
+    },
+    {
+      "id": "node-cjs-shell-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/cjs-shell.js.txt",
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"]
+    },
+    {
+      "id": "node-esm-delete-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/esm-delete.js.txt",
+      "expectedCategories": ["destructive_behavior"]
+    },
+    {
+      "id": "node-read-upload-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/read-upload.js.txt",
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+    },
+    {
+      "id": "node-environment-001",
+      "language": "node",
+      "kind": "malicious",
+      "sourceFile": "node/environment.js.txt",
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+    },
+    {
+      "id": "node-http-get-001",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "node/http-get.js.txt",
+      "expectedCategories": ["network_egress"]
+    },
+    {
+      "id": "node-local-file-001",
+      "language": "node",
+      "kind": "hard-negative",
+      "sourceFile": "node/local-file.js.txt",
+      "expectedCategories": []
+    },
+    {
+      "id": "node-documentation-001",
+      "language": "node",
+      "kind": "hard-negative",
+      "sourceFile": "node/documentation.js.txt",
+      "expectedCategories": []
+    },
+    {
+      "id": "public-nvm-install-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/nvm/install.sh.txt",
+      "sha256": "b5f8ba6dcc759c1c58c027f07e439bb18afb0a8f16525470364d401a9471eb54",
+      "expectedCategories": ["network_egress", "persistence"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "command curl --fail"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.shell-rc",
+          "evidencePattern": "NVM_PROFILE"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "nvm-sh/nvm",
+        "commit": "65ded65d46c16481dbbe8e93f8ba9e6b35f20740",
+        "sourceUrl": "https://github.com/nvm-sh/nvm/blob/65ded65d46c16481dbbe8e93f8ba9e6b35f20740/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/nvm/LICENSE.md"
+      }
+    },
+    {
+      "id": "public-homebrew-install-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/homebrew-install/install.sh.txt",
+      "sha256": "8ff338091a5e10bb5fc040b38316648110f42feff057ecf9feaab51fd0a13ef9",
+      "maximumParseErrors": 1,
+      "expectedCategories": [
+        "dynamic_execution",
+        "interpreter_escape",
+        "network_egress",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "USABLE_GIT.*fetch"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "execute_sudo"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "tee /etc/paths[.]d/homebrew"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.interpreter",
+          "evidencePattern": "ruby -e"
+        },
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.interpreter-inline-code",
+          "evidencePattern": "ruby -e"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "Homebrew/install",
+        "commit": "ca0130bd52235f2fcb2bf23cfdda004bc5d250c1",
+        "sourceUrl": "https://github.com/Homebrew/install/blob/ca0130bd52235f2fcb2bf23cfdda004bc5d250c1/install.sh",
+        "license": "BSD-2-Clause",
+        "licenseFile": "public/homebrew-install/LICENSE.txt"
+      }
+    },
+    {
+      "id": "public-atomic-pipe-to-shell-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/pipe-to-shell.sh.txt",
+      "sha256": "20a129c11f003e8c1c0a264800d71c05996999e8c41a54ab855d271d191dfaa9",
+      "expectedCategories": ["download_execution", "network_egress"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.004/T1059.004.yaml",
+        "upstreamSha256": "27b52dd93ed8b71af08d45a1c06561dece3ad4463b457cea9ff071c0605a784e",
+        "upstreamId": "fca246a8-a585-4f28-a2df-6495973976a1",
+        "license": "MIT",
+        "transformation": "Replaced the remote_url placeholder with an inert .invalid URL."
+      }
+    },
+    {
+      "id": "public-atomic-bashrc-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/bashrc-persistence.sh.txt",
+      "sha256": "0dbdc220294c0042cbafa8cd601ab00c3cd4448a8d32c39cd15a4785e708457d",
+      "expectedCategories": ["persistence"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1546.004/T1546.004.yaml",
+        "upstreamSha256": "f709ed6ed473f2c368e3e949b0804d4ef06473938b68e029982d63bac57c0e45",
+        "upstreamId": "0a898315-4cfa-4007-bafe-33a4646d115f",
+        "license": "MIT",
+        "transformation": "Substituted the command_to_add placeholder with its inert default marker command."
+      }
+    },
+    {
+      "id": "public-atomic-private-key-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/discover-private-keys.sh.txt",
+      "sha256": "3f1ab94bb90d8397a496553a22b46a1bb524bac5607d2759c290a48e6a0b8976",
+      "expectedCategories": ["credential_access"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "46959285-906d-40fa-9437-5a439accd878",
+        "license": "MIT",
+        "transformation": "Substituted search_path and output_file placeholders with upstream defaults."
+      }
+    },
+    {
+      "id": "public-atomic-overwrite-log-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/overwrite-log.sh.txt",
+      "sha256": "e83013254f017a5ce5cb2bb37833e6a3c8328f7bf47a71ad2abbb3c39e43bb82",
+      "expectedCategories": ["defense_evasion", "destructive_behavior"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1485/T1485.yaml",
+        "upstreamSha256": "dec58f0061250f6573532a24b952809a5feb21494dc36fb8a22002a4020cd005",
+        "upstreamId": "38deee99-fd65-4031-bec8-bfa4f9f26146",
+        "license": "MIT",
+        "transformation": "Substituted overwrite_source and file_to_overwrite placeholders with upstream defaults."
+      }
+    },
+    {
+      "id": "public-pipx-standalone-python-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/pipx/standalone_python.py.txt",
+      "sha256": "68866dc10a2667777049eefcf5b9d5280ecfca436be6f233b26eac9e7df32028",
+      "expectedCategories": ["network_egress", "second_stage_payload", "destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "urlopen"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "python.second-stage",
+          "evidencePattern": "tarfile[.]open"
+        },
+        {
+          "category": "destructive_behavior",
+          "ruleId": "python.destructive",
+          "evidencePattern": "shutil[.]rmtree"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pypa/pipx",
+        "commit": "d57b062260b62dee083117c7b15c36d15450ed47",
+        "sourceUrl": "https://github.com/pypa/pipx/blob/d57b062260b62dee083117c7b15c36d15450ed47/src/pipx/standalone_python.py",
+        "license": "MIT",
+        "licenseFile": "public/pipx/LICENSE"
+      }
+    },
+    {
+      "id": "public-pnpm-self-installer-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/pnpm-self-installer/installTo.js.txt",
+      "sha256": "168c44087c82f6a76c34359f655a0887fd9d82ebdcccfdfbd5b8ea18cab04f7c",
+      "expectedCategories": ["network_egress", "second_stage_payload", "dynamic_execution", "interpreter_escape"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "got[.]stream"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "javascript.second-stage",
+          "evidencePattern": "unpackStream[.]remote"
+        },
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "spawnSync"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "javascript.interpreter-escape",
+          "evidencePattern": "spawnSync[(]'node'"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pnpm/self-installer",
+        "commit": "9c3348754cfd49b24df846bffb44a90244f1c2dd",
+        "sourceUrl": "https://github.com/pnpm/self-installer/blob/9c3348754cfd49b24df846bffb44a90244f1c2dd/src/installTo.js",
+        "license": "MIT",
+        "licenseFile": "public/pnpm-self-installer/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-atomic-telnet-client-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/client.py.txt",
+      "sha256": "432f729fe9111b2f2ac195332b7e77f76a0216948952c6deb459a0ff8d1d9c11",
+      "expectedCategories": ["network_egress", "dynamic_execution", "interpreter_escape", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "telnetlib3[.]open_connection"
+        },
+        {
+          "category": "dynamic_execution",
+          "ruleId": "python.dynamic-code",
+          "evidencePattern": "asyncio[.]create_subprocess_shell"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "python.interpreter-escape",
+          "evidencePattern": "asyncio[.]create_subprocess_shell"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "writer[.]write"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1071/src/client.py",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "upstreamId": "T1071 telnet client source"
+      }
+    },
+    {
+      "id": "holdout-node-gyp-install-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/node-gyp/install.js.txt",
+      "sha256": "f0a0017fec48692a8eb8922b6eaff8d12f4a4eb1af4e42f23efa3e8797dff2c3",
+      "expectedCategories": ["network_egress", "second_stage_payload", "destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.download-wrapper",
+          "evidencePattern": "release[.]tarballUrl"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "javascript.second-stage",
+          "evidencePattern": "tar[.]extract"
+        },
+        {
+          "category": "destructive_behavior",
+          "ruleId": "javascript.destructive",
+          "evidencePattern": "fs[.]rm"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "nodejs/node-gyp",
+        "commit": "42367da5a2683115ff538b92caed5c32c322005f",
+        "sourceUrl": "https://github.com/nodejs/node-gyp/blob/42367da5a2683115ff538b92caed5c32c322005f/lib/install.js",
+        "license": "MIT",
+        "licenseFile": "public/node-gyp/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-aiohttp-curl-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/aiohttp/curl.py.txt",
+      "sha256": "9edea06311c326eddad6ff86d4ce077c95945fba17404d44dfde613844514202",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "session[.]request"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "aio-libs/aiohttp",
+        "commit": "c3f07fcf858bc1ac328345d717c2fa7e22b31801",
+        "sourceUrl": "https://github.com/aio-libs/aiohttp/blob/c3f07fcf858bc1ac328345d717c2fa7e22b31801/examples/curl.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/aiohttp/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-pacote-remote-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/pacote/remote.js.txt",
+      "sha256": "d4843de4eec468b75632de2f431eb769a333dbd345b1b294f57a4a9eb077192c",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "fetch[(]this[.]resolved"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "npm/pacote",
+        "commit": "c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f",
+        "sourceUrl": "https://github.com/npm/pacote/blob/c82bdcdd8010a9a87c95e1e09b0ba51322b4f93f/lib/remote.js",
+        "license": "ISC",
+        "licenseFile": "public/pacote/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-memo-http-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/memo/_http.py.txt",
+      "sha256": "80e01e971a33306cbf7a02561170a2daa58b09f6fa9f5b63542d1c82563deecd",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "client[.]post"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "client[.]post"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "koaning/memo",
+        "commit": "6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1",
+        "sourceUrl": "https://github.com/koaning/memo/blob/6bd1155a5f1f9df5d3aeb3f13d6b09aeb295efc1/memo/_http.py",
+        "license": "MIT",
+        "licenseFile": "public/memo/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-mime-db-undici-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/mime-db/request.js.txt",
+      "sha256": "eaabfded0c974d00f7a9312a23505121de5af28f7a2840a9a8bad048e0829b9c",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "request[(]url"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "jshttp/mime-db",
+        "commit": "ba120a7f71bc8ab7d5299e88c0049063239029a7",
+        "sourceUrl": "https://github.com/jshttp/mime-db/blob/ba120a7f71bc8ab7d5299e88c0049063239029a7/scripts/lib/request.js",
+        "license": "MIT",
+        "licenseFile": "public/mime-db/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-twine-auth-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/twine/auth.py.txt",
+      "sha256": "638a8beb059a8e0328567d73dd2bd918b9da15a6ad77281b2f354a01fd0a7ccb",
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "python.credential-access",
+          "evidencePattern": "keyring[.]get_password"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "session[.]get"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "session[.]post"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "pypa/twine",
+        "commit": "e72703b10f5e97b0b87c436500527ba8369cfa52",
+        "sourceUrl": "https://github.com/pypa/twine/blob/e72703b10f5e97b0b87c436500527ba8369cfa52/twine/auth.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/twine/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-mqtt-rimraf-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/mqtt/esbuild.js.txt",
+      "sha256": "9d3b836c96a89e1cdf983275f21889d7768f30fdcb27c3d10c98dfa9326cc4a1",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "javascript.destructive.rimraf",
+          "evidencePattern": "rimraf[(]outdir"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "mqttjs/MQTT.js",
+        "commit": "6e3a676630a68e6355a94d99a82d1433b486c300",
+        "sourceUrl": "https://github.com/mqttjs/MQTT.js/blob/6e3a676630a68e6355a94d99a82d1433b486c300/esbuild.js",
+        "license": "MIT",
+        "licenseFile": "public/mqtt/LICENSE.md"
+      }
+    },
+    {
+      "id": "holdout-adafruit-retrogame-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/adafruit-retrogame/retrogame.py.txt",
+      "sha256": "dad3a969b9df0eab2b3f401f8eb6b00c77d929749f32ee29c333e15f64377925",
+      "expectedCategories": [
+        "download_execution",
+        "network_egress",
+        "persistence",
+        "system_modification",
+        "destructive_behavior"
+      ],
+      "expectedFindings": [
+        {
+          "category": "download_execution",
+          "ruleId": "python.chain.adafruit-download-install"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "python.wrapper.adafruit-shell-network",
+          "evidencePattern": "curl"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "python.wrapper.adafruit-shell-persistence",
+          "evidencePattern": "systemctl enable"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "python.wrapper.adafruit-shell-system",
+          "evidencePattern": "/etc/systemd/system"
+        },
+        {
+          "category": "destructive_behavior",
+          "ruleId": "python.wrapper.adafruit-shell-remove",
+          "evidencePattern": "shell[.]remove"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "adafruit/Raspberry-Pi-Installer-Scripts",
+        "commit": "85c3e7697fc970275215a8a27953b36c16f9b074",
+        "sourceUrl": "https://github.com/adafruit/Raspberry-Pi-Installer-Scripts/blob/85c3e7697fc970275215a8a27953b36c16f9b074/retrogame.py",
+        "license": "MIT",
+        "licenseFile": "public/adafruit-retrogame/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-anaconda-audit-disable-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/anaconda/anaconda.py.txt",
+      "sha256": "d726cca651d791df8a33c6f2b739f954b20ced42e814e1df4d8a6ab8f631caec",
+      "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "python.defense-evasion.audit-disable",
+          "evidencePattern": "auditctl"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "rhinstaller/anaconda",
+        "commit": "43a7fc4c561566fa16003752ed79db96ba3cee4e",
+        "sourceUrl": "https://github.com/rhinstaller/anaconda/blob/43a7fc4c561566fa16003752ed79db96ba3cee4e/anaconda.py",
+        "license": "GPL-2.0-only",
+        "licenseFile": "public/anaconda/COPYING"
+      }
+    },
+    {
+      "id": "holdout-electorrent-suid-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/electorrent/after-pack.js.txt",
+      "sha256": "7d37dc6ab8d29e16ff131afbab4e4f94c4f7d2cf68635dcc64da627d2772dcbd",
+      "expectedCategories": ["dynamic_execution", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "chmod 4755"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "javascript.privilege",
+          "evidencePattern": "chmod 4755"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "tympanix/Electorrent",
+        "commit": "89eb958ece9cf5eaacec529bb75c4c2ab619210f",
+        "sourceUrl": "https://github.com/tympanix/Electorrent/blob/89eb958ece9cf5eaacec529bb75c4c2ab619210f/util/after-pack.js",
+        "license": "GPL-3.0-only",
+        "licenseFile": "public/electorrent/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-whad-capabilities-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/whad-client/setup.py.txt",
+      "sha256": "ae4aca4ba3ec7acd9950216164322679e92cd40600fe0d9cd7953389b189c100",
+      "expectedCategories": [
+        "dynamic_execution",
+        "privilege_escalation",
+        "system_modification"
+      ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "python.dynamic-code",
+          "evidencePattern": "Popen"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "python.privilege",
+          "evidencePattern": "setcap"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "python.system-modification",
+          "evidencePattern": "/usr/lib/udev/rules[.]d"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "whad-team/whad-client",
+        "commit": "57f7370e58cc9d0d318f3986ac3808335251cea7",
+        "sourceUrl": "https://github.com/whad-team/whad-client/blob/57f7370e58cc9d0d318f3986ac3808335251cea7/setup.py",
+        "license": "MIT",
+        "licenseFile": "public/whad-client/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-gajira-env-token-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/gajira-todo/index.js.txt",
+      "sha256": "f22b6e2aba59b4e7ab6c718ff59b56b3898aa259d370f3caf1a31394a07ab8a5",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "javascript.environment-secret",
+          "evidencePattern": "process[.]env[.]GITHUB_TOKEN"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "atlassian/gajira-todo",
+        "commit": "fe2531caa6b1bedfaea48faac8c3b418a9b8c909",
+        "sourceUrl": "https://github.com/atlassian/gajira-todo/blob/fe2531caa6b1bedfaea48faac8c3b418a9b8c909/index.js",
+        "license": "ISC",
+        "licenseFile": "public/gajira-todo/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-apt-s3-env-credentials-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/apt-transport-s3/s3.py.txt",
+      "sha256": "62d6f93072ae66a878ad69ae3fcd35e024d63a57d94e5bd48f7b2434a812fb35",
+      "expectedCategories": ["credential_access", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "python.environment-secret",
+          "evidencePattern": "AWS_SECRET_ACCESS_KEY"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "urlopen"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "MayaraCloud/apt-transport-s3",
+        "commit": "55c0f04d19164662c5eb0e499a46572375b34744",
+        "sourceUrl": "https://github.com/MayaraCloud/apt-transport-s3/blob/55c0f04d19164662c5eb0e499a46572375b34744/s3",
+        "license": "GPL-3.0-or-later",
+        "licenseNote": "The SPDX license is stated in the source file header."
+      }
+    },
+    {
+      "id": "holdout-epicshop-workshop-updater-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/epicshop/update-workshops.js.txt",
+      "sha256": "c8d75f24dbf3b06f0c8f004f13248930083d95a59b91b8cca382c9165066695b",
+      "expectedCategories": [
+        "credential_access",
+        "network_egress",
+        "dynamic_execution",
+        "data_exfiltration",
+        "destructive_behavior",
+        "second_stage_payload"
+      ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "execa"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.git-push",
+          "evidencePattern": "git.*push"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "epicweb-dev/epicshop",
+        "commit": "82256e67a6991136375a55f1228853371bd8995d",
+        "sourceUrl": "https://github.com/epicweb-dev/epicshop/blob/82256e67a6991136375a55f1228853371bd8995d/other/update-workshops/index.js",
+        "license": "GPL-3.0-only",
+        "licenseFile": "public/epicshop/LICENSE.md"
+      }
+    },
+    {
+      "id": "holdout-cpython-smtplib-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/cpython/smtplib.py.txt",
+      "sha256": "fc846e9b3154d39593a25de7c5815de50c7ab22f5dd04a8ad65d5da99a7f25ef",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "create_connection"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "self[.]sock[.]sendall"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "python/cpython",
+        "commit": "2ffab083782968a4d732738f4f1dff6bbd69d2b0",
+        "sourceUrl": "https://github.com/python/cpython/blob/2ffab083782968a4d732738f4f1dff6bbd69d2b0/Lib/smtplib.py",
+        "license": "Python-2.0",
+        "licenseFile": "public/cpython/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-tailscale-installer-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/tailscale/installer.sh.txt",
+      "sha256": "805e85ed6f6f81a7ea2e70d52d47e7d5290863299e5c922b2787d71aa312f22e",
+      "expectedCategories": [
+        "network_egress",
+        "system_modification",
+        "privilege_escalation",
+        "persistence"
+      ],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "[$]SUDO"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler",
+          "evidencePattern": "systemctl enable"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "tailscale/tailscale",
+        "commit": "c0c453334a5fa421134767de995c816d7db21811",
+        "sourceUrl": "https://github.com/tailscale/tailscale/blob/c0c453334a5fa421134767de995c816d7db21811/scripts/installer.sh",
+        "license": "BSD-3-Clause",
+        "licenseFile": "public/tailscale/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-semantic-release-npm-publish-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/semantic-release-npm/publish.js.txt",
+      "sha256": "45b83787edffc472f0372f0855c7793e7722a0db1ab5dd1dbb2b7875e5b5f6db",
+      "expectedCategories": [
+        "dynamic_execution",
+        "network_egress",
+        "data_exfiltration"
+      ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "javascript.dynamic-code",
+          "evidencePattern": "npm.*publish"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.npm-publish",
+          "evidencePattern": "npm.*publish"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.npm-publish",
+          "evidencePattern": "npm.*publish"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "semantic-release/npm",
+        "commit": "43332788f38a2e0fef69d9cf230b10639fbb457e",
+        "sourceUrl": "https://github.com/semantic-release/npm/blob/43332788f38a2e0fef69d9cf230b10639fbb457e/lib/publish.js",
+        "license": "MIT",
+        "licenseFile": "public/semantic-release-npm/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-docker-installer-wrapper-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/docker-install/install.sh.txt",
+      "sha256": "b991f2806186f7287bb9e53362060c382e906d154599b2fb0982f34246bacfd4",
+      "expectedCategories": [
+        "dynamic_execution",
+        "network_egress",
+        "system_modification",
+        "privilege_escalation",
+        "persistence"
+      ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.eval",
+          "evidencePattern": "[$]sh_c"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "curl"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "[$]sh_c"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler",
+          "evidencePattern": "systemctl enable"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "docker/docker-install",
+        "commit": "5ce20f2eef3615d08fea941eda5a109e949e8ebf",
+        "sourceUrl": "https://github.com/docker/docker-install/blob/5ce20f2eef3615d08fea941eda5a109e949e8ebf/install.sh",
+        "license": "Apache-2.0",
+        "licenseFile": "public/docker-install/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-npm-cli-publish-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/npm-cli/publish.js.txt",
+      "sha256": "a1b91f9172fd17527865a16381bebddf0aa8b9a61feb545f951118a8a69bd138",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.libnpmpublish",
+          "evidencePattern": "libpub"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.libnpmpublish",
+          "evidencePattern": "tarballData"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "npm/cli",
+        "commit": "834408e8f0f2295d02205d8ff5d011c859835225",
+        "sourceUrl": "https://github.com/npm/cli/blob/834408e8f0f2295d02205d8ff5d011c859835225/lib/commands/publish.js",
+        "license": "Artistic-2.0",
+        "licenseFile": "public/npm-cli/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-rustup-init-download-execute-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/rustup/rustup-init.sh.txt",
+      "sha256": "9a47c3dd4d35d36397cf8e3c8dd9319741393e81476f5d6f0c650590635ace77",
+      "expectedCategories": ["network_egress", "download_execution"],
+      "maximumParseErrors": 1,
+      "expectedFindings": [
+        {
+          "category": "download_execution",
+          "ruleId": "chain.wrapper-download-execute",
+          "evidencePattern": "ensure downloader.*ignore"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "curl|wget"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "rust-lang/rustup",
+        "commit": "720e6b862df1309c0a5b2aea7f81be1f975af41f",
+        "sourceUrl": "https://github.com/rust-lang/rustup/blob/720e6b862df1309c0a5b2aea7f81be1f975af41f/rustup-init.sh",
+        "license": "Apache-2.0 OR MIT",
+        "licenseFile": "public/rustup/LICENSE-APACHE",
+        "additionalLicenseFiles": ["public/rustup/LICENSE-MIT"]
+      }
+    },
+    {
+      "id": "holdout-semantic-release-github-assets-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/semantic-release-github/publish.js.txt",
+      "sha256": "423e316e0ac5bab0c0d81fc195375aa4c1f6b4dbc946606b51b63f302815c305",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.octokit-request",
+          "evidencePattern": "octokit[.]request"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.octokit-upload",
+          "evidencePattern": "upload"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "semantic-release/github",
+        "commit": "33e8734811bd66937809f9fe884cb283fef238b4",
+        "sourceUrl": "https://github.com/semantic-release/github/blob/33e8734811bd66937809f9fe884cb283fef238b4/lib/publish.js",
+        "license": "MIT",
+        "licenseFile": "public/semantic-release-github/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-bun-installer-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/bun/install.sh.txt",
+      "sha256": "04882bf41679d49d9af108657a1e5515bf04fdf2940d12c0d0b1e5d79dc53be8",
+      "expectedCategories": [
+        "network_egress",
+        "download_execution",
+        "second_stage_payload",
+        "persistence",
+        "interpreter_escape"
+      ],
+      "expectedFindings": [
+        {
+          "category": "download_execution",
+          "ruleId": "chain.archive-output-execute",
+          "evidencePattern": "curl.*[$]exe completions"
+        },
+        {
+          "category": "second_stage_payload",
+          "ruleId": "chain.second-stage-variable-archive",
+          "evidencePattern": "curl.*[$]exe completions"
+        },
+        {
+          "category": "persistence",
+          "ruleId": "persistence.shell-rc-variable",
+          "evidencePattern": "fish_config|zsh_config|bash_config"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "oven-sh/bun",
+        "commit": "789be97db9b746533cf692e8367146e2d3c0d7cb",
+        "sourceUrl": "https://github.com/oven-sh/bun/blob/789be97db9b746533cf692e8367146e2d3c0d7cb/src/runtime/cli/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/bun/LICENSE.md"
+      }
+    },
+    {
+      "id": "holdout-aws-cli-gamelift-upload-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/aws-cli/uploadbuild.py.txt",
+      "sha256": "90af33f0fcc0f645e668079a13f4026c744a59de2757b7d8b4431e25729e184f",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "upload_file"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "python.exfiltration",
+          "evidencePattern": "upload_file"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "aws/aws-cli",
+        "commit": "29b7877a85aa55270de844574d47bdbbdc300b76",
+        "sourceUrl": "https://github.com/aws/aws-cli/blob/29b7877a85aa55270de844574d47bdbbdc300b76/awscli/customizations/gamelift/uploadbuild.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/aws-cli/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-deno-installer-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/deno-install/install.sh.txt",
+      "sha256": "9c1a4a0ab8ec6c7e81ec7e4d82465693dc197e65632fec646d703a096b981778",
+      "expectedCategories": [
+        "network_egress",
+        "download_execution",
+        "dynamic_execution",
+        "interpreter_escape",
+        "second_stage_payload"
+      ],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "chain.downloaded-dynamic-code",
+          "evidencePattern": "curl.*[$]exe eval"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "chain.downloaded-interpreter",
+          "evidencePattern": "curl.*[$]exe eval"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "denoland/deno_install",
+        "commit": "41d4676f8677ec16449b9e2303e7bd52ed81f03b",
+        "sourceUrl": "https://github.com/denoland/deno_install/blob/41d4676f8677ec16449b9e2303e7bd52ed81f03b/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/deno-install/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-ohmyzsh-installer-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "benign",
+      "sourceFile": "public/ohmyzsh/install.sh.txt",
+      "sha256": "95118b50d062198597e2b73d3a57b609fd95ca68cdc86faf4460d955f0172b61",
+      "expectedCategories": [
+        "network_egress",
+        "persistence",
+        "system_modification",
+        "privilege_escalation",
+        "dynamic_execution",
+        "interpreter_escape"
+      ],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.shell-rc-replace",
+          "evidencePattern": "mv.*[.]zshrc"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.login-shell",
+          "evidencePattern": "chsh -s"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.interpreter",
+          "evidencePattern": "exec zsh"
+        }
+      ],
+      "forbiddenFindings": [
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.interpreter",
+          "evidencePattern": "command_exists zsh"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "ohmyzsh/ohmyzsh",
+        "commit": "7ea697fd8138550ddf7262456d412f0dcd1cbf84",
+        "sourceUrl": "https://github.com/ohmyzsh/ohmyzsh/blob/7ea697fd8138550ddf7262456d412f0dcd1cbf84/tools/install.sh",
+        "license": "MIT",
+        "licenseFile": "public/ohmyzsh/LICENSE.txt"
+      }
+    },
+    {
+      "id": "holdout-huggingface-hub-download-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/huggingface-hub/file_download.py.txt",
+      "sha256": "1a221b53b3fb9965b74c98cb7b183f61d276d91d7920ef4f8f0ca00725ca4b93",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "http_stream_backoff"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "huggingface/huggingface_hub",
+        "commit": "bbdef5b34d166a622891775c03ab0a4755b88280",
+        "sourceUrl": "https://github.com/huggingface/huggingface_hub/blob/bbdef5b34d166a622891775c03ab0a4755b88280/src/huggingface_hub/file_download.py",
+        "license": "Apache-2.0",
+        "licenseFile": "public/huggingface-hub/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-node-pre-gyp-install-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/node-pre-gyp/install.js.txt",
+      "sha256": "c341364fb7a5a1989ec2e9841767e7de719fe06ea5f3c86a0075520f40713b01",
+      "expectedCategories": [
+        "credential_access",
+        "network_egress",
+        "second_stage_payload"
+      ],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network",
+          "evidencePattern": "fetch"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "mapbox/node-pre-gyp",
+        "commit": "14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5",
+        "sourceUrl": "https://github.com/mapbox/node-pre-gyp/blob/14fe6fdcf51861e4bc8b7333765b27a23ccc9ae5/lib/install.js",
+        "license": "BSD-3-Clause",
+        "licenseFile": "public/node-pre-gyp/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-ansible-get-url-001",
+      "split": "validation",
+      "language": "python",
+      "kind": "benign",
+      "sourceFile": "public/ansible/get_url.py.txt",
+      "sha256": "691bd57e3cd32377c0fdf763481f715eebfb8e4740c618aef6723b7740be4833",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "python.network",
+          "evidencePattern": "fetch_url"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "ansible/ansible",
+        "commit": "67c6b7c5dd9a029d46c6a3792c14f9b61f66580e",
+        "sourceUrl": "https://github.com/ansible/ansible/blob/67c6b7c5dd9a029d46c6a3792c14f9b61f66580e/lib/ansible/modules/get_url.py",
+        "license": "GPL-3.0-or-later",
+        "licenseFile": "public/ansible/COPYING"
+      }
+    },
+    {
+      "id": "holdout-google-cloud-storage-upload-001",
+      "split": "validation",
+      "language": "node",
+      "kind": "benign",
+      "sourceFile": "public/google-cloud-storage/uploadFile.js.txt",
+      "sha256": "883677c4439c71c18f94116015d1b653a236942f7379805f7e79fd72d33d830d",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "javascript.network.google-cloud-storage-upload",
+          "evidencePattern": "bucket.*upload"
+        },
+        {
+          "category": "data_exfiltration",
+          "ruleId": "javascript.exfiltration.google-cloud-storage-upload",
+          "evidencePattern": "bucket.*upload"
+        }
+      ],
+      "provenance": {
+        "type": "public-snapshot",
+        "repository": "googleapis/nodejs-storage",
+        "commit": "189663a279d85451a65614b47a748d667d7eb3db",
+        "sourceUrl": "https://github.com/googleapis/nodejs-storage/blob/189663a279d85451a65614b47a748d667d7eb3db/samples/uploadFile.js",
+        "license": "Apache-2.0",
+        "licenseFile": "public/google-cloud-storage/LICENSE"
+      }
+    },
+    {
+      "id": "holdout-atomic-dns-exfiltration-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/dns-exfiltration.sh.txt",
+      "sha256": "c8e9d4a5f4cc229f224a98ab6f4a679e7d642b077d714177572c3cb78a3fa221",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "data_exfiltration",
+          "ruleId": "chain.dns-file-exfiltration",
+          "evidencePattern": "xxd.*dig"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1048.003/T1048.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1048.003.yaml.txt",
+        "upstreamSha256": "127930b947c082bcbd72b6d4727cad8234c700c20a5eb4a108b27e9a36a2add5",
+        "upstreamId": "c403b5a4-b5fc-49f2-b181-d1c80d27db45",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced input_file with /tmp/atomic-input.txt, encoded_data.hex with a /tmp path, and .domain with the reserved example.invalid suffix."
+      }
+    },
+    {
+      "id": "holdout-atomic-timestomp-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/timestomp.sh.txt",
+      "sha256": "ad9375f153de3ead67c44daec57730b30fcecfd8db12a82ed2c35ac0e71622a1",
+      "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.timestomp",
+          "evidencePattern": "touch.*-t.*197001010000"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1070.006/T1070.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1070.006.yaml.txt",
+        "upstreamSha256": "f6c5af6964aabb5224bc447fa22d4ecbfbc3c4e16a4007d61a9687f8b7e6ef5f",
+        "upstreamId": "5f9113d5-ed75-47ed-ba23-ea3573d05810",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced target_filename with /tmp/atomic-timestomp.txt."
+      }
+    },
+    {
+      "id": "holdout-atomic-netrc-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-netrc.sh.txt",
+      "sha256": "169f68663abb4cca796c05ff2f4e7fb4d41378b281a61468bf2e1ce61fda6689",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "chain.find-read-netrc",
+          "evidencePattern": "find.*\\.netrc.*cat"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "da4f751a-020b-40d7-b9ff-d433b7799803",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced file_path with /tmp/atomic-home and quoted displayed file paths."
+      }
+    },
+    {
+      "id": "holdout-atomic-crontab-replace-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/replace-crontab.sh.txt",
+      "sha256": "32b1fb8299e46bf48d379f513393900451a6b323298a1f6479473e09ae6922f2",
+      "expectedCategories": ["persistence"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler",
+          "evidencePattern": "crontab\\s+/tmp/atomic-cron"
+        }
+      ],
+      "forbiddenFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler",
+          "evidencePattern": "crontab\\s+-l"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1053.003/T1053.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1053.003.yaml.txt",
+        "upstreamSha256": "4830ac00380213b101a686458ddebdbf92757f5b68b285aab09cac909cac63ab",
+        "upstreamId": "435057fb-74b1-410e-9403-d81baf194f75",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced command, temporary crontab, and backup paths with inert /tmp/atomic-* paths."
+      }
+    },
+    {
+      "id": "holdout-atomic-setuid-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/setuid-file.sh.txt",
+      "sha256": "c49c9683259e09065c55c8b5405f36fdf7fc6562b0ceccc29640871ea58742f6",
+      "expectedCategories": ["privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.suid-capability",
+          "evidencePattern": "chmod\\s+u\\+xs"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1548.001/T1548.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1548.001.yaml.txt",
+        "upstreamSha256": "292386dac7ae7745958e1c4997c0b54dae3041cc924c94d594d837712cbfecba",
+        "upstreamId": "759055b3-3885-4582-a8ec-c00c9d64dd79",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced file_to_setuid with /tmp/atomic-setuid and omitted cleanup."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-ufw-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-ufw.sh.txt",
+      "sha256": "7098e96b4d37cfdf151af729941ad75f29dbaeb7970667a07c4930f5676a1b60",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.security-control",
+          "evidencePattern": "ufw\\s+disable"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.firewall-disable",
+          "evidencePattern": "ufw\\s+disable"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1686/T1686.yaml",
+        "upstreamFile": "public/atomic-red-team/T1686.yaml.txt",
+        "upstreamSha256": "64c9ef50a35974d2523484e7577890da241ffe7fabcde4f3e64c28c7da88ffd3",
+        "upstreamId": "fe135572-edcd-49a2-afe6-1d39521c5a9a",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the Linux UFW disable executor command without cleanup or prerequisites."
+      }
+    },
+    {
+      "id": "holdout-atomic-delete-gcs-bucket-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/delete-gcs-bucket.sh.txt",
+      "sha256": "1e38288fc12f9a7f669a9a870bdf67b4f3fec96d5039f2d9cabbb2dce91da786",
+      "expectedCategories": ["destructive_behavior", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.cloud-storage-delete",
+          "evidencePattern": "gcloud\\s+storage\\s+buckets\\s+delete"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.cloud-storage-cli",
+          "evidencePattern": "gcloud\\s+storage\\s+buckets\\s+delete"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1485/T1485.yaml",
+        "upstreamFile": "public/atomic-red-team/T1485.yaml.txt",
+        "upstreamSha256": "dec58f0061250f6573532a24b952809a5feb21494dc36fb8a22002a4020cd005",
+        "upstreamId": "4ac71389-40f4-448a-b73f-754346b3f928",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Kept the GCS bucket deletion command and replaced bucket_name with atomic-evaluation-bucket."
+      }
+    },
+    {
+      "id": "holdout-atomic-python-pty-spawn-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/python-pty-spawn.sh.txt",
+      "sha256": "93d268d97be3ecc50c62f9bcad736ad32b002975e2cddfe4d508361f4409d2dd",
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.discovered-python-command",
+          "evidencePattern": "[$]which_python\\s+-c"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.discovered-python",
+          "evidencePattern": "[$]which_python\\s+-c"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.006/T1059.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.006.yaml.txt",
+        "upstreamSha256": "d00ae4d0e180f8508092ada1a271b56a7ed094673278bc0dc64491621ee04d85",
+        "upstreamId": "161d694c-b543-4434-85c3-c3a433e33792",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Kept interpreter discovery and the first Python pty.spawn command; omitted exit and the duplicate bash spawn."
+      }
+    },
+    {
+      "id": "holdout-atomic-keychain-dump-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/dump-keychain.sh.txt",
+      "sha256": "d19b70e993ebf331d8fd0548fc467bd56a500ff4c4257ed233b1e80158a38bb0",
+      "expectedCategories": ["credential_access", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.macos-keychain",
+          "evidencePattern": "security\\s+dump-keychain"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1555.001/T1555.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1555.001.yaml.txt",
+        "upstreamSha256": "4e968f55659da084ec56c668fff5258c0b268eee89d456a8424b11de23988cac",
+        "upstreamId": "88e1fa00-bf63-4e5b-a3e1-e2ea51c8cca6",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the macOS Keychain dump executor command without cleanup."
+      }
+    },
+    {
+      "id": "holdout-atomic-emond-persistence-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/emond-persistence.sh.txt",
+      "sha256": "7d82e0196207d2a07d6d01f4d17560cd8a7c8919b6cfe6fd735f394878afd1ac",
+      "expectedCategories": ["persistence", "privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.emond",
+          "evidencePattern": "(?:/etc/emond[.]d/rules|/private/var/db/emondClients)"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1543.001/T1543.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1543.001.yaml.txt",
+        "upstreamSha256": "6d314768f184dd93207a45dd145428513c8c04ac5af4dde80e6fe044d3a50863",
+        "upstreamId": "11979f23-9b9d-482a-9935-6fc9cd022c3e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced script_location, destination filename, and trigger filename with atomic-evaluation paths."
+      }
+    },
+    {
+      "id": "holdout-atomic-python-http-server-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/python-http-server.sh.txt",
+      "sha256": "772cade9d2d545b125e6da20e2e85dd63ba74260e30c6fd47646a1357f0593a3",
+      "expectedCategories": ["data_exfiltration", "interpreter_escape", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "data_exfiltration",
+          "ruleId": "exfil.python-http-server",
+          "evidencePattern": "python3\\s+-m\\s+http[.]server"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.python-http-server",
+          "evidencePattern": "python3\\s+-m\\s+http[.]server"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1048.003/T1048.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1048.003.yaml.txt",
+        "upstreamSha256": "127930b947c082bcbd72b6d4727cad8234c700c20a5eb4a108b27e9a36a2add5",
+        "upstreamId": "3ea1f938-f80a-4305-9aa8-431bc4867313",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Changed the served directory and port to inert evaluation values; retained the executor control flow."
+      }
+    },
+    {
+      "id": "holdout-atomic-iptables-flush-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/flush-iptables.sh.txt",
+      "sha256": "aec5180162aa35dc92a989d9425489c6a069ae60d4108aa9f1896f550a7a2064",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.firewall-flush",
+          "evidencePattern": "iptables\\s+-F"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.firewall-flush",
+          "evidencePattern": "iptables\\s+-F"
+        }
+      ],
+      "forbiddenFindings": [
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "iptables-save"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1686/T1686.yaml",
+        "upstreamFile": "public/atomic-red-team/T1686.yaml.txt",
+        "upstreamSha256": "64c9ef50a35974d2523484e7577890da241ffe7fabcde4f3e64c28c7da88ffd3",
+        "upstreamId": "7784c64e-ed0b-4b65-bf63-c86db229fd56",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the iptables-save backup path with an inert /tmp/atomic-* path; retained the flush command."
+      }
+    },
+    {
+      "id": "holdout-atomic-gpg-encryption-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/gpg-encrypt-file.sh.txt",
+      "sha256": "219ca9a594962386b56b06d130921866e8ba9df54893900d8d2b125c59dd688f",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.discovered-gpg-encryption",
+          "evidencePattern": "[$]which_gpg[^\\n]*(?:-c|--symmetric)"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1486/T1486.yaml",
+        "upstreamFile": "public/atomic-red-team/T1486.yaml.txt",
+        "upstreamSha256": "86b6bd3a3c6a53e8e124e86296feea9d1f19f13cc4578cf726f3b26083043b95",
+        "upstreamId": "7b8ce084-3922-4618-8d22-95f996173765",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Used command -v for inert GPG discovery, replaced input/output/password values, and retained the symmetric encryption flags."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-time-machine-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-time-machine.sh.txt",
+      "sha256": "ebb6bf39f553ae529c7fdc2c916ec144bbce7b8283867907bddd369463d86f20",
+      "expectedCategories": ["destructive_behavior", "privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.backup-disable",
+          "evidencePattern": "tmutil\\s+disable"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.backup-disable",
+          "evidencePattern": "tmutil\\s+disable"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1490/T1490.yaml",
+        "upstreamFile": "public/atomic-red-team/T1490.yaml.txt",
+        "upstreamSha256": "7128ddb54074a8c17e777ea0c253530c66cd880623b2455528d24133f76b4b8b",
+        "upstreamId": "ed952f70-91d4-445a-b7ff-30966bfb1aff",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Time Machine disable executor command without its cleanup command."
+      }
+    },
+    {
+      "id": "holdout-atomic-lazagne-firefox-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/lazagne-firefox.sh.txt",
+      "sha256": "da87c5712150197de0d5459d0c362ceb39f9e017015b0d5314c13dd450a31691",
+      "expectedCategories": ["credential_access", "interpreter_escape"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.lazagne-browser",
+          "evidencePattern": "laZagne[.]py\\s+browsers\\s+-firefox"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1555.003/T1555.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1555.003.yaml.txt",
+        "upstreamSha256": "3539f7b97c78e46263e74cca5a4828a5e855254ad3c3c3c0c85af0f31e87cda6",
+        "upstreamId": "87e88698-621b-4c45-8a89-4eaebdeaabb1",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the LaZagne checkout and output paths with inert /tmp/atomic-* paths; retained the browser and Firefox module arguments."
+      }
+    },
+    {
+      "id": "holdout-atomic-download-chmod-run-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/download-chmod-run.sh.txt",
+      "sha256": "a8d04329b40c4dfdac2c0f1916c0cb8a61a92b635319271a87f96856a6a30cb4",
+      "expectedCategories": ["download_execution", "network_egress", "second_stage_payload"],
+      "expectedFindings": [
+        {
+          "category": "second_stage_payload",
+          "ruleId": "chain.second-stage-downloaded-script",
+          "evidencePattern": "curl[\\s\\S]*(?:chmod|bash)[\\s\\S]*atomic-payload[.]sh"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "bdc373c5-e9cf-4563-8a7b-a9ba720a90f3",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the remote URL and payload name with inert example.invalid and atomic-* values; retained download, chmod, and Bash execution structure."
+      }
+    },
+    {
+      "id": "holdout-atomic-rsync-remote-pull-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/rsync-remote-pull.sh.txt",
+      "sha256": "c1e7f4a32679332bfc8cdbcbdb92c28c37d1794a2cf8d397f414ae53d7942fcb",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.rsync-remote",
+          "evidencePattern": "rsync[\\s\\S]*atomic@example[.]invalid:"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "3180f7d5-52c0-4493-9ea0-e3431a84773f",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced username, remote host, and paths with inert atomic/example.invalid values; retained rsync pull structure."
+      }
+    },
+    {
+      "id": "holdout-atomic-rsync-remote-push-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/rsync-remote-push.sh.txt",
+      "sha256": "90b88fd1dea0a160b0d9deca8773e4ffdb4480439c369d3bc580073329d2ee57",
+      "expectedCategories": ["data_exfiltration", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "data_exfiltration",
+          "ruleId": "exfil.rsync-push",
+          "evidencePattern": "rsync[\\s\\S]*/tmp/atomic-source[\\s\\S]*atomic@example[.]invalid:"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "0fc6e977-cb12-44f6-b263-2824ba917409",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced username, remote host, and paths with inert atomic/example.invalid values; retained rsync push structure."
+      }
+    },
+    {
+      "id": "holdout-atomic-openssl-rsautl-encryption-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/openssl-rsautl-encrypt.sh.txt",
+      "sha256": "7a097060dddfcb957ace90e8da58c212adb560be714785a478741f32464f125e",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.discovered-openssl-encryption",
+          "evidencePattern": "[$]which_openssl\\s+rsautl\\s+-encrypt"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1486/T1486.yaml",
+        "upstreamFile": "public/atomic-red-team/T1486.yaml.txt",
+        "upstreamSha256": "86b6bd3a3c6a53e8e124e86296feea9d1f19f13cc4578cf726f3b26083043b95",
+        "upstreamId": "142752dc-ca71-443b-9359-cf6f497315f1",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Used command -v for inert OpenSSL discovery and replaced key, input, and output paths with /tmp/atomic-* values; retained the RSA key generation and rsautl encryption structure."
+      }
+    },
+    {
+      "id": "holdout-atomic-ufw-logging-off-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/ufw-logging-off.sh.txt",
+      "sha256": "04f5c30016987d0484a105047f12520e336530be4d1668326466a9546f68d3b4",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.security-control",
+          "evidencePattern": "ufw\\s+logging\\s+off"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.firewall-logging-disable",
+          "evidencePattern": "ufw\\s+logging\\s+off"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1686/T1686.yaml",
+        "upstreamFile": "public/atomic-red-team/T1686.yaml.txt",
+        "upstreamSha256": "64c9ef50a35974d2523484e7577890da241ffe7fabcde4f3e64c28c7da88ffd3",
+        "upstreamId": "8a95b832-2c2a-494d-9cb0-dc9dd97c8bad",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without its prerequisite and cleanup commands."
+      }
+    },
+    {
+      "id": "holdout-atomic-discovered-python-download-execute-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/discovered-python-download-execute.sh.txt",
+      "sha256": "2eca3b599e8f745d29699511a849625c11d46d28728d9bc68da77a942c6773b7",
+      "expectedCategories": ["download_execution", "dynamic_execution", "interpreter_escape", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.discovered-python-command",
+          "evidencePattern": "[$]which_python\\s+-c"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.discovered-python",
+          "evidencePattern": "[$]which_python\\s+-c"
+        },
+        {
+          "category": "download_execution",
+          "ruleId": "python.chain.download-write-execute",
+          "evidencePattern": "requests[.]get[\\s\\S]*os[.]system"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.006/T1059.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.006.yaml.txt",
+        "upstreamSha256": "d00ae4d0e180f8508092ada1a271b56a7ed094673278bc0dc64491621ee04d85",
+        "upstreamId": "3a95cdb2-c6ea-4761-b24e-02b71889b8bb",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Reduced interpreter discovery to command -v python3, replaced the URL and output with inert example.invalid and /tmp/atomic-* values, and retained the inline requests download, file write, and os.system execution chain."
+      }
+    },
+    {
+      "id": "holdout-atomic-generated-python-download-execute-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/generated-python-download-execute.sh.txt",
+      "sha256": "3db19d697b92c766849a606a386c0a8f592e63b7fdabe03d53ee2c25f65b7704",
+      "expectedCategories": ["download_execution", "dynamic_execution", "interpreter_escape", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.discovered-python-script",
+          "evidencePattern": "[$]runtime\\s+/tmp/atomic-stage[.]py"
+        },
+        {
+          "category": "download_execution",
+          "ruleId": "python.chain.download-write-execute",
+          "evidencePattern": "requests[.]get[\\s\\S]*os[.]system"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.006/T1059.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.006.yaml.txt",
+        "upstreamSha256": "d00ae4d0e180f8508092ada1a271b56a7ed094673278bc0dc64491621ee04d85",
+        "upstreamId": "6c4d1dcb-33c7-4c36-a8df-c6cfd0408be8",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Reduced interpreter discovery to command -v python3, replaced the URL, generated script, and payload paths with inert example.invalid and /tmp/atomic-* values, and retained the echo-built Python download/write/execute chain."
+      }
+    },
+    {
+      "id": "holdout-atomic-generated-compiled-python-download-execute-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/generated-compiled-python-download-execute.sh.txt",
+      "sha256": "601ca342949d0762887319fbee612609b75031ddd5b84c3005e9897fa0c1e4b4",
+      "expectedCategories": ["download_execution", "dynamic_execution", "interpreter_escape", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.discovered-python-command",
+          "evidencePattern": "[$]runtime\\s+-c[\\s\\S]*py_compile"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.discovered-python",
+          "evidencePattern": "[$]runtime\\s+-c[\\s\\S]*py_compile"
+        },
+        {
+          "category": "download_execution",
+          "ruleId": "python.chain.download-write-execute",
+          "evidencePattern": "requests[.]get[\\s\\S]*os[.]system"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.006/T1059.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.006.yaml.txt",
+        "upstreamSha256": "d00ae4d0e180f8508092ada1a271b56a7ed094673278bc0dc64491621ee04d85",
+        "upstreamId": "0b44d79b-570a-4b27-a31f-3bf2156e5eaa",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Reduced interpreter discovery to command -v python3, replaced the URL, source, bytecode, and payload paths with inert example.invalid and /tmp/atomic-* values, and retained the echo-built source, py_compile step, and bytecode execution."
+      }
+    },
+    {
+      "id": "holdout-atomic-delete-iptables-drop-rule-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/delete-iptables-drop-rule.sh.txt",
+      "sha256": "9933d66950021632aa83fa7d2c26619b031056f95dead182506cf1d7595b1702",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.firewall-rule-delete",
+          "evidencePattern": "iptables\\s+-D\\s+OUTPUT[\\s\\S]*-j\\s+DROP"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.firewall-rule-delete",
+          "evidencePattern": "iptables\\s+-D\\s+OUTPUT[\\s\\S]*-j\\s+DROP"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1686/T1686.yaml",
+        "upstreamFile": "public/atomic-red-team/T1686.yaml.txt",
+        "upstreamSha256": "64c9ef50a35974d2523484e7577890da241ffe7fabcde4f3e64c28c7da88ffd3",
+        "upstreamId": "899a7fb5-d197-4951-8614-f19ac4a73ad4",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without its prerequisite setup and cleanup commands."
+      }
+    },
+    {
+      "id": "holdout-atomic-find-oci-session-token-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-oci-session-token.sh.txt",
+      "sha256": "ee5593b96a971675ef21a9b99efa15c15800936b597cf761e60a1e61b8f4a402",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.oci-session-token",
+          "evidencePattern": "find[\\s\\S]*[.]oci/sessions[\\s\\S]*-name\\s+token"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "9d9c22c9-fa97-4008-a204-478cf68c40af",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the search root with an inert /tmp/atomic-home path and retained the .oci/sessions token filename search."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-aslr-sysctl-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-aslr-sysctl.sh.txt",
+      "sha256": "863a8d2c98833b8f3390bf8a76168773b57b9b9b555ac60459ac65843b246114",
+      "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.aslr-disable",
+          "evidencePattern": "sysctl\\s+-w\\s+kernel[.]randomize_va_space=0"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.aslr-disable",
+          "evidencePattern": "sysctl\\s+-w\\s+kernel[.]randomize_va_space=0"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "ac333fe1-ce2b-400b-a117-538634427439",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Linux bash executor command without its cleanup command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-scp-remote-push-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/scp-remote-push.sh.txt",
+      "sha256": "cc8b5f2c410d55be52a1482d63eac47de0c61cb069dbc3210b89f51586d82847",
+      "expectedCategories": ["data_exfiltration", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "data_exfiltration",
+          "ruleId": "exfil.scp-push",
+          "evidencePattern": "scp\\s+/tmp/atomic-report[.]txt\\s+analyst@192[.]0[.]2[.]10:"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "scp\\s+/tmp/atomic-report[.]txt\\s+analyst@192[.]0[.]2[.]10:"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "83a49600-222b-4866-80a0-37736ad29344",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced Atomic input arguments with an inert documentation address and /tmp paths while preserving local-to-remote SCP operand direction."
+      }
+    },
+    {
+      "id": "holdout-atomic-awk-shell-escape-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/awk-shell-escape.sh.txt",
+      "sha256": "dce1d43908179c43596fe32cd72f78c225da721e1fd7bbf02d31c9d766480fcd",
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"],
+      "expectedFindings": [
+        {
+          "category": "dynamic_execution",
+          "ruleId": "dynamic.awk-system-shell",
+          "evidencePattern": "awk\\s+'BEGIN\\s*[{]system[(]"
+        },
+        {
+          "category": "interpreter_escape",
+          "ruleId": "escape.awk-system-shell",
+          "evidencePattern": "system[(]\"/bin/sh\\s+&\"[)]"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1059.004/T1059.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1059.004.yaml.txt",
+        "upstreamSha256": "27b52dd93ed8b71af08d45a1c06561dece3ad4463b457cea9ff071c0605a784e",
+        "upstreamId": "ee72b37d-b8f5-46a5-a9e7-0ff50035ffd5",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single shell executor command without modification; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-read-shadow-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/read-shadow.sh.txt",
+      "sha256": "bf9702d8b6fc452795b3aae9541c7569c7ffa9074d97633dc32a2e74b1008ffc",
+      "expectedCategories": ["credential_access", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.shadow-read",
+          "evidencePattern": "cat\\s+/etc/shadow"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+cat\\s+/etc/shadow"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1003.008/T1003.008.yaml",
+        "upstreamFile": "public/atomic-red-team/T1003.008.yaml.txt",
+        "upstreamSha256": "7dcf4f55d4ba4eb215ea91a39c122f82cb3b3ced86cee4cb602f03f0ee5bcd63",
+        "upstreamId": "3723ab77-c546-403c-8fb4-bb577033b235",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the output argument with an inert /tmp path while preserving both executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-history-to-dev-null-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/history-to-dev-null.sh.txt",
+      "sha256": "bfd63309de490a84d16ceb26cbd2bee46885da234467866ce7d01c6b7116633f",
+      "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.history-disable",
+          "evidencePattern": "export\\s+HISTFILE=\"/dev/null\""
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1690/T1690.yaml",
+        "upstreamFile": "public/atomic-red-team/T1690.yaml.txt",
+        "upstreamSha256": "6bd93610dfa9acafce883916096f6b0bab929c28b85c667efb20bfaa9dcb4c6e",
+        "upstreamId": "b3dacb6c-a9e3-44ec-bf87-38db60c5cad1",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor assignment that redirects shell history to /dev/null; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-add-trusted-root-cert-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/add-trusted-root-cert.sh.txt",
+      "sha256": "e909a1a12d1d6cdbf17a9926c83228a11b2cdac7f89d977933aa6b18edea4aba",
+      "expectedCategories": ["privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+security\\s+add-trusted-cert"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.trust-root-install",
+          "evidencePattern": "security\\s+add-trusted-cert"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1553.004/T1553.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1553.004.yaml.txt",
+        "upstreamSha256": "fa18467775f261af1338727bd3f5d749bc710df362a98680cc3ae36f9435d6da",
+        "upstreamId": "cc4a0b8c-426f-40ff-9426-4e10e5bf4c49",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the macOS trust-root installation command and replaced the certificate placeholder with an inert /tmp path; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-systemd-transient-timer-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/systemd-transient-timer.sh.txt",
+      "sha256": "8094b31716cf74416025cbf0dc4d085ba65fcac4f6ae2a1fdcf3370c1d96bf90",
+      "expectedCategories": ["persistence"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.systemd-transient-timer",
+          "evidencePattern": "systemd-run\\s+--user.*--on-calendar"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1053.006/T1053.006.yaml",
+        "upstreamFile": "public/atomic-red-team/T1053.006.yaml.txt",
+        "upstreamSha256": "c0f8cf61604901717b2b2f6e2213d7d61b7c5e0bfb4e3fb26261e50425a389aa",
+        "upstreamId": "3de33f5b-62e5-4e63-a2a0-6fd8808c80ec",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the user-level transient timer executor and changed only the inert /tmp log filename; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-memory-swap-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-memory-swap.sh.txt",
+      "sha256": "2c5405b60d71b0f7f098863e3f2ed37969605ed6d51c34d1fe342c0fd38572f8",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.swap-disable",
+          "evidencePattern": "swapoff\\s+-a"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "e74e4c63-6fde-4ad2-9ee8-21c3a1733114",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied and whitespace-normalized the four executor commands that disable memory swap; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-nmap-port-scan-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/nmap-port-scan.sh.txt",
+      "sha256": "fb1a29764519dfe42a1669f2e98dbca9b29eec37ca7c4afa8f4982af14923fb6",
+      "expectedCategories": ["network_egress", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.port-scan",
+          "evidencePattern": "nmap\\s+-sS\\s+192\\.0\\.2\\.0/24"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+nmap"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1046/T1046.yaml",
+        "upstreamFile": "public/atomic-red-team/T1046.yaml.txt",
+        "upstreamSha256": "30a1a7c8dfaced727e8e9d0ecdbfe412a0915d695b4af399a8359fb3af3c9605",
+        "upstreamId": "515942b0-a09f-4163-a7bb-22fefb6f185f",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the sudo nmap executor command and replaced its host range and port placeholders with documentation-only 192.0.2.0/24 and port 80; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-at-scheduled-job-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/at-scheduled-job.sh.txt",
+      "sha256": "eaa1d97efc656e05c1ab00df3a7158bb26561f23246a3337fcc911d312bf5075",
+      "expectedCategories": ["persistence"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.scheduler-at",
+          "evidencePattern": "at\\s+23:59"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1053.002/T1053.002.yaml",
+        "upstreamFile": "public/atomic-red-team/T1053.002.yaml.txt",
+        "upstreamSha256": "b473e0b730f636d5119d00d570a0f5a024ad9100f9e3ab0c2257dd90583379c1",
+        "upstreamId": "7266d898-ac82-4ec0-97c7-436075d0d08e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Replaced the command and time placeholders with an inert /tmp write and a static future time while preserving the pipe-to-at structure; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-aws-imds-role-credentials-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/aws-imds-role-credentials.sh.txt",
+      "sha256": "2326e140fd43071e98736139608620ac23b1c053fdee7aead66a1a9181c08b38",
+      "expectedCategories": ["credential_access", "network_egress"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.cloud-metadata",
+          "evidencePattern": "169\\.254\\.169\\.254/latest/meta-data/iam/security-credentials/example-role"
+        },
+        {
+          "category": "network_egress",
+          "ruleId": "network.tool",
+          "evidencePattern": "curl.*169\\.254\\.169\\.254"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.005/T1552.005.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.005.yaml.txt",
+        "upstreamSha256": "1961a243e13701ab60e794fdb1f0abb7a0d2b251cbdd71c2396114273ed45e24",
+        "upstreamId": "c9aa1ca4-04df-4623-adac-1f199ca5ce42",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the final IMDSv2 credential request and replaced placeholders with an inert token, example role, and /tmp output path; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-sysrq-force-reboot-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/sysrq-force-reboot.sh.txt",
+      "sha256": "4828fccedcce9e92e2eb540c341d657b409ada998078510a60b758ea39db355a",
+      "expectedCategories": ["destructive_behavior"],
+      "expectedFindings": [
+        {
+          "category": "destructive_behavior",
+          "ruleId": "destructive.sysrq-reboot",
+          "evidencePattern": "echo\\s+b\\s*>\\s*/proc/sysrq-trigger"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "6d6d3154-1a52-4d1a-9d51-92ab8148b32e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied and whitespace-normalized the two executor writes that enable SysRq and request an immediate reboot; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-delete-audit-rules-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/delete-audit-rules.sh.txt",
+      "sha256": "ccaf23df8e63442469441312324469dce624338bf3e4b685d20f538f3a288f98",
+      "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.audit-rules-delete",
+          "evidencePattern": "auditctl\\s+-D"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685.004/T1685.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.004.yaml.txt",
+        "upstreamSha256": "c3d31c8db49bd42520cbc7c23525c651ba98f6e28caa321da5367083595c1b92",
+        "upstreamId": "33a29ab1-cabb-407f-9448-269041bf2856",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command that deletes all auditd rules; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-enable-sysv-service-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/enable-sysv-service.sh.txt",
+      "sha256": "4ce2c6203df5ea35f208b36c49f5f5364624695ffc73c0afa5302695a4cd75e1",
+      "expectedCategories": ["persistence"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.sysv-enable",
+          "evidencePattern": "update-rc\\.d\\s+T1543\\.002\\s+defaults"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1543.002/T1543.002.yaml",
+        "upstreamFile": "public/atomic-red-team/T1543.002.yaml.txt",
+        "upstreamSha256": "eba68d4d167136669371009508d097c547d1ec1142feb0f0a2bc8ce0475b8a53",
+        "upstreamId": "c35ac4a8-19de-43af-b9f8-755da7e89c89",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the Debian SysV autostart registration command from the executor; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-create-local-account-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/create-local-account.sh.txt",
+      "sha256": "8da3102ec084ad73ea9b18b88db381523baa9803854a7a61c7b4a16acefb9698",
+      "expectedCategories": ["system_modification"],
+      "expectedFindings": [
+        {
+          "category": "system_modification",
+          "ruleId": "system.account-create",
+          "evidencePattern": "useradd\\s+-M\\s+-N\\s+-r"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1136.001/T1136.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1136.001.yaml.txt",
+        "upstreamSha256": "1a6cd567e53bb42eb7564bd46bdf2299d3c805f2faa25a397a64886494ae5f3f",
+        "upstreamId": "40d8eabd-e394-46f6-8785-b9bfa1d011d2",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic input placeholder with its inert default username and copied only the useradd executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-malicious-pam-rule-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/insert-pam-bypass-rule.sh.txt",
+      "sha256": "429cfb3aa5a8f173ac5a7d373500acb0f77c96f2e822768d9e783adc75ca35d4",
+      "expectedCategories": ["privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.pam-bypass",
+          "evidencePattern": "pam_succeed_if[.]so\\s+uid\\s+>=\\s+0"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "/etc/pam[.]d/su-l"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1556.003/T1556.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1556.003.yaml.txt",
+        "upstreamSha256": "5189d4472933d71e720312bdba10e324e5ca568925e40f55f925defe1447dbf9",
+        "upstreamId": "4b9dde80-ae22-44b1-a82a-644bf009eb9c",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the sed executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-unlimited-sudo-cache-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/unlimited-sudo-cache.sh.txt",
+      "sha256": "604eb754228ba21118986b3ff56f15e031074de4e6cf8692a8659cc071f223d1",
+      "expectedCategories": ["defense_evasion", "privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.sudo-cache-unlimited",
+          "evidencePattern": "timestamp_timeout=-1"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+sed"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "/etc/sudoers"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1548.003/T1548.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1548.003.yaml.txt",
+        "upstreamSha256": "50ebd910568df8766dfd7b1d0506c7e3b9564b6418743e56990333c4e0529441",
+        "upstreamId": "a7b17659-dd5e-46f7-b7d1-e6792c91d0bc",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Linux executor command that sets an unlimited sudo credential-cache timeout; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-sudo-tty-tickets-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-sudo-tty-tickets.sh.txt",
+      "sha256": "065f5dd98736f7ddce209caf2e3eabedfd26f84a18ecde8edceebd17e005d89f",
+      "expectedCategories": ["defense_evasion", "privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.sudo-tty-tickets-disable",
+          "evidencePattern": "!.*tty_tickets"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+sh"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "/etc/sudoers"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1548.003/T1548.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1548.003.yaml.txt",
+        "upstreamSha256": "50ebd910568df8766dfd7b1d0506c7e3b9564b6418743e56990333c4e0529441",
+        "upstreamId": "91a60b03-fb75-4d24-a42e-2eb8956e8de1",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Linux executor command that disables per-terminal sudo credential tickets; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-edit-sudoers-with-vim-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/edit-sudoers-with-vim.sh.txt",
+      "sha256": "3b4726b4d48915d9155008a3990ac57e89eeb671f149c8859498754c99ff52c6",
+      "expectedCategories": ["privilege_escalation", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "system_modification",
+          "ruleId": "system.sudoers-editor",
+          "evidencePattern": "vim\\s+/etc/sudoers"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+vim"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1548.003/T1548.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1548.003.yaml.txt",
+        "upstreamSha256": "50ebd910568df8766dfd7b1d0506c7e3b9564b6418743e56990333c4e0529441",
+        "upstreamId": "150c3a08-ee6e-48a6-aeaf-3659d24ceb4e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single Linux executor command that opens sudoers in an interactive editor; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-discover-gnupg-directory-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/discover-gnupg-directory.sh.txt",
+      "sha256": "04c7e6431d64b6eb758eefe5c87e96d04bc51fea31713ff80dd85774a6f6d130",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.gnupg-discovery",
+          "evidencePattern": "find\\s+/\\s+-type\\s+d\\s+-name\\s+['\"]?[.]gnupg"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "2a5a0601-f5fb-4e2e-aa09-73282ae6afca",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the GnuPG discovery executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-stage-private-ssh-keys-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/stage-private-ssh-keys.sh.txt",
+      "sha256": "223968866610ddad3788c922d620802e87b0e800b6c663f65fff9f6ad0709bfe",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.private-key-stage",
+          "evidencePattern": "find\\s+/\\s+-name\\s+id_rsa.*-exec\\s+cp"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "7c247dc7-5128-4643-907b-73a76d9135c3",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic input placeholders with their inert defaults and copied only the command that discovers and stages private SSH keys; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-search-safari-cookies-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/search-safari-cookies.sh.txt",
+      "sha256": "66a09e0a6125db70cc8df707028ae4f7346879e044c97b2a4c624fb69bee0599",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.browser-cookie-search",
+          "evidencePattern": "cd\\s+~/Library/Cookies.*grep\\s+-q\\s+[\"']?coinbase"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1555.003/T1555.003.yaml",
+        "upstreamFile": "public/atomic-red-team/T1555.003.yaml.txt",
+        "upstreamSha256": "3539f7b97c78e46263e74cca5a4828a5e855254ad3c3c3c0c85af0f31e87cda6",
+        "upstreamId": "c1402f7b-67ca-43a8-b5f3-3143abedc01b",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic search_string placeholder with its inert default and copied only the two Safari cookie-search commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-stage-keychain-file-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/stage-keychain-file.sh.txt",
+      "sha256": "d65b65987fd3afee0c9aaeec4b1041f1febce798f736e5771e93ae7350601626",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.keychain-file-stage",
+          "evidencePattern": "cat\\s+~/Library/Keychains/login[.]keychain-db\\s+>\\s+/tmp/keychain"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1555.001/T1555.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1555.001.yaml.txt",
+        "upstreamSha256": "4e968f55659da084ec56c668fff5258c0b268eee89d456a8424b11de23988cac",
+        "upstreamId": "5c32102a-c508-49d3-978f-288f8a9f6617",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic keychain_export placeholder with its inert /tmp default and copied only the keychain-file staging command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-install-launchagent-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/install-launchagent.sh.txt",
+      "sha256": "7068a0fc08f2682ac2c3e80df974a2dbe5f036bab8a389d4ca6a154c5753370e",
+      "expectedCategories": ["persistence", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "persistence",
+          "ruleId": "persistence.launchagent-install-load",
+          "evidencePattern": "cp\\s+/tmp/atomicredteam_T1543_001[.]plist\\s+~/Library/LaunchAgents/com[.]atomicredteam[.]plist.*launchctl\\s+load\\s+-w\\s+~/Library/LaunchAgents/com[.]atomicredteam[.]plist"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+cp"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1543.001/T1543.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1543.001.yaml.txt",
+        "upstreamSha256": "6d314768f184dd93207a45dd145428513c8c04ac5af4dde80e6fe044d3a50863",
+        "upstreamId": "a5983dee-bf6c-4eaf-951c-dbc1a7b90900",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic plist inputs with inert static /tmp and user LaunchAgents paths and copied only the executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-search-password-pattern-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/search-password-pattern.sh.txt",
+      "sha256": "336ec8f785dfebb90646d2eeb62841898249473638c9e339a935f57f41ec8831",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.password-pattern-search",
+          "evidencePattern": "grep\\s+-ri\\s+password\\s+/"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "bd4cf0d1-7646-474e-8610-78ccf5a097c4",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic file_path placeholder with its inert static default and copied only the executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-find-aws-credentials-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-aws-credentials.sh.txt",
+      "sha256": "fd02d0e6249804fb5015050959e8d31e3292f74d6c400a4b3f276c34c77cfbab",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.aws-credentials-discovery",
+          "evidencePattern": "find\\s+/[.]aws\\s+-name\\s+[\"']?credentials"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "37807632-d3da-442e-8c2e-00f44928ff8f",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic file_path placeholder with its inert static root default, normalized the resulting double slash, and copied only the find command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-find-azure-token-cache-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-azure-token-cache.sh.txt",
+      "sha256": "877526b900679535d90514fac78d255809cd0d43d55b2068e147d2f75a46f12a",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.azure-token-cache-discovery",
+          "evidencePattern": "find\\s+/[.]azure\\s+-name\\s+[\"']?msal_token_cache[.]json.*-o\\s+-name\\s+[\"']?accessTokens[.]json"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "a8f6148d-478a-4f43-bc62-5efee9f931a4",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic file_path placeholder with its inert static root default, normalized the resulting double slash, and copied only the find command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-find-gcp-credential-databases-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/find-gcp-credential-databases.sh.txt",
+      "sha256": "fb9b935d2437380024a5d0bbeb15a8f247df9d65e6345e12d53996178ff76ddc",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.gcp-credential-db-discovery",
+          "evidencePattern": "find\\s+/[.]config/gcloud\\s+-name\\s+[\"']?credentials[.]db.*-o\\s+-name\\s+[\"']?access_tokens[.]db"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.001/T1552.001.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.001.yaml.txt",
+        "upstreamSha256": "e12b714bbcdfb07f5456f91bbddeb736073597e41ed5b86bc2a1044c60dabbdc",
+        "upstreamId": "aa12eb29-2dbb-414e-8b20-33d34af93543",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic file_path placeholder with its inert static root default, normalized the resulting double slash, and copied only the find command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-stage-private-ssh-keys-rsync-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/stage-private-ssh-keys-rsync.sh.txt",
+      "sha256": "81235680577bc84fbb90e05b138667e8e01347428cc1492d6daf397fda9178c1",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.private-key-rsync-stage",
+          "evidencePattern": "find\\s+/\\s+-name\\s+id_rsa.*-exec\\s+rsync\\s+-R\\s+\\{\\}\\s+/tmp/art-staging"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "864bb0b2-6bb5-489a-b43b-a77b3a16d68a",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic search and output inputs with inert static defaults and copied only the executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-stage-private-ssh-keys-gcp-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/stage-private-ssh-keys-gcp.sh.txt",
+      "sha256": "960706861164adf62b93f205deac5f842867208053b74549da25ea82623091f6",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.private-key-gcp-stage",
+          "evidencePattern": "find\\s+/\\s+-name\\s+id_rsa.*-exec\\s+gcp\\s+--parents\\s+\\{\\}\\s+/tmp/art-staging"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "12e4a260-a7fd-4ed8-bf18-1a28c1395775",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic search and output inputs with inert static defaults and copied only the executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-manifest-private-ssh-key-locations-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/manifest-private-ssh-key-locations.sh.txt",
+      "sha256": "3f1ab94bb90d8397a496553a22b46a1bb524bac5607d2759c290a48e6a0b8976",
+      "expectedCategories": ["credential_access"],
+      "expectedFindings": [
+        {
+          "category": "credential_access",
+          "ruleId": "credential.private-key-location-manifest",
+          "evidencePattern": "find\\s+/\\s+-name\\s+id_rsa.*>>\\s+/tmp/keyfile_locations[.]txt"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1552.004/T1552.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1552.004.yaml.txt",
+        "upstreamSha256": "2da3cda17f05315b08fee9d3d7430a953f8eaa7a8d989accafb397b4e0934ba0",
+        "upstreamId": "46959285-906d-40fa-9437-5a439accd878",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic search and output inputs with inert static defaults and copied only the executor commands; the evaluation harness never executes them."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-auditd-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-auditd.sh.txt",
+      "sha256": "412d0ea02dbab6196bd3373b553721f5fcfe46b1ccc972b07ecc9d2ca294087a",
+      "expectedCategories": ["defense_evasion"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.audit-disable",
+          "evidencePattern": "auditctl\\s+-e\\s+0"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685.004/T1685.004.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.004.yaml.txt",
+        "upstreamSha256": "c3d31c8db49bd42520cbc7c23525c651ba98f6e28caa321da5367083595c1b92",
+        "upstreamId": "7906f0a6-b527-46ee-9026-6e81a9184e08",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command that disables the Linux audit system; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-scp-remote-pull-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/scp-remote-pull.sh.txt",
+      "sha256": "21c53d906aaf0713ed84be4c13ae89d5da77010f1a5cb66204c3813cedef1020",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.scp-pull",
+          "evidencePattern": "scp\\s+adversary@adversary-host:/tmp/adversary-scp\\s+/tmp/victim-files/"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "b9d22b9a-9778-4426-abf0-568ea64e9c33",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic remote and local path inputs with inert static defaults and copied the single executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-sftp-remote-pull-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/sftp-remote-pull.sh.txt",
+      "sha256": "d0b61277f340e8bd4d078c6811b9ea33ab668c59a5b2c30f2a73abddefdb0cf4",
+      "expectedCategories": ["network_egress"],
+      "expectedFindings": [
+        {
+          "category": "network_egress",
+          "ruleId": "network.sftp-pull",
+          "evidencePattern": "sftp\\s+adversary@adversary-host:/tmp/adversary-sftp\\s+/tmp/victim-files/"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "0139dba1-f391-405e-a4f5-f3989f2c88ef",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic remote and local path inputs with inert static defaults and copied the single executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-sftp-remote-push-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/sftp-remote-push.sh.txt",
+      "sha256": "ac22a046380bff132664afa8f2c3b522b8769be5a88a64a0f84baaf317753bff",
+      "expectedCategories": ["network_egress", "data_exfiltration"],
+      "expectedFindings": [
+        {
+          "category": "data_exfiltration",
+          "ruleId": "exfil.sftp-push",
+          "evidencePattern": "sftp\\s+victim@victim-host:/tmp/victim-files/\\s+<<<\\s+\\$'put\\s+/tmp/adversary-sftp'"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1105/T1105.yaml",
+        "upstreamFile": "public/atomic-red-team/T1105.yaml.txt",
+        "upstreamSha256": "e51e04df34bc0c7d906d863d901b3190e5d11cc01cf8a8d24c0de42f3c1eb886",
+        "upstreamId": "f564c297-7978-4aa9-b37a-d90477feea4e",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Substituted the Atomic remote and local path inputs with inert static defaults and copied the single executor command; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-journald-001",
+      "split": "validation",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-journald.sh.txt",
+      "sha256": "234604541ff643e759e9120037eef333895adcf2faa48a02eae47e416b35db9c",
+      "expectedCategories": ["defense_evasion", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.journald-disable",
+          "evidencePattern": "systemctl\\s+stop\\s+systemd-journald"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+systemctl"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "c3a377f9-1203-4454-aa35-9d391d34768f",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without modification; the evaluation harness never executes it."
+      }
+    },
+    {
+      "id": "holdout-atomic-disable-journald-storage-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/disable-journald-storage.sh.txt",
+      "sha256": "2d71192237d80fd8d1ea04550f3c351be437ecd854aaf55c0c9829b528b7c661",
+      "expectedCategories": ["defense_evasion", "system_modification", "privilege_escalation"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.journald-storage-disable",
+          "evidencePattern": "sed\\s+-i\\s+['\"]s/Storage=auto/Storage=none/"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.sensitive-config",
+          "evidencePattern": "/etc/systemd/journald[.]conf"
+        },
+        {
+          "category": "privilege_escalation",
+          "ruleId": "privilege.sudo",
+          "evidencePattern": "sudo\\s+sed"
+        }
+      ],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1685/T1685.yaml",
+        "upstreamFile": "public/atomic-red-team/T1685.yaml.txt",
+        "upstreamSha256": "ece96e579e6d0fb0599abb9e4bcadfb031e9c1e6f86e4f45494990521e065319",
+        "upstreamId": "12e5551c-8d5c-408e-b3e4-63f53b03379f",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Copied the single executor command without modification; the evaluation harness never executes it."
+      }
+    }
+  ]
+}

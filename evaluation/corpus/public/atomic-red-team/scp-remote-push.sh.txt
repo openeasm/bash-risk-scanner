@@ -1,0 +1,1 @@
+scp /tmp/atomic-report.txt analyst@192.0.2.10:/tmp/atomic-upload

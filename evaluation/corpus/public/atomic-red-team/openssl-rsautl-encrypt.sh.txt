@@ -1,0 +1,4 @@
+which_openssl=$(command -v openssl)
+$which_openssl genrsa -out /tmp/atomic-private.pem 2048
+$which_openssl rsa -in /tmp/atomic-private.pem -pubout -out /tmp/atomic-public.pem
+$which_openssl rsautl -encrypt -inkey /tmp/atomic-public.pem -pubin -in /tmp/atomic-input.txt -out /tmp/atomic-encrypted.bin

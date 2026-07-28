@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+release_url="https://updates.invalid/agent.sh"
+curl --fail --silent --show-error "$release_url" | bash

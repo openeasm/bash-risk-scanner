@@ -1,0 +1,3 @@
+sudo touch /tmp/atomic-setuid
+sudo chown root /tmp/atomic-setuid
+sudo chmod u+xs /tmp/atomic-setuid

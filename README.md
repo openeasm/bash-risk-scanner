@@ -136,11 +136,49 @@ cat script.sh | bash-risk-scan
 ```bash
 npm test
 npm run test:report
+npm run evaluate
+npm run check
 npm run lint
 npm run build
 npm pack --dry-run
 ```
 
-`npm run test:report` 会在 `reports/` 生成静态 HTML 测试报告，入口为
-`reports/test-report.html`。查看时需要保留同目录的资源文件。命令仍在终端输出
+`npm run test:report` 会在 `reports/` 生成 Vitest 静态 HTML 明细。完整测试报告
+入口为 `reports/index.html`，用例明细入口为 `reports/test-report.html`。查看时
+需要保留同目录的资源文件。命令仍在终端输出
 默认测试结果，并在任一测试失败时返回非零状态。
+
+`npm run evaluate` 会构建包并运行 `evaluation/corpus/manifest.json` 中的非执行
+种子语料，按语言和风险类别计算 TP、FP、FN、precision、recall、F1、解析错误率
+及扫描耗时。门禁阈值位于 `evaluation/config.json`，结果写入
+`evaluation/results/`，同时生成 `reports/evaluation.html`。种子语料只用于建立
+评测机制和防止已知回归，其分数不能代表未经抽样的真实世界总体准确率。
+
+`npm run evaluate:import-public` 可按固定 commit 和 SHA-256 重新获取公开语料快照。
+当前公开语料包括 nvm、Atomic Red Team、pipx、pnpm self-installer、node-gyp、
+Homebrew、aiohttp、npm pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
+Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop 与
+CPython smtplib、Tailscale installer、semantic-release/npm 的许可快照；CI 使用
+仓库内快照，不联网下载，也不会执行样本。当前还包括 Docker installer 与 npm CLI
+publish、Rustup、semantic-release/github、Bun、AWS CLI、Deno、Oh My Zsh、
+Hugging Face Hub、node-pre-gyp、Ansible 和 Google Cloud Storage 的完整许可快照。
+Atomic Red Team DNS 外传、timestomp、`.netrc`、crontab、SUID、UFW、GCS 删除、
+变量 Python、Keychain、emond、Python HTTP server、iptables flush、变量定位
+GPG/OpenSSL 加密、Time Machine、LaZagne、下载后执行、rsync 远程传输和 T1690
+历史抑制已转为 validation 回归；UFW 日志关闭也已转为 validation。冻结 test
+分层保留跨语言控制、iptables 规则删除、OCI session token、Linux ASLR、SCP
+方向、awk shell escape、密码哈希访问控制、信任存储修改、瞬态 systemd timer、
+全局 swap 禁用、nmap 扫描、at 作业、云 metadata 凭据访问和 SysRq 破坏指令，
+近期修复的 T1685.004、T1543.002、T1136.001、T1556.003，以及 T1548.003 的
+无限 sudo 缓存、`!tty_tickets`、sudoers 编辑器和 T1552.004 的 `.gnupg`
+凭据目录发现、私有 SSH 密钥发现后暂存、Safari Cookie 搜索、macOS
+login.keychain 文件暂存、LaunchAgent plist 安装加载、广泛文件树密码模式搜索、
+AWS credentials、Azure token cache 和 GCP 凭据数据库发现均已进入
+validation；rsync、FreeBSD `gcp` 私钥暂存、私钥位置清单生成和
+`auditctl -e 0` 审计禁用、SCP/SFTP 传输和停止 `systemd-journald` 也已修复，
+当前冻结 test 为把 `journald.conf` 的 `Storage` 改为 `none`。
+本轮不针对
+新 test 调参，报告会如实保留 FP、FN 及 finding 约束错误。
+
+导入器默认复核已有本地文件的 SHA-256，只下载缺失或不匹配的快照；使用
+`npm run evaluate:import-public:refresh` 可强制从固定 commit 重新获取全部文件。

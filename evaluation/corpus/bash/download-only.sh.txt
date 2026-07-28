@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+curl --fail --location https://releases.invalid/tool.tar.gz --output /tmp/tool.tar.gz
+sha256sum --check /tmp/tool.tar.gz.sha256

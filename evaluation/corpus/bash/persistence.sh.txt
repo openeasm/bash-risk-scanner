@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+echo "*/10 * * * * /opt/agent/run" | crontab -

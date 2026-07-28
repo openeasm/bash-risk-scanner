@@ -1,0 +1,1 @@
+rsync -r /tmp/atomic-source atomic@example.invalid:/tmp/atomic-destination

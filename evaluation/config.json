@@ -1,0 +1,19 @@
+{
+  "performanceRuns": 3,
+  "minimum": {
+    "precision": 0.95,
+    "recall": 0.9
+  },
+  "minimumBySplit": {
+    "test": {
+      "precision": 1,
+      "recall": 0.5
+    }
+  },
+  "requiredPerfectSplits": ["regression"],
+  "maximum": {
+    "forbiddenFindingCount": 0,
+    "parseErrorRate": 0.05,
+    "p95Milliseconds": 100
+  }
+}

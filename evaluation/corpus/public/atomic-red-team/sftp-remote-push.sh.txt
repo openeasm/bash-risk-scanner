@@ -1,0 +1,1 @@
+sftp victim@victim-host:/tmp/victim-files/ <<< $'put /tmp/adversary-sftp'

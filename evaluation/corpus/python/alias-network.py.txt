@@ -1,0 +1,4 @@
+import requests as http_client
+
+response = http_client.get("https://telemetry.invalid/ping", timeout=5)
+print(response.status_code)

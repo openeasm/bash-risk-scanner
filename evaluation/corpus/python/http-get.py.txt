@@ -1,0 +1,4 @@
+import requests
+
+metadata = requests.get("https://api.invalid/public-metadata", timeout=5).json()
+print(metadata["version"])

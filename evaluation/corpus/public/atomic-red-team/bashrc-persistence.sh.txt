@@ -1,0 +1,1 @@
+echo 'echo "Atomic test marker" > /tmp/T1546.004' >> ~/.bashrc

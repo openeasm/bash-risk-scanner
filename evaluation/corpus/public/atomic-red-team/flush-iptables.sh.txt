@@ -1,0 +1,2 @@
+iptables-save > /tmp/atomic-iptables.rules
+iptables -F
