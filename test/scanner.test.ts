@@ -501,6 +501,45 @@ describe("scan", () => {
     }
   });
 
+  it("detects firewall shutdown without flagging firewall administration", () => {
+    const disabled = scan("ufw disable");
+    expect(disabled.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "system.firewall-disable",
+        category: "system_modification",
+      }),
+      expect.objectContaining({
+        ruleId: "defense.security-control",
+        category: "defense_evasion",
+      }),
+    ]));
+
+    const stopped = scan("systemctl stop firewalld.service");
+    expect(stopped.findings.some((finding) =>
+      finding.ruleId === "system.firewall-disable"
+    )).toBe(true);
+    expect(scan("ufw logging off").findings.some((finding) =>
+      finding.ruleId === "defense.security-control"
+    )).toBe(true);
+
+    const hardNegatives = [
+      "ufw status verbose",
+      "ufw enable",
+      "ufw prepend deny from 192.0.2.10",
+      "ufw --help",
+      "systemctl status ufw",
+      "systemctl start firewalld",
+      "service pf status",
+      "pfctl -s rules",
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "system.firewall-disable"
+        || finding.ruleId === "defense.security-control"
+      )).toBe(false);
+    }
+  });
+
   it("detects writes through profile path variables", () => {
     const result = scan(`command printf '%s' "$SOURCE" >> "$NVM_PROFILE"`);
     expect(result.findings.some((finding) => finding.category === "persistence")).toBe(true);

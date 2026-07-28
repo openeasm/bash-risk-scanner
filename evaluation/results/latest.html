@@ -13,17 +13,17 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <p>冻结测试集不会在本轮规则开发中用于调参；因此“门禁通过”不等于所有样本完全匹配，
 而是各分层的 precision、recall、解析率和性能均达到配置阈值。</p>
 <div class="cards">
-<div class="card"><div class="big">63/64</div>样本通过</div>
+<div class="card"><div class="big">64/65</div>样本通过</div>
 <div class="card"><div class="big">100.0%</div>Precision</div>
 <div class="card"><div class="big">98.5%</div>Recall</div>
-<div class="card"><div class="big">99.2%</div>F1</div>
-<div class="card"><div class="big">84.29 ms</div>P95</div>
+<div class="card"><div class="big">99.3%</div>F1</div>
+<div class="card"><div class="big">88.36 ms</div>P95</div>
 </div>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>bash</td><td>52</td><td>0</td><td>2</td>
-    <td>100.0%</td><td>96.3%</td><td>98.1%</td>
+    <td>bash</td><td>54</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>96.4%</td><td>98.2%</td>
   </tr>
 <tr>
     <td>python</td><td>38</td><td>0</td><td>0</td>
@@ -36,8 +36,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <h2>按语料来源</h2><table><thead><tr><th>来源</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 <tr>
-    <td>public-derived</td><td>12</td><td>0</td><td>2</td>
-    <td>100.0%</td><td>85.7%</td><td>92.3%</td>
+    <td>public-derived</td><td>14</td><td>0</td><td>2</td>
+    <td>100.0%</td><td>87.5%</td><td>93.3%</td>
   </tr>
 <tr>
     <td>public-snapshot</td><td>94</td><td>0</td><td>0</td>
@@ -58,7 +58,7 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>0.0%</td><td>0.0%</td>
   </tr>
 <tr>
-    <td>validation</td><td>106</td><td>0</td><td>0</td>
+    <td>validation</td><td>108</td><td>0</td><td>0</td>
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>按风险类别</h2><table><thead><tr><th>类别</th><th>TP</th><th>FP</th><th>FN</th>
@@ -72,12 +72,12 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>defense_evasion</td><td>3</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>75.0%</td><td>85.7%</td>
+    <td>defense_evasion</td><td>4</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>destructive_behavior</td><td>7</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>destructive_behavior</td><td>7</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>87.5%</td><td>93.3%</td>
   </tr>
 <tr>
     <td>download_execution</td><td>6</td><td>0</td><td>0</td>
@@ -92,8 +92,8 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>network_egress</td><td>40</td><td>0</td><td>0</td>
-    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
+    <td>network_egress</td><td>40</td><td>0</td><td>1</td>
+    <td>100.0%</td><td>97.6%</td><td>98.8%</td>
   </tr>
 <tr>
     <td>persistence</td><td>9</td><td>0</td><td>0</td>
@@ -108,16 +108,16 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
     <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr>
 <tr>
-    <td>system_modification</td><td>6</td><td>0</td><td>1</td>
-    <td>100.0%</td><td>85.7%</td><td>92.3%</td>
+    <td>system_modification</td><td>7</td><td>0</td><td>0</td>
+    <td>100.0%</td><td>100.0%</td><td>100.0%</td>
   </tr></tbody></table>
 <h2>失败样本</h2>
 <table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>缺少指定 finding</th><th>禁止 finding</th><th>实际证据</th></tr></thead><tbody>
-<tr><td><code>holdout-atomic-disable-ufw-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/disable-ufw.sh.txt</span></td>
-<td>defense_evasion, system_modification</td><td>无</td>
-<td class="fail">defense_evasion, system_modification</td>
+<tr><td><code>holdout-atomic-delete-gcs-bucket-001</code><br>redcanaryco/atomic-red-team<br><span class="muted">public/atomic-red-team/delete-gcs-bucket.sh.txt</span></td>
+<td>destructive_behavior, network_egress</td><td>无</td>
+<td class="fail">destructive_behavior, network_egress</td>
 <td class="pass">无</td>
 <td class="pass">无</td>
 <td>无</td></tr></tbody></table>
-<p class="muted">生成时间：2026-07-28T17:08:23.278Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
+<p class="muted">生成时间：2026-07-28T17:13:09.152Z。样本只作为文本传给扫描器，评测器不执行样本。</p>
 </body></html>

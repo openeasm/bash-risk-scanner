@@ -1470,12 +1470,24 @@
     },
     {
       "id": "holdout-atomic-disable-ufw-001",
-      "split": "test",
+      "split": "validation",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "public/atomic-red-team/disable-ufw.sh.txt",
       "sha256": "7098e96b4d37cfdf151af729941ad75f29dbaeb7970667a07c4930f5676a1b60",
       "expectedCategories": ["defense_evasion", "system_modification"],
+      "expectedFindings": [
+        {
+          "category": "defense_evasion",
+          "ruleId": "defense.security-control",
+          "evidencePattern": "ufw\\s+disable"
+        },
+        {
+          "category": "system_modification",
+          "ruleId": "system.firewall-disable",
+          "evidencePattern": "ufw\\s+disable"
+        }
+      ],
       "provenance": {
         "type": "public-derived",
         "repository": "redcanaryco/atomic-red-team",
@@ -1487,6 +1499,27 @@
         "license": "MIT",
         "licenseFile": "public/atomic-red-team/LICENSE.txt",
         "transformation": "Copied the Linux UFW disable executor command without cleanup or prerequisites."
+      }
+    },
+    {
+      "id": "holdout-atomic-delete-gcs-bucket-001",
+      "split": "test",
+      "language": "bash",
+      "kind": "malicious",
+      "sourceFile": "public/atomic-red-team/delete-gcs-bucket.sh.txt",
+      "sha256": "1e38288fc12f9a7f669a9a870bdf67b4f3fec96d5039f2d9cabbb2dce91da786",
+      "expectedCategories": ["destructive_behavior", "network_egress"],
+      "provenance": {
+        "type": "public-derived",
+        "repository": "redcanaryco/atomic-red-team",
+        "commit": "1ba1dd8d9ce6f74700f7aec2e60de5632f667f03",
+        "sourceUrl": "https://github.com/redcanaryco/atomic-red-team/blob/1ba1dd8d9ce6f74700f7aec2e60de5632f667f03/atomics/T1485/T1485.yaml",
+        "upstreamFile": "public/atomic-red-team/T1485.yaml.txt",
+        "upstreamSha256": "dec58f0061250f6573532a24b952809a5feb21494dc36fb8a22002a4020cd005",
+        "upstreamId": "4ac71389-40f4-448a-b73f-754346b3f928",
+        "license": "MIT",
+        "licenseFile": "public/atomic-red-team/LICENSE.txt",
+        "transformation": "Kept the GCS bucket deletion command and replaced bucket_name with atomic-evaluation-bucket."
       }
     }
   ]

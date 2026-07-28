@@ -112,8 +112,8 @@ CI 会执行门禁并上传这两个文件。
 - 修复 FP 时必须保留原始 TP，避免通过删除规则“修复”误报。
 - P95 扫描耗时和内存不得超过既定预算。
 
-当前基线为 64 条离线语料：63 条完全匹配，precision 100%、recall 98.5%、
-F1 99.2%。前二十轮冻结集暴露的缺口均已转为带具体
+当前基线为 65 条离线语料：64 条完全匹配，precision 100%、recall 98.5%、
+F1 99.3%。前二十一轮冻结集暴露的缺口均已转为带具体
 rule/evidence 约束的
 validation 回归：
 
@@ -190,21 +190,25 @@ validation 回归：
 - Atomic Red Team SUID/SGID：组合符号模式 `u+xs/g+xs/u+x,g+s`、`a+rsx`
   与数值模式均命中；普通执行位、移除 `s`、SUID 查询和单独 `chown root`
   均不命中。
+- Atomic Red Team UFW：`ufw disable`、停止/禁用已知防火墙服务与 `pfctl -d`
+  同时识别系统修改和防御规避；关闭 UFW 日志仅识别防御规避。状态查询、启用、
+  添加拒绝规则、帮助命令和普通服务停止均不命中。
 
 本轮重新冻结的公开恶意样本尚未用于调参：
 
-- Atomic Red Team T1686 的 Linux 步骤使用 `ufw disable` 关闭防火墙。目前
-  `defense_evasion` 与 `system_modification` 均未命中，作为下一轮两个待修复 FN。
+- Atomic Red Team T1485 的 GCP 步骤使用
+  `gcloud storage buckets delete gs://...` 删除云存储 bucket。目前
+  `destructive_behavior` 与 `network_egress` 均未命中，作为下一轮两个待修复 FN。
 - 派生样本固定上游 YAML、GUID、commit 和 SHA-256，只把目标文件替换为
   惰性参数或只复制单条 executor 命令，评测器不会执行命令。
 
 新 test 分层只有两个预期类别且均未命中，因此 recall 基线为 0；整体门槛仍保持
 precision 95%、recall 90%，`maximum.forbiddenFindingCount` 保持 0。下一轮应
-识别 `ufw disable`、关闭防火墙服务和关闭防火墙日志，同时用
-`ufw status/enable`、添加拒绝规则和帮助命令等 hard-negative 限制误报。
+识别明确的 `gcloud storage buckets delete`，同时用 bucket 列表/描述、对象下载、
+本地同名 wrapper 和其他 `gcloud storage` 管理命令作为 hard-negative。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-107 个单元测试或当前小规模公开语料外推生产环境准确率。
+108 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

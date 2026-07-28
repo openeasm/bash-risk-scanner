@@ -1,0 +1,1 @@
+gcloud storage buckets delete gs://atomic-evaluation-bucket

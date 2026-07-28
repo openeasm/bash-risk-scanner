@@ -96,6 +96,15 @@ export const COMMAND_RULES: Rule[] = [
     pattern: /^\s*chsh\b(?=[^;\n]*(?:^|\s)-s(?:\s|$))/i,
   },
   {
+    id: "system.firewall-disable",
+    category: "system_modification",
+    title: "Disables a host firewall",
+    severity: "critical",
+    confidence: "high",
+    message: "Disables a host firewall or stops its service.",
+    pattern: /^\s*(?:ufw\s+disable\b|systemctl\s+(?:stop|disable)\s+(?:ufw|firewalld|iptables|nftables)(?:\.service)?\b|service\s+(?:ufw|firewalld|iptables|nftables|pf)\s+(?:stop|disable)\b|pfctl\s+-d\b)/i,
+  },
+  {
     id: "persistence.shell-rc-replace",
     category: "persistence",
     title: "Replaces a shell startup file",
@@ -138,7 +147,7 @@ export const COMMAND_RULES: Rule[] = [
     severity: "critical",
     confidence: "medium",
     message: "Stops, kills, or changes security monitoring/auditing.",
-    pattern: /^\s*(?:systemctl\s+(?:stop|disable)|pkill|killall|service\s+\S+\s+stop|auditctl\s+-e\s+0)\b[^;\n]*(?:audit|edr|defender|falcon|sentinel|security|antivirus)?/i,
+    pattern: /^\s*(?:auditctl\s+-e\s+0\b|ufw\s+(?:disable\b|logging\s+off\b)|pfctl\s+-d\b|systemctl\s+(?:stop|disable)\s+(?:\S*(?:audit|edr|defender|falcon|sentinel|security|antivirus)\S*|ufw|firewalld|iptables|nftables)(?:\.service)?\b|service\s+(?:\S*(?:audit|edr|defender|falcon|sentinel|security|antivirus)\S*|ufw|firewalld|iptables|nftables|pf)\s+(?:stop|disable)\b|(?:pkill|killall)\b[^;\n]*(?:audit|edr|defender|falcon|sentinel|security|antivirus))/i,
   },
   {
     id: "defense.timestomp",
