@@ -34,7 +34,7 @@ async function main(): Promise<void> {
   const paths = args.filter((arg) => !arg.startsWith("-"));
 
   if (args.includes("--help")) {
-    console.log("Usage: bash-risk-scan [--compact] [--language=bash|python|javascript|node] [--policy-locale=zh-CN|en] [--policy-profile=ai-agent|audit] [file ...]\nReads stdin when no file is supplied.");
+    console.log("Usage: agent-runtime-risk-scan [--compact] [--language=bash|python|javascript|node] [--policy-locale=zh-CN|en] [--policy-profile=ai-agent|audit] [file ...]\nReads stdin when no file is supplied.");
     return;
   }
 

@@ -1,5 +1,5 @@
 {
-  "name": "bash-risk-scanner",
+  "name": "agent-runtime-risk-scanner",
   "version": "0.1.0",
   "description": "Tree-sitter based static risk scanner for Bash, Python, and Node.js",
   "type": "module",
@@ -7,6 +7,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
+    "agent-runtime-risk-scan": "./dist/cli.cjs",
     "bash-risk-scan": "./dist/cli.cjs",
     "code-risk-scan": "./dist/cli.cjs"
   },
@@ -50,11 +51,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openeasm/bash-risk-scanner.git"
+    "url": "git+https://github.com/openeasm/agent-runtime-risk-scanner.git"
   },
-  "homepage": "https://github.com/openeasm/bash-risk-scanner#readme",
+  "homepage": "https://github.com/openeasm/agent-runtime-risk-scanner#readme",
   "bugs": {
-    "url": "https://github.com/openeasm/bash-risk-scanner/issues"
+    "url": "https://github.com/openeasm/agent-runtime-risk-scanner/issues"
   },
   "engines": {
     "node": ">=18"

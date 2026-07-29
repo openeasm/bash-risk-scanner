@@ -1,4 +1,4 @@
-# bash-risk-scanner
+# agent-runtime-risk-scanner
 
 基于 Tree-sitter 的 Node.js 静态风险扫描器，统一支持 Bash、Python 和
 Node.js/JavaScript。当前真实世界规则建设优先覆盖 macOS，以及从 Bash 启动的
@@ -13,25 +13,25 @@ Windows/PowerShell 行为。它按语法树提取调用并检测单调用特征�
 [检测能力矩阵](docs/detection-matrix.md)。
 
 在线测试报告与全部语料浏览器：
-[openeasm.github.io/bash-risk-scanner](https://openeasm.github.io/bash-risk-scanner/)。
+[openeasm.github.io/agent-runtime-risk-scanner](https://openeasm.github.io/agent-runtime-risk-scanner/)。
 
 ## 安装
 
 ```bash
-npm install bash-risk-scanner
+npm install agent-runtime-risk-scanner
 ```
 
 尚未发布到 npm 时，可以直接从 GitHub 安装。建议固定 commit，避免主分支后续变更
 影响构建复现：
 
 ```bash
-npm install github:openeasm/bash-risk-scanner#<commit-sha>
+npm install github:openeasm/agent-runtime-risk-scanner#<commit-sha>
 ```
 
 也可以跟随最新版主分支：
 
 ```bash
-npm install github:openeasm/bash-risk-scanner#main
+npm install github:openeasm/agent-runtime-risk-scanner#main
 ```
 
 Git 安装会通过 `prepare` 自动生成 `dist`，因此无需在仓库中提交构建产物。安装时不能
@@ -48,7 +48,7 @@ import {
   scan,
   scanPython,
   scanJavaScript
-} from "bash-risk-scanner";
+} from "agent-runtime-risk-scanner";
 
 // 默认语言是 Bash。
 const bashResult = scan(`
@@ -76,7 +76,7 @@ for (const finding of bashResult.findings) {
 CommonJS：
 
 ```js
-const { scan } = require("bash-risk-scanner");
+const { scan } = require("agent-runtime-risk-scanner");
 const result = scan("eval \"$payload\"");
 ```
 
@@ -204,13 +204,15 @@ scan(source, {
 ## CLI
 
 ```bash
-code-risk-scan script.sh
-code-risk-scan --language=python script.py
-code-risk-scan --language=node script.js
-code-risk-scan --policy-locale=en script.sh
-code-risk-scan --policy-profile=audit script.sh
-cat script.sh | bash-risk-scan
+agent-runtime-risk-scan script.sh
+agent-runtime-risk-scan --language=python script.py
+agent-runtime-risk-scan --language=node script.js
+agent-runtime-risk-scan --policy-locale=en script.sh
+agent-runtime-risk-scan --policy-profile=audit script.sh
+cat script.sh | agent-runtime-risk-scan
 ```
+
+`code-risk-scan` 和旧名称 `bash-risk-scan` 暂时保留为兼容别名。
 
 结果为 JSON。决策为 `block` 时退出码为 2；读取或运行错误时为 1；
 `allow` 和 `ask` 为 0，调用方可根据 JSON 中的决策实现交互确认。
