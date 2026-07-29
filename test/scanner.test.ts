@@ -1740,6 +1740,50 @@ describe("scan", () => {
     }
   });
 
+  it("detects staging macOS Chrome Login Data without matching ordinary Chrome files", () => {
+    const stages = [
+      `cp ~/Library/"Application Support/Google/Chrome/Default/Login Data" "/tmp/Login Data"`,
+      `sudo cp "/Users/alice/Library/Application Support/Google/Chrome/Profile 1/Login Data For Account" ./login-copy.db`,
+      `command /bin/cp -p "/Users/alice/Library/Application Support/Google/Chrome/Default/Login Data" /tmp/chrome-login.db`,
+    ];
+    for (const source of stages) {
+      expect(scan(source).findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "credential.chrome-login-data-stage",
+          category: "credential_access",
+          confidence: "high",
+        }),
+      ]));
+    }
+
+    const hardNegatives = [
+      `ls ~/Library/"Application Support/Google/Chrome/Default/Login Data"`,
+      `cp ~/Library/"Application Support/Google/Chrome/Default/History" /tmp/History`,
+      `cp ~/Library/"Application Support/Chromium/Default/Login Data" /tmp/login.db`,
+      `cp "$chrome_profile/Login Data" /tmp/login.db`,
+      `cp ~/Library/"Application Support/Google/Chrome/Default/Login Data" "$destination"`,
+      `cp ~/Library/"Application Support/Google/Chrome/Default/Login Data" /dev/null`,
+      `cp --help ~/Library/"Application Support/Google/Chrome/Default/Login Data"`,
+      `echo 'cp ~/Library/Application Support/Google/Chrome/Default/Login Data /tmp/login.db'`,
+      `cp() { echo "project helper"; }
+       cp ~/Library/"Application Support/Google/Chrome/Default/Login Data" /tmp/login.db`,
+    ];
+    for (const source of hardNegatives) {
+      expect(scan(source).findings.some((finding) =>
+        finding.ruleId === "credential.chrome-login-data-stage"
+      ), source).toBe(false);
+    }
+
+    const bypassesShadow = scan(`
+      cp() { echo "project helper"; }
+      command cp ~/Library/"Application Support/Google/Chrome/Default/Login Data" /tmp/login.db
+      sudo cp ~/Library/"Application Support/Google/Chrome/Default/Login Data For Account" /tmp/account.db
+    `);
+    expect(bypassesShadow.findings.filter((finding) =>
+      finding.ruleId === "credential.chrome-login-data-stage"
+    )).toHaveLength(2);
+  });
+
   it("detects installing and loading the same LaunchAgent without joining unrelated commands", () => {
     const installs = [
       `sudo cp /tmp/agent.plist ~/Library/LaunchAgents/com.example.agent.plist

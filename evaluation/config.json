@@ -13,6 +13,9 @@
   "requiredPerfectSplits": ["regression"],
   "maximum": {
     "forbiddenFindingCount": 0,
+    "decisionFalseBlockRate": 0,
+    "decisionUnnecessaryAskRate": 0,
+    "decisionUnsafeAllowRate": 0,
     "parseErrorRate": 0.05,
     "p95Milliseconds": 100
   }

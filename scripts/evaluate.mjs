@@ -34,6 +34,10 @@ function ratio(numerator, denominator) {
   return denominator === 0 ? 1 : numerator / denominator;
 }
 
+function rate(numerator, denominator) {
+  return denominator === 0 ? 0 : numerator / denominator;
+}
+
 function percentile(values, value) {
   if (values.length === 0) return 0;
   const ordered = [...values].sort((a, b) => a - b);
@@ -102,6 +106,16 @@ for (const sample of manifest.samples) {
       findingMatches(finding, forbiddenFinding),
     ),
   );
+  const expectedDecision = sample.expectedDecision;
+  if (
+    expectedDecision !== undefined
+    && !["allow", "ask", "block"].includes(expectedDecision)
+  ) {
+    throw new Error(`Invalid expectedDecision for ${sample.id}: ${expectedDecision}`);
+  }
+  const actualDecision = result.decision.action;
+  const decisionMatched = expectedDecision === undefined
+    || actualDecision === expectedDecision;
 
   sampleResults.push({
     id: sample.id,
@@ -119,6 +133,9 @@ for (const sample of manifest.samples) {
     falseNegatives,
     missingExpectedFindings,
     forbiddenFindings,
+    expectedDecision,
+    actualDecision,
+    decisionMatched,
     findingCount: result.findings.length,
     parseErrorCount: result.parseErrors.length,
     maximumParseErrors: sample.maximumParseErrors ?? 0,
@@ -126,6 +143,7 @@ for (const sample of manifest.samples) {
     passed: falsePositives.length === 0 && falseNegatives.length === 0
       && missingExpectedFindings.length === 0
       && forbiddenFindings.length === 0
+      && decisionMatched
       && result.parseErrors.length <= (sample.maximumParseErrors ?? 0),
   });
 }
@@ -177,6 +195,42 @@ for (const category of allCategories) {
 const durations = sampleResults.map((sample) => sample.durationMilliseconds);
 const parseErrorSamples = sampleResults.filter((sample) => sample.parseErrorCount > 0).length;
 const overall = aggregate(sampleResults);
+const decisionSamples = sampleResults.filter(
+  (sample) => sample.expectedDecision !== undefined,
+);
+const falseBlocks = decisionSamples.filter(
+  (sample) => sample.actualDecision === "block" && sample.expectedDecision !== "block",
+);
+const unnecessaryAsks = decisionSamples.filter(
+  (sample) => sample.actualDecision === "ask" && sample.expectedDecision === "allow",
+);
+const unsafeAllows = decisionSamples.filter(
+  (sample) => sample.actualDecision === "allow" && sample.expectedDecision !== "allow",
+);
+const decisionMetrics = {
+  evaluatedSamples: decisionSamples.length,
+  correctSamples: decisionSamples.filter((sample) => sample.decisionMatched).length,
+  mismatchCount: decisionSamples.filter((sample) => !sample.decisionMatched).length,
+  falseBlockCount: falseBlocks.length,
+  unnecessaryAskCount: unnecessaryAsks.length,
+  unsafeAllowCount: unsafeAllows.length,
+  accuracy: ratio(
+    decisionSamples.filter((sample) => sample.decisionMatched).length,
+    decisionSamples.length,
+  ),
+  falseBlockRate: rate(
+    falseBlocks.length,
+    decisionSamples.filter((sample) => sample.expectedDecision !== "block").length,
+  ),
+  unnecessaryAskRate: rate(
+    unnecessaryAsks.length,
+    decisionSamples.filter((sample) => sample.expectedDecision === "allow").length,
+  ),
+  unsafeAllowRate: rate(
+    unsafeAllows.length,
+    decisionSamples.filter((sample) => sample.expectedDecision !== "allow").length,
+  ),
+};
 const summary = {
   sampleCount: sampleResults.length,
   passedSamples: sampleResults.filter((sample) => sample.passed).length,
@@ -186,6 +240,7 @@ const summary = {
     0,
   ),
   ...overall,
+  decisions: decisionMetrics,
   parseErrorRate: ratio(parseErrorSamples, sampleResults.length),
   performance: {
     p50Milliseconds: percentile(durations, 0.5),
@@ -201,6 +256,12 @@ const gates = {
   p95Milliseconds: summary.performance.p95Milliseconds <= config.maximum.p95Milliseconds,
   forbiddenFindings: summary.forbiddenFindingCount
     <= (config.maximum.forbiddenFindingCount ?? 0),
+  decisionFalseBlockRate: summary.decisions.falseBlockRate
+    <= (config.maximum.decisionFalseBlockRate ?? 1),
+  decisionUnnecessaryAskRate: summary.decisions.unnecessaryAskRate
+    <= (config.maximum.decisionUnnecessaryAskRate ?? 1),
+  decisionUnsafeAllowRate: summary.decisions.unsafeAllowRate
+    <= (config.maximum.decisionUnsafeAllowRate ?? 1),
 };
 for (const split of config.requiredPerfectSplits ?? []) {
   gates[`split:${split}:samples`] = sampleResults
@@ -214,7 +275,7 @@ for (const [split, minimum] of Object.entries(config.minimumBySplit ?? {})) {
 }
 const passed = Object.values(gates).every(Boolean);
 const report = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   generatedAt: new Date().toISOString(),
   corpus: {
     manifest: "evaluation/corpus/manifest.json",
@@ -272,8 +333,18 @@ code{background:#edf1f4;padding:2px 4px;border-radius:3px}.muted{color:#607080}
 <div class="card"><div class="big">${percent(summary.precision)}</div>Precision</div>
 <div class="card"><div class="big">${percent(summary.recall)}</div>Recall</div>
 <div class="card"><div class="big">${percent(summary.f1)}</div>F1</div>
+<div class="card"><div class="big">${summary.decisions.correctSamples}/${summary.decisions.evaluatedSamples}</div>决策正确</div>
+<div class="card"><div class="big">${summary.decisions.falseBlockCount}</div>False Block</div>
+<div class="card"><div class="big">${summary.decisions.unnecessaryAskCount}</div>多余确认</div>
+<div class="card"><div class="big">${summary.decisions.unsafeAllowCount}</div>危险放行</div>
 <div class="card"><div class="big">${summary.performance.p95Milliseconds.toFixed(2)} ms</div>P95</div>
 </div>
+<h2>执行决策误报指标</h2>
+<table><thead><tr><th>指标</th><th>数量</th><th>比例</th><th>含义</th></tr></thead><tbody>
+<tr><td>False Block</td><td>${summary.decisions.falseBlockCount}</td><td>${percent(summary.decisions.falseBlockRate)}</td><td>预期 allow/ask，却被 block</td></tr>
+<tr><td>Unnecessary Ask</td><td>${summary.decisions.unnecessaryAskCount}</td><td>${percent(summary.decisions.unnecessaryAskRate)}</td><td>预期 allow，却要求确认</td></tr>
+<tr><td>Unsafe Allow</td><td>${summary.decisions.unsafeAllowCount}</td><td>${percent(summary.decisions.unsafeAllowRate)}</td><td>预期 ask/block，却被 allow</td></tr>
+</tbody></table>
 <h2>按语言</h2><table><thead><tr><th>语言</th><th>TP</th><th>FP</th><th>FN</th>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 ${metricRows(Object.entries(languages))}</tbody></table>
@@ -287,9 +358,10 @@ ${metricRows(Object.entries(datasetSplits))}</tbody></table>
 <th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
 ${metricRows(Object.entries(categories))}</tbody></table>
 <h2>失败样本</h2>
-${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>漏检（FN）</th><th>缺少指定 finding</th><th>禁止 finding</th><th>实际证据</th></tr></thead><tbody>
+${failures.length === 0 ? "<p class=\"pass\">无</p>" : `<table><thead><tr><th>ID / 来源</th><th>期望类别</th><th>实际类别</th><th>预期/实际决策</th><th>漏检（FN）</th><th>缺少指定 finding</th><th>禁止 finding</th><th>实际证据</th></tr></thead><tbody>
 ${failures.map((sample) => `<tr><td><code>${escapeHtml(sample.id)}</code><br>${escapeHtml(sample.provenance.repository ?? sample.provenance.type)}<br><span class="muted">${escapeHtml(sample.sourceFile)}</span></td>
 <td>${escapeHtml(sample.expectedCategories.join(", "))}</td><td>${escapeHtml(sample.actualCategories.join(", ") || "无")}</td>
+<td class="${sample.decisionMatched ? "pass" : "fail"}">${escapeHtml(sample.expectedDecision ?? "未标注")} / ${escapeHtml(sample.actualDecision)}</td>
 <td class="${sample.falseNegatives.length ? "fail" : "pass"}">${escapeHtml(sample.falseNegatives.join(", ") || "无")}</td>
 <td class="${sample.missingExpectedFindings.length ? "fail" : "pass"}">${escapeHtml(sample.missingExpectedFindings.map((finding) => finding.ruleId ?? finding.category).join(", ") || "无")}</td>
 <td class="${sample.forbiddenFindings.length ? "fail" : "pass"}">${escapeHtml(sample.forbiddenFindings.map((finding) => `${finding.ruleId}: ${finding.evidence}`).join(", ") || "无")}</td>
@@ -308,6 +380,10 @@ console.log(`Passed: ${summary.passedSamples}/${summary.sampleCount}`);
 console.log(`Precision: ${percent(summary.precision)}`);
 console.log(`Recall: ${percent(summary.recall)}`);
 console.log(`F1: ${percent(summary.f1)}`);
+console.log(`Decision accuracy: ${summary.decisions.correctSamples}/${summary.decisions.evaluatedSamples}`);
+console.log(`False blocks: ${summary.decisions.falseBlockCount}`);
+console.log(`Unnecessary asks: ${summary.decisions.unnecessaryAskCount}`);
+console.log(`Unsafe allows: ${summary.decisions.unsafeAllowCount}`);
 console.log(`P95: ${summary.performance.p95Milliseconds.toFixed(2)} ms`);
 if (!passed) {
   console.error(`Evaluation gates failed: ${Object.entries(gates).filter(([, ok]) => !ok).map(([gate]) => gate).join(", ")}`);

@@ -56,6 +56,11 @@ npm run evaluate
 结果位于 `evaluation/results/latest.json` 和 `evaluation/results/latest.html`；
 CI 会执行门禁并上传这两个文件。
 
+样本可使用 `expectedDecision: "allow" | "ask" | "block"` 标注执行决策。报告
+分别统计 False Block（预期 allow/ask 却阻止）、Unnecessary Ask（预期 allow
+却要求确认）和 Unsafe Allow（预期 ask/block 却放行）。未标注决策的历史样本
+继续参与 finding 指标，但不进入决策误报分母，避免用当前实现反推“期望值”。
+
 ## 建议的样本清单格式
 
 ```json
@@ -346,6 +351,10 @@ validation 回归：
 - Atomic Red Team T1555.001 的静态 Keychain 数据库读取并重定向到静态暂存文件
   现在识别为凭据暂存；只读查看、`/dev/null`、原地覆盖、动态源或目标、普通文件、
   文本和函数遮蔽均不命中。
+- Atomic Red Team T1555.003 的 macOS Chrome `Login Data` 与
+  `Login Data For Account` 复制现在识别为凭据暂存，并支持 shell 相邻引号片段；
+  仅查看、History、Chromium、动态源或目标、`/dev/null`、帮助、文本和函数遮蔽
+  均不命中。
 - Atomic Red Team T1543.001 的 plist 安装和 `launchctl load/bootstrap` 现在按
   同一静态 LaunchAgent 路径关联；仅复制或加载、不同或动态路径、卸载、反向顺序、
   中途删除、不同函数或条件分支、文本和函数遮蔽均不命中。
@@ -394,19 +403,22 @@ test 分层保留已经修复的跨语言控制、iptables 规则删除、OCI to
 已修复的 Atomic T1685.004、T1543.002、T1136.001 和 T1556.003 已转入
 validation；Atomic T1548.003 的 `timestamp_timeout=-1` 也已转入 validation。
 `Defaults !tty_tickets`、`sudo vim /etc/sudoers`、`.gnupg` 目录发现、私钥暂存、
-Safari Cookie 搜索、Keychain 文件暂存、LaunchAgent 安装加载、广泛密码搜索、
+Safari Cookie 搜索、Keychain 文件暂存、Chrome Login Data 暂存、
+LaunchAgent 安装加载、广泛密码搜索、
 AWS credentials、Azure token cache、GCP 凭据数据库发现、rsync 和 gcp 私钥
 暂存、私钥位置清单、`auditctl -e 0`、SCP/SFTP 传输和 journald 服务停止也已
 转入 validation。当前冻结样本改为 Atomic T1685 使用 sed 把
 `/etc/systemd/journald.conf` 的 `Storage=auto` 改为 `Storage=none`；扫描器能
 识别系统修改和 sudo 权限提升，但尚未识别 `defense_evasion` 类别及
-`defense.journald-storage-disable`。发布门禁继续要求整体
+`defense.journald-storage-disable`。该 Linux 项按当前 Windows/macOS 优先级暂缓；
+下一阶段优先扩展 macOS 真实样本，并为原生 PowerShell 引入独立 AST 能力，避免
+仅凭 Bash 中出现 `powershell`/`pwsh` 就宣称完整 Windows 覆盖。发布门禁继续要求整体
 precision 95%、recall 90%、regression 完全匹配，且
 `maximum.forbiddenFindingCount` 为 0。下一轮应区分将 Storage 设置为 none 与
 恢复 auto/persistent、只读取配置、其他键、非原地 sed、帮助、文本和函数遮蔽。
 
 这些数字只用于版本间回归对比。门槛应随着更多授权真实语料持续校准，不能从
-163 个单元测试或当前小规模公开语料外推生产环境准确率。
+172 个单元测试或当前小规模公开语料外推生产环境准确率。
 
 加入 87 KB Hugging Face 样本后，首次 P95 从 96.62 ms 升至 116.19 ms。扫描器将
 Python 对象绑定合并进主遍历，并仅对候选环境访问节点读取 `node.text`，复测 P95

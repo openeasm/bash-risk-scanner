@@ -45,10 +45,11 @@
   </header>
 
   <div class="cards">
-    <div class="card"><div class="metric">163 / 163</div><div>单元测试通过</div></div>
-    <div class="card"><div class="metric">2 / 2</div><div>测试文件通过</div></div>
-    <div class="card"><div class="metric">119 / 120</div><div>语料完全匹配</div></div>
+    <div class="card"><div class="metric">172 / 172</div><div>单元测试通过</div></div>
+    <div class="card"><div class="metric">3 / 3</div><div>测试文件通过</div></div>
+    <div class="card"><div class="metric">120 / 121</div><div>语料完全匹配</div></div>
     <div class="card"><div class="metric">99.6%</div><div>语料类别召回率</div></div>
+    <div class="card"><div class="metric">20 / 20</div><div>决策标注匹配</div></div>
   </div>
 
   <section>
@@ -56,8 +57,34 @@
     <p class="pass">通过：Bash、Python 和 Node.js 均能在精选样例中检出全部 12 类风险。</p>
     <p>额外测试覆盖行为链、可信下载域名、私网 IP、源码位置、语法错误、
       Bash 内嵌 Python/Node.js、静态管道、heredoc、扫描限制和已知误报边界。</p>
-    <p class="muted">报告基线：2 个测试文件、163 个测试。详细断言和耗时见
+    <p class="muted">报告基线：3 个测试文件、172 个测试。详细断言和耗时见
       <a href="./test-report.html">Vitest HTML 报告</a>。</p>
+  </section>
+
+  <section>
+    <h2>内置执行决策</h2>
+    <p>扫描结果现在默认包含确定性的 <code>allow</code>、<code>ask</code> 或
+      <code>block</code>。多条策略同时命中时使用
+      <code>block &gt; ask &gt; allow</code>，解析错误默认阻止执行。</p>
+    <ul>
+      <li><code>policy.locale: "zh-CN"</code>：返回中文标题和原因（默认）。</li>
+      <li><code>policy.locale: "en"</code>：返回英文标题和原因。</li>
+      <li>稳定的英文 <code>policyId</code> 不随语言变化，可以用于动作覆盖和审计。</li>
+      <li><code>ai-agent</code> 默认严格执行；<code>audit</code> 将阻止降为人工确认。</li>
+      <li>20 条跨语言决策基线中 False Block、多余确认和危险放行均为 0。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>macOS / Windows 覆盖重点</h2>
+    <ul>
+      <li>macOS：公开样本覆盖 Keychain、Safari Cookie、Chrome Login Data、
+        LaunchAgent、emond 和 Time Machine；本轮新增 Chrome 凭据数据库复制暂存。</li>
+      <li>新增真实样本的两条 <code>cp ~/Library/"Application Support/Google/Chrome/…/Login Data"</code>
+        均命中 <code>credential.chrome-login-data-stage</code>。</li>
+      <li>Windows：当前覆盖 Bash 中调用 <code>powershell</code>/<code>pwsh</code>，
+        尚无原生 PowerShell AST，不能视为完整的 <code>.ps1</code> 检测。</li>
+    </ul>
   </section>
 
   <h2>三语言风险检出矩阵</h2>
@@ -109,11 +136,10 @@
 
   <section class="warning">
     <h2>当前结论边界</h2>
-    <p>59 条离线语料得到 precision 100%、recall 99.2%、F1 99.6%，但样本规模仍小，
-      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。上一轮 Ansible 和
-      Google Cloud Storage 的 3 个 FN 已修复；新的冻结 test 集保留 Atomic Red Team
-      T1048.003 “文件编码→循环读取→DNS 查询”链的数据外传 FN，网络外联已命中。
-      该缺口没有在本轮针对测试集调参。</p>
+    <p>121 条离线语料得到 precision 100%、recall 99.6%、F1 99.8%，但样本规模仍小，
+      且不是从生产流量随机抽样，不能外推为真实世界总体准确率。120 条严格匹配；
+      唯一已知缺口是 Linux journald <code>Storage=none</code> 尚未归类为防御规避。
+      该 Linux 项按当前 Windows/macOS 优先级暂缓，报告继续如实保留。</p>
   </section>
 
   <section>
