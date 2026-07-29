@@ -21,6 +21,22 @@ Windows/PowerShell 行为。它按语法树提取调用并检测单调用特征�
 npm install bash-risk-scanner
 ```
 
+尚未发布到 npm 时，可以直接从 GitHub 安装。建议固定 commit，避免主分支后续变更
+影响构建复现：
+
+```bash
+npm install github:openeasm/bash-risk-scanner#<commit-sha>
+```
+
+也可以跟随最新版主分支：
+
+```bash
+npm install github:openeasm/bash-risk-scanner#main
+```
+
+Git 安装会通过 `prepare` 自动生成 `dist`，因此无需在仓库中提交构建产物。安装时不能
+使用 `--ignore-scripts`，并且需要能够安装开发依赖和运行 Node.js 构建工具。
+
 `tree-sitter` 使用原生 Node.js addon；安装环境需要存在对应平台的预编译产物，或具备可用的 C/C++ 构建工具链。
 
 ## Node.js API
