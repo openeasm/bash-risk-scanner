@@ -213,6 +213,7 @@ PowerShell AST 或独立解析器，并以 AMSI 绕过、Defender 配置、注�
 npm test
 npm run test:report
 npm run evaluate
+npm run atomic:coverage
 npm run check
 npm run lint
 npm run build
@@ -233,6 +234,11 @@ False Block、安全命令的多余确认和危险行为被错误放行。门禁
 评测机制和防止已知回归，其分数不能代表未经抽样的真实世界总体准确率。
 
 `npm run evaluate:import-public` 可按固定 commit 和 SHA-256 重新获取公开语料快照。
+`npm run atomic:coverage` 使用仓库内固定的 Atomic 全量 inventory，生成
+`evaluation/results/atomic-coverage.json` 和 `reports/atomic-coverage.html`，
+统计 Windows/macOS 命令型目标 GUID 的语料覆盖。该指标表示样本是否已纳入人工
+标注语料，不等于检出率。维护者可用 `npm run atomic:inventory:refresh` 从固定
+commit 重新生成 inventory；正常 CI 不联网。
 当前公开语料包括 nvm、Atomic Red Team、pipx、pnpm self-installer、node-gyp、
 Homebrew、aiohttp、npm pacote、memo、mime-db、Twine、MQTT.js、Adafruit installer、
 Anaconda、Electorrent、WHAD client、Gajira TODO、apt-transport-s3、Epicshop 与

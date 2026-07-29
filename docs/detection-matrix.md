@@ -90,7 +90,13 @@
 | Unsafe Allow 指标 | ✅ |
 | 当前人工决策基线 | 20/20 匹配 |
 | 当前检测语料 | 120/121 严格匹配 |
+| Atomic 全量 inventory | 1,817 tests / 340 techniques |
+| Windows/macOS 命令型目标 | 1,455 |
+| 已纳入目标 GUID | 33（2.3%） |
+| macOS 命令型语料覆盖 | 33/242（13.6%） |
+| Windows 命令型语料覆盖 | 0/1,216 |
 
 当前评测结果仅代表仓库内已标注语料，不能外推为生产环境总体准确率。详情见
 [`reports/evaluation.html`](../reports/evaluation.html) 和
+[`reports/atomic-coverage.html`](../reports/atomic-coverage.html)，评测方法见
 [`docs/real-world-testing.md`](./real-world-testing.md)。
