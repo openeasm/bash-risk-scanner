@@ -1,4 +1,4 @@
-# agent-runtime-risk-scanner
+# agent-tool-scanner
 
 基于 Tree-sitter 的 Node.js 静态风险扫描器，统一支持 Bash、Python 和
 Node.js/JavaScript。当前真实世界规则建设优先覆盖 macOS，以及从 Bash 启动的
@@ -13,25 +13,25 @@ Windows/PowerShell 行为。它按语法树提取调用并检测单调用特征�
 [检测能力矩阵](docs/detection-matrix.md)。
 
 在线测试报告与全部语料浏览器：
-[openeasm.github.io/agent-runtime-risk-scanner](https://openeasm.github.io/agent-runtime-risk-scanner/)。
+[openeasm.github.io/agent-tool-scanner](https://openeasm.github.io/agent-tool-scanner/)。
 
 ## 安装
 
 ```bash
-npm install agent-runtime-risk-scanner
+npm install agent-tool-scanner
 ```
 
 尚未发布到 npm 时，可以直接从 GitHub 安装。建议固定 commit，避免主分支后续变更
 影响构建复现：
 
 ```bash
-npm install github:openeasm/agent-runtime-risk-scanner#<commit-sha>
+npm install github:openeasm/agent-tool-scanner#<commit-sha>
 ```
 
 也可以跟随最新版主分支：
 
 ```bash
-npm install github:openeasm/agent-runtime-risk-scanner#main
+npm install github:openeasm/agent-tool-scanner#main
 ```
 
 Git 安装会通过 `prepare` 自动生成 `dist`，因此无需在仓库中提交构建产物。安装时不能
@@ -48,7 +48,7 @@ import {
   scan,
   scanPython,
   scanJavaScript
-} from "agent-runtime-risk-scanner";
+} from "agent-tool-scanner";
 
 // 默认语言是 Bash。
 const bashResult = scan(`
@@ -76,7 +76,7 @@ for (const finding of bashResult.findings) {
 CommonJS：
 
 ```js
-const { scan } = require("agent-runtime-risk-scanner");
+const { scan } = require("agent-tool-scanner");
 const result = scan("eval \"$payload\"");
 ```
 
@@ -204,12 +204,12 @@ scan(source, {
 ## CLI
 
 ```bash
-agent-runtime-risk-scan script.sh
-agent-runtime-risk-scan --language=python script.py
-agent-runtime-risk-scan --language=node script.js
-agent-runtime-risk-scan --policy-locale=en script.sh
-agent-runtime-risk-scan --policy-profile=audit script.sh
-cat script.sh | agent-runtime-risk-scan
+agent-tool-scan script.sh
+agent-tool-scan --language=python script.py
+agent-tool-scan --language=node script.js
+agent-tool-scan --policy-locale=en script.sh
+agent-tool-scan --policy-profile=audit script.sh
+cat script.sh | agent-tool-scan
 ```
 
 `code-risk-scan` 和旧名称 `bash-risk-scan` 暂时保留为兼容别名。

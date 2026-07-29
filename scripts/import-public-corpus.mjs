@@ -525,7 +525,7 @@ async function download(url) {
         const response = await fetch(candidate.url, {
           headers: {
             accept: candidate.accept,
-            "user-agent": "agent-runtime-risk-scanner-corpus-importer",
+            "user-agent": "agent-tool-scanner-corpus-importer",
           },
           signal: AbortSignal.timeout(15_000),
         });
