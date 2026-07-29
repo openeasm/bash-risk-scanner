@@ -56,6 +56,11 @@ npm run evaluate
 结果位于 `evaluation/results/latest.json` 和 `evaluation/results/latest.html`；
 CI 会执行门禁并上传这两个文件。
 
+样本可使用 `expectedDecision: "allow" | "ask" | "block"` 标注执行决策。报告
+分别统计 False Block（预期 allow/ask 却阻止）、Unnecessary Ask（预期 allow
+却要求确认）和 Unsafe Allow（预期 ask/block 却放行）。未标注决策的历史样本
+继续参与 finding 指标，但不进入决策误报分母，避免用当前实现反推“期望值”。
+
 ## 建议的样本清单格式
 
 ```json

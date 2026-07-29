@@ -223,7 +223,9 @@ npm pack --dry-run
 
 `npm run evaluate` 会构建包并运行 `evaluation/corpus/manifest.json` 中的非执行
 种子语料，按语言和风险类别计算 TP、FP、FN、precision、recall、F1、解析错误率
-及扫描耗时。门禁阈值位于 `evaluation/config.json`，结果写入
+及扫描耗时。带有 `expectedDecision` 的样本还会比较 `allow/ask/block`，统计
+False Block、安全命令的多余确认和危险行为被错误放行。门禁阈值位于
+`evaluation/config.json`，结果写入
 `evaluation/results/`，同时生成 `reports/evaluation.html`。种子语料只用于建立
 评测机制和防止已知回归，其分数不能代表未经抽样的真实世界总体准确率。
 

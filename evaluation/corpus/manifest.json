@@ -14,140 +14,160 @@
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "bash/download-execute.sh.txt",
-      "expectedCategories": ["download_execution", "network_egress"]
+      "expectedCategories": ["download_execution", "network_egress"],
+      "expectedDecision": "block"
     },
     {
       "id": "bash-read-upload-001",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "bash/read-upload.sh.txt",
-      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"],
+      "expectedDecision": "block"
     },
     {
       "id": "bash-persistence-001",
       "language": "bash",
       "kind": "malicious",
       "sourceFile": "bash/persistence.sh.txt",
-      "expectedCategories": ["persistence"]
+      "expectedCategories": ["persistence"],
+      "expectedDecision": "block"
     },
     {
       "id": "bash-download-only-001",
       "language": "bash",
       "kind": "benign",
       "sourceFile": "bash/download-only.sh.txt",
-      "expectedCategories": ["network_egress"]
+      "expectedCategories": ["network_egress"],
+      "expectedDecision": "ask"
     },
     {
       "id": "bash-documentation-001",
       "language": "bash",
       "kind": "hard-negative",
       "sourceFile": "bash/documentation.sh.txt",
-      "expectedCategories": []
+      "expectedCategories": [],
+      "expectedDecision": "allow"
     },
     {
       "id": "bash-temp-cleanup-001",
       "language": "bash",
       "kind": "hard-negative",
       "sourceFile": "bash/temp-cleanup.sh.txt",
-      "expectedCategories": []
+      "expectedCategories": [],
+      "expectedDecision": "allow"
     },
     {
       "id": "python-alias-network-001",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/alias-network.py.txt",
-      "expectedCategories": ["network_egress"]
+      "expectedCategories": ["network_egress"],
+      "expectedDecision": "ask"
     },
     {
       "id": "python-alias-shell-001",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/alias-shell.py.txt",
-      "expectedCategories": ["dynamic_execution", "interpreter_escape"]
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"],
+      "expectedDecision": "ask"
     },
     {
       "id": "python-path-credential-001",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/path-credential.py.txt",
-      "expectedCategories": ["credential_access"]
+      "expectedCategories": ["credential_access"],
+      "expectedDecision": "ask"
     },
     {
       "id": "python-read-upload-001",
       "language": "python",
       "kind": "malicious",
       "sourceFile": "python/read-upload.py.txt",
-      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"],
+      "expectedDecision": "block"
     },
     {
       "id": "python-http-get-001",
       "language": "python",
       "kind": "benign",
       "sourceFile": "python/http-get.py.txt",
-      "expectedCategories": ["network_egress"]
+      "expectedCategories": ["network_egress"],
+      "expectedDecision": "ask"
     },
     {
       "id": "python-local-file-001",
       "language": "python",
       "kind": "hard-negative",
       "sourceFile": "python/local-file.py.txt",
-      "expectedCategories": []
+      "expectedCategories": [],
+      "expectedDecision": "allow"
     },
     {
       "id": "python-documentation-001",
       "language": "python",
       "kind": "hard-negative",
       "sourceFile": "python/documentation.py.txt",
-      "expectedCategories": []
+      "expectedCategories": [],
+      "expectedDecision": "allow"
     },
     {
       "id": "node-cjs-shell-001",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/cjs-shell.js.txt",
-      "expectedCategories": ["dynamic_execution", "interpreter_escape"]
+      "expectedCategories": ["dynamic_execution", "interpreter_escape"],
+      "expectedDecision": "ask"
     },
     {
       "id": "node-esm-delete-001",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/esm-delete.js.txt",
-      "expectedCategories": ["destructive_behavior"]
+      "expectedCategories": ["destructive_behavior"],
+      "expectedDecision": "block"
     },
     {
       "id": "node-read-upload-001",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/read-upload.js.txt",
-      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"],
+      "expectedDecision": "block"
     },
     {
       "id": "node-environment-001",
       "language": "node",
       "kind": "malicious",
       "sourceFile": "node/environment.js.txt",
-      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"]
+      "expectedCategories": ["credential_access", "network_egress", "data_exfiltration"],
+      "expectedDecision": "block"
     },
     {
       "id": "node-http-get-001",
       "language": "node",
       "kind": "benign",
       "sourceFile": "node/http-get.js.txt",
-      "expectedCategories": ["network_egress"]
+      "expectedCategories": ["network_egress"],
+      "expectedDecision": "ask"
     },
     {
       "id": "node-local-file-001",
       "language": "node",
       "kind": "hard-negative",
       "sourceFile": "node/local-file.js.txt",
-      "expectedCategories": []
+      "expectedCategories": [],
+      "expectedDecision": "allow"
     },
     {
       "id": "node-documentation-001",
       "language": "node",
       "kind": "hard-negative",
       "sourceFile": "node/documentation.js.txt",
-      "expectedCategories": []
+      "expectedCategories": [],
+      "expectedDecision": "allow"
     },
     {
       "id": "public-nvm-install-001",
