@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>全部测试语料 · bash-risk-scanner</title>
+  <style>
+    :root{color-scheme:light;--ink:#17202a;--muted:#617080;--line:#dce3e8;
+      --blue:#1261a0;--green:#117a45;--red:#b42318;--amber:#a15c00;--bg:#f5f7f9;--card:#fff}
+    *{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);
+      font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+    main{width:min(1380px,calc(100% - 28px));margin:24px auto 70px}
+    header{padding:24px;color:#fff;border-radius:14px;background:linear-gradient(125deg,#102a43,#1261a0)}
+    h1{margin:0 0 6px}a{color:var(--blue)}header a{color:#fff}.muted{color:var(--muted)}
+    .toolbar{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:2fr repeat(4,1fr);
+      gap:10px;margin:16px 0;padding:12px;background:rgba(245,247,249,.96);backdrop-filter:blur(8px)}
+    input,select{width:100%;padding:9px;border:1px solid #b9c5ce;border-radius:7px;background:#fff}
+    .summary{margin:8px 0 16px}.case{margin:10px 0;background:var(--card);border:1px solid var(--line);
+      border-radius:10px}.case>summary{cursor:pointer;padding:13px 16px;font-weight:650}
+    .body{padding:0 16px 16px}.tags{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}
+    .tag{padding:2px 7px;border-radius:999px;background:#e8eff4}.pass{color:var(--green)}
+    .fail{color:var(--red)}.ask{color:var(--amber)}pre{max-height:420px;overflow:auto;
+      padding:13px;border-radius:8px;background:#101820;color:#e8edf2;white-space:pre-wrap}
+    table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid var(--line);text-align:left}
+    th{background:#edf4f8}@media(max-width:800px){.toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>全部测试语料</h1>
+    <div>浏览源码、来源、预期/实际类别、findings 与执行决策。样本只展示，不执行。</div>
+    <div><a href="./index.html">返回总览</a> · <a href="./test-report.html">172 条单元测试</a> ·
+      <a href="./atomic-coverage.html">Atomic 覆盖矩阵</a></div>
+  </header>
+  <div class="toolbar">
+    <input id="search" placeholder="搜索 ID、源码、规则、来源…">
+    <select id="language"><option value="">全部语言</option></select>
+    <select id="kind"><option value="">全部类型</option></select>
+    <select id="status"><option value="">全部结果</option><option value="pass">通过</option><option value="fail">失败</option></select>
+    <select id="decision"><option value="">全部决策</option><option>allow</option><option>ask</option><option>block</option></select>
+  </div>
+  <div class="summary" id="summary">加载中…</div>
+  <div id="cases"></div>
+</main>
+<script type="module">
+  const data = await fetch("./data/corpus-cases.json").then(response => {
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+  });
+  const $ = id => document.getElementById(id);
+  const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character =>
+    ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[character]));
+  const unique = key => [...new Set(data.cases.map(item => item[key]))].sort();
+  for (const language of unique("language")) $("language").insertAdjacentHTML("beforeend",
+    `<option>${escapeHtml(language)}</option>`);
+  for (const kind of unique("kind")) $("kind").insertAdjacentHTML("beforeend",
+    `<option>${escapeHtml(kind)}</option>`);
+
+  function render() {
+    const query = $("search").value.toLowerCase();
+    const filtered = data.cases.filter(item => {
+      if ($("language").value && item.language !== $("language").value) return false;
+      if ($("kind").value && item.kind !== $("kind").value) return false;
+      if ($("status").value && (item.passed ? "pass" : "fail") !== $("status").value) return false;
+      if ($("decision").value && item.actualDecision !== $("decision").value) return false;
+      if (!query) return true;
+      return JSON.stringify(item).toLowerCase().includes(query);
+    });
+    $("summary").textContent = `显示 ${filtered.length} / ${data.count} 条语料`;
+    $("cases").innerHTML = filtered.map(item => {
+      const findings = item.actualFindings.length
+        ? `<table><thead><tr><th>Rule</th><th>类别</th><th>证据</th></tr></thead><tbody>${item.actualFindings.map(finding =>
+          `<tr><td><code>${escapeHtml(finding.ruleId)}</code></td><td>${escapeHtml(finding.category)}</td><td>${escapeHtml(finding.evidence)}</td></tr>`).join("")}</tbody></table>`
+        : "<p>无 finding</p>";
+      const sourceUrl = item.provenance?.sourceUrl
+        ? ` · <a href="${escapeHtml(item.provenance.sourceUrl)}" target="_blank" rel="noreferrer">上游来源</a>` : "";
+      return `<details class="case"><summary>
+        <span class="${item.passed ? "pass" : "fail"}">${item.passed ? "PASS" : "FAIL"}</span>
+        · ${escapeHtml(item.id)} · ${escapeHtml(item.language)} ·
+        <span class="${escapeHtml(item.actualDecision)}">${escapeHtml(item.actualDecision)}</span>
+      </summary><div class="body">
+        <div class="tags"><span class="tag">${escapeHtml(item.split)}</span><span class="tag">${escapeHtml(item.kind)}</span>
+          <span class="tag">${escapeHtml(item.sourceFile)}</span></div>
+        <p>来源：${escapeHtml(item.provenance?.repository ?? item.provenance?.type)}${sourceUrl}</p>
+        <p>期望类别：${escapeHtml(item.expectedCategories.join(", ") || "无")}<br>
+          实际类别：${escapeHtml(item.actualCategories.join(", ") || "无")}<br>
+          决策：${escapeHtml(item.expectedDecision ?? "未标注")} → ${escapeHtml(item.actualDecision)}</p>
+        <h3>源码</h3><pre>${escapeHtml(item.source)}</pre>
+        <h3>Findings</h3>${findings}
+      </div></details>`;
+    }).join("");
+  }
+  for (const id of ["search","language","kind","status","decision"]) {
+    $(id).addEventListener(id === "search" ? "input" : "change", render);
+  }
+  render();
+</script>
+</body>
+</html>

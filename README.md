@@ -10,6 +10,9 @@ Windows/PowerShell 行为。它按语法树提取调用并检测单调用特征�
 完整的语言、平台、默认决策和已知边界见
 [检测能力矩阵](docs/detection-matrix.md)。
 
+在线测试报告与全部语料浏览器：
+[openeasm.github.io/bash-risk-scanner](https://openeasm.github.io/bash-risk-scanner/)。
+
 ## 安装
 
 ```bash
