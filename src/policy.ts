@@ -129,8 +129,8 @@ const POLICIES: PolicyDefinition[] = [
     score: 85,
     categories: ["second_stage_payload"],
     text: {
-      "zh-CN": { title: "确认二阶段载荷", reason: "命令会下载或解压载荷，并准备执行后续脚本或二进制文件。" },
-      en: { title: "Confirm second-stage payload", reason: "The command downloads or extracts a payload and prepares a later script or binary for execution." },
+      "zh-CN": { title: "确认二阶段载荷", reason: "代码形成了下载后解压，或下载、解压后执行脚本或二进制文件的行为链。" },
+      en: { title: "Confirm second-stage payload", reason: "The code forms a download-and-extract chain, or downloads, extracts, and executes a later script or binary." },
     },
   },
   {

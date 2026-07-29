@@ -1424,7 +1424,6 @@ const CALLEE_BY_CATEGORY: Record<
     data_exfiltration: /(?:^|\.)(?:post|put|patch|upload_file|put_object|send|sendall|write)$/,
     destructive_behavior: /(?:^|\.)(?:rmtree|removedirs|open)$/,
     interpreter_escape: /(?:^|\.)(?:system|popen|run|call|Popen|check_call|check_output|create_subprocess_shell)$/,
-    second_stage_payload: /(?:^|\.)(?:get|urlretrieve|unpack_archive|open|ZipFile)$/,
   },
   javascript: {
     download_execution: /^(?:eval|Function|child_process\.(?:exec|execSync|spawn|spawnSync))$/,
@@ -1438,7 +1437,6 @@ const CALLEE_BY_CATEGORY: Record<
     data_exfiltration: /(?:^|\.)(?:fetch|post|put|patch|send|write|upload|putObject|sendCommand)$/,
     destructive_behavior: /(?:^|\.)(?:rm|rmSync|rmdir|rmdirSync|unlink|unlinkSync|writeFile|writeFileSync|open|openSync)$/,
     interpreter_escape: /(?:^|\.)(?:exec|execSync|spawn|spawnSync)$/,
-    second_stage_payload: /^(?:(?:.*\.)?(?:fetch|get|extract|unzip|tar)|unpack-stream\.remote)$/,
   },
 };
 
@@ -1466,6 +1464,27 @@ function executionScopeId(
     if (scopeTypes.has(current.type)) return current.id;
   }
   return node.tree.rootNode.id;
+}
+
+function behaviorChainScopeId(
+  node: SyntaxNode,
+  language: "python" | "javascript",
+): number {
+  const scopeTypes = language === "python"
+    ? new Set(["function_definition", "lambda"])
+    : new Set([
+      "function_declaration",
+      "function_expression",
+      "arrow_function",
+      "generator_function",
+      "generator_function_declaration",
+      "method_definition",
+    ]);
+  let outermostScope = node.tree.rootNode.id;
+  for (let current = node.parent; current; current = current.parent) {
+    if (scopeTypes.has(current.type)) outermostScope = current.id;
+  }
+  return outermostScope;
 }
 
 function bashExecutionScopeId(node: SyntaxNode): number {
@@ -2229,6 +2248,7 @@ function scanAstLanguage(
     callee: canonicalizeCallee(calleeOf(node), aliases),
     text: source.slice(node.startIndex, node.endIndex),
     scopeId: executionScopeId(node, language),
+    chainScopeId: behaviorChainScopeId(node, language),
     startIndex: node.startIndex,
   }));
   const scopeByCallStart = new Map(
@@ -2286,6 +2306,39 @@ function scanAstLanguage(
       severity: "critical",
       confidence: "high",
       message: "Downloaded response content is written to a static path that is subsequently executed.",
+    });
+  }
+  const archiveDownloadCallee = language === "python"
+    ? /^(?:requests\.(?:get|request)|urllib\.request\.(?:urlopen|urlretrieve))$/
+    : /^(?:fetch|node-fetch|npm-registry-fetch|undici\.(?:fetch|request|stream)|axios\.(?:get|request)|https?\.(?:get|request)|got\.stream|.*\/download\.download)$/;
+  const archiveExtractCallee = language === "python"
+    ? /(?:^|\.)(?:unpack_archive|extract|extractall)$/
+    : /(?:^|\.)(?:extract|unzip)$|^tar\.(?:extract|x)$|^unpack-stream\.remote$/;
+  const downloadExtractChain = canonicalCalls.flatMap((downloadCall) =>
+    !archiveDownloadCallee.test(downloadCall.callee)
+      ? []
+      : canonicalCalls.flatMap((extractCall) =>
+      extractCall.chainScopeId === downloadCall.chainScopeId
+      && extractCall.startIndex > downloadCall.startIndex
+      && archiveExtractCallee.test(extractCall.callee)
+        ? [{ downloadCall, extractCall }]
+        : [],
+      )
+  )[0];
+  if (downloadExtractChain) {
+    findings.push({
+      ruleId: `${language}.chain.download-extract`,
+      category: "second_stage_payload",
+      title: "Downloads and extracts a second-stage payload",
+      severity: "high",
+      confidence: "medium",
+      message: "A network download is followed by archive extraction in the same execution scope.",
+      evidence: evidence(
+        `${downloadExtractChain.downloadCall.text}\n${downloadExtractChain.extractCall.text}`,
+        maxEvidence,
+      ),
+      range: rootRange,
+      language,
     });
   }
   const readCallee = language === "python"

@@ -24,7 +24,7 @@
 | 数据外传 | ✅ | ✅ | ✅ | ✅ 通用上传链 | ◐ Bash/语言层上传调用 | `block` | 文件读取→POST/上传、SCP/SFTP/rsync push、DNS 外传、反向连接 |
 | 破坏行为 | ✅ | ✅ | ✅ | ✅ Time Machine 禁用 | ◐ 不解析原生 PowerShell 删除语义 | `block` | `rm -rf`、磁盘写入、批量加密、云资源删除、强制重启 |
 | 解释器逃逸 | ✅ | ✅ | ✅ | ✅ AppleScript/Python/Node 等 | ◐ PowerShell 入口 | `ask` | Python、Perl、Ruby、Node、PHP、AppleScript、PowerShell |
-| 二阶段载荷 | ✅ | ✅ | ✅ | ✅ 通用链 | ◐ Bash/语言入口 | `ask` | 下载压缩包→解压→运行脚本/二进制 |
+| 二阶段载荷 | ✅ | ✅ | ✅ | ✅ 通用链 | ◐ Bash/语言入口 | `ask` | Bash：下载→解压→运行；Python/Node.js：同一外层执行作用域内下载→解压。单独下载或单独解压不命中 |
 
 决策合并优先级为 `block > ask > allow`。没有命中已知风险且源码可可靠解析时，
 默认决策为 `allow`；解析错误默认 `block`。

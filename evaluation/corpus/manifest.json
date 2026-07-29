@@ -332,17 +332,12 @@
       "kind": "benign",
       "sourceFile": "public/pipx/standalone_python.py.txt",
       "sha256": "68866dc10a2667777049eefcf5b9d5280ecfca436be6f233b26eac9e7df32028",
-      "expectedCategories": ["network_egress", "second_stage_payload", "destructive_behavior"],
+      "expectedCategories": ["network_egress", "destructive_behavior"],
       "expectedFindings": [
         {
           "category": "network_egress",
           "ruleId": "python.network",
           "evidencePattern": "urlopen"
-        },
-        {
-          "category": "second_stage_payload",
-          "ruleId": "python.second-stage",
-          "evidencePattern": "tarfile[.]open"
         },
         {
           "category": "destructive_behavior",
@@ -375,8 +370,8 @@
         },
         {
           "category": "second_stage_payload",
-          "ruleId": "javascript.second-stage",
-          "evidencePattern": "unpackStream[.]remote"
+          "ruleId": "javascript.chain.download-extract",
+          "evidencePattern": "got[.]stream"
         },
         {
           "category": "dynamic_execution",
@@ -454,8 +449,8 @@
         },
         {
           "category": "second_stage_payload",
-          "ruleId": "javascript.second-stage",
-          "evidencePattern": "tar[.]extract"
+          "ruleId": "javascript.chain.download-extract",
+          "evidencePattern": "release[.]tarballUrl"
         },
         {
           "category": "destructive_behavior",
@@ -836,8 +831,7 @@
         "network_egress",
         "dynamic_execution",
         "data_exfiltration",
-        "destructive_behavior",
-        "second_stage_payload"
+        "destructive_behavior"
       ],
       "expectedFindings": [
         {
