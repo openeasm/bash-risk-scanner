@@ -15,6 +15,37 @@ export type RiskCategory =
 export type Severity = "low" | "medium" | "high" | "critical";
 export type Confidence = "low" | "medium" | "high";
 export type SupportedLanguage = "bash" | "python" | "javascript" | "node";
+export type DecisionAction = "allow" | "ask" | "block";
+export type PolicyLocale = "zh-CN" | "en";
+export type PolicyProfile = "ai-agent" | "audit";
+
+export interface PolicyMatch {
+  policyId: string;
+  action: DecisionAction;
+  title: string;
+  reason: string;
+  findingRuleIds: string[];
+}
+
+export interface ScanDecision {
+  action: DecisionAction;
+  riskScore: number;
+  approvalRequired: boolean;
+  profile: PolicyProfile;
+  locale: PolicyLocale;
+  title: string;
+  reason: string;
+  matchedPolicies: PolicyMatch[];
+}
+
+export interface PolicyOptions {
+  /** Built-in decision profile. Default: `ai-agent`. */
+  profile?: PolicyProfile;
+  /** Language used by decision titles and reasons. Default: `zh-CN`. */
+  locale?: PolicyLocale;
+  /** Override the action of a stable policy ID. */
+  overrides?: Record<string, DecisionAction>;
+}
 
 export interface Position {
   row: number;
@@ -58,6 +89,8 @@ export interface ScanResult {
     bySeverity: Partial<Record<Severity, number>>;
   };
   parseErrors: SourceRange[];
+  /** Deterministic built-in execution decision. */
+  decision: ScanDecision;
 }
 
 export interface ScanOptions {
@@ -85,4 +118,6 @@ export interface ScanOptions {
   maxEmbeddedDepth?: number;
   /** Maximum embedded payload size in UTF-16 code units. Default: 100000. */
   maxEmbeddedCodeLength?: number;
+  /** Built-in allow/ask/block decision policy. Enabled by default. */
+  policy?: PolicyOptions;
 }

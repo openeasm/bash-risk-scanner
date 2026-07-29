@@ -45,8 +45,8 @@
   </header>
 
   <div class="cards">
-    <div class="card"><div class="metric">164 / 164</div><div>单元测试通过</div></div>
-    <div class="card"><div class="metric">2 / 2</div><div>测试文件通过</div></div>
+    <div class="card"><div class="metric">172 / 172</div><div>单元测试通过</div></div>
+    <div class="card"><div class="metric">3 / 3</div><div>测试文件通过</div></div>
     <div class="card"><div class="metric">120 / 121</div><div>语料完全匹配</div></div>
     <div class="card"><div class="metric">99.6%</div><div>语料类别召回率</div></div>
   </div>
@@ -56,8 +56,21 @@
     <p class="pass">通过：Bash、Python 和 Node.js 均能在精选样例中检出全部 12 类风险。</p>
     <p>额外测试覆盖行为链、可信下载域名、私网 IP、源码位置、语法错误、
       Bash 内嵌 Python/Node.js、静态管道、heredoc、扫描限制和已知误报边界。</p>
-    <p class="muted">报告基线：2 个测试文件、164 个测试。详细断言和耗时见
+    <p class="muted">报告基线：3 个测试文件、172 个测试。详细断言和耗时见
       <a href="./test-report.html">Vitest HTML 报告</a>。</p>
+  </section>
+
+  <section>
+    <h2>内置执行决策</h2>
+    <p>扫描结果现在默认包含确定性的 <code>allow</code>、<code>ask</code> 或
+      <code>block</code>。多条策略同时命中时使用
+      <code>block &gt; ask &gt; allow</code>，解析错误默认阻止执行。</p>
+    <ul>
+      <li><code>policy.locale: "zh-CN"</code>：返回中文标题和原因（默认）。</li>
+      <li><code>policy.locale: "en"</code>：返回英文标题和原因。</li>
+      <li>稳定的英文 <code>policyId</code> 不随语言变化，可以用于动作覆盖和审计。</li>
+      <li><code>ai-agent</code> 默认严格执行；<code>audit</code> 将阻止降为人工确认。</li>
+    </ul>
   </section>
 
   <section>

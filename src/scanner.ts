@@ -4,6 +4,7 @@ import Python from "tree-sitter-python";
 import JavaScript from "tree-sitter-javascript";
 import { extractEmbeddedPayloads } from "./embedded.js";
 import { JAVASCRIPT_RULES, PYTHON_RULES, type LanguageRule } from "./language-rules.js";
+import { decide } from "./policy.js";
 import {
   ARCHIVE_DOWNLOAD,
   COMMAND_RULES,
@@ -2340,7 +2341,12 @@ function scanAstLanguage(
     `${item.ruleId}:${item.range.startIndex}`,
     item,
   ])).values()].sort((a, b) => a.range.startIndex - b.range.startIndex);
-  return { findings: unique, summary: emptySummary(unique), parseErrors };
+  return {
+    findings: unique,
+    summary: emptySummary(unique),
+    parseErrors,
+    decision: decide(unique, parseErrors, options.policy),
+  };
 }
 
 function scanBash(source: string, options: ScanOptions): ScanResult {
@@ -3670,6 +3676,7 @@ function scanBash(source: string, options: ScanOptions): ScanResult {
     findings: unique,
     summary: emptySummary(unique),
     parseErrors,
+    decision: decide(unique, parseErrors, options.policy),
   };
 }
 
